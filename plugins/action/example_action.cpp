@@ -20,16 +20,29 @@
 
 namespace robotx_behavior_tree
 {
-class ExampleAction : public BT::SyncActionNode
+
+class ActionNode : public BT::SyncActionNode
 {
 public:
-  ExampleAction(
+  ActionNode(
     const std::string & name,
     const BT::NodeConfiguration & config)
   :  BT::SyncActionNode(name, config)
   {
     setRegistrationID(name);
   }
+
+protected:
+  std::string name;
+};
+class ExampleAction : public ActionNode
+{
+public:
+  ExampleAction(
+    const std::string & name,
+    const BT::NodeConfiguration & config)
+  :  ActionNode(name, config)
+  {}
 
   static BT::PortsList providedPorts()
   {
