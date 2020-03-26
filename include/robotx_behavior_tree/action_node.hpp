@@ -11,37 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#ifndef ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
+#define ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 
+#include <behaviortree_cpp_v3/action_node.h>
+#include <behaviortree_cpp_v3/bt_factory.h>
 #include <string>
-#include <memory>
-
-#include "robotx_behavior_tree/action_node.hpp"
 
 namespace robotx_behavior_tree
 {
-class ExampleAction : public ActionNode
+class ActionNode : public BT::SyncActionNode
 {
 public:
-  ExampleAction(
+  ActionNode(
     const std::string & name,
     const BT::NodeConfiguration & config)
-  :  ActionNode(name, config)
-  {}
-
-  static BT::PortsList providedPorts()
+  :  BT::SyncActionNode(name, config)
   {
-    return {BT::InputPort<int>("test_input")};
+    setRegistrationID(name);
   }
 
 protected:
-  BT::NodeStatus tick() override {return BT::NodeStatus::FAILURE;}
+  std::string name;
 };
 }  // namespace robotx_behavior_tree
 
-BT_REGISTER_NODES(factory) {
-  BT::NodeBuilder builder = [](const std::string & name,
-      const BT::NodeConfiguration & config) {
-      return std::make_unique<robotx_behavior_tree::ExampleAction>(name, config);
-    };
-  factory.registerBuilder<robotx_behavior_tree::ExampleAction>("ExampleAction", builder);
-}
+#endif  // ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
