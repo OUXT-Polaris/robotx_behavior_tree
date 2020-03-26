@@ -46,5 +46,5 @@ BT_REGISTER_NODES(factory) {
       const BT::NodeConfiguration & config) {
       return std::make_unique<robotx_behavior_tree::ExampleAction>(name, config);
     };
-  factory.registerBuilder<robotx_behavior_tree::ExampleAction>("Example", builder);
+  factory.registerBuilder<robotx_behavior_tree::ExampleAction>("ExampleAction", builder);
 }

@@ -34,6 +34,8 @@ ament_target_dependencies(${plugin} ${dependencies})
 target_compile_definitions(${plugin} PRIVATE BT_PLUGIN_EXPORT)
 endforeach()
 
+ament_export_libraries(${plugin_libs})
+
 install(TARGETS
   ${plugin_libs}
     ARCHIVE DESTINATION lib
