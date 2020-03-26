@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "robotx_behavior_tree/action_node.hpp"
+#include "robotx_behavior_tree/register_nodes.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -38,10 +39,4 @@ protected:
 };
 }  // namespace robotx_behavior_tree
 
-BT_REGISTER_NODES(factory) {
-  BT::NodeBuilder builder = [](const std::string & name,
-      const BT::NodeConfiguration & config) {
-      return std::make_unique<robotx_behavior_tree::ExampleAction>(name, config);
-    };
-  factory.registerBuilder<robotx_behavior_tree::ExampleAction>("ExampleAction", builder);
-}
+REGISTER_NODES(robotx_behavior_tree, ExampleAction)
