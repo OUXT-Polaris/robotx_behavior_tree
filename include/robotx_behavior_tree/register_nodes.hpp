@@ -14,23 +14,22 @@
 
 #ifndef ROBOTX_BEHAVIOR_TREE__REGISTER_NODES_HPP_
 #define ROBOTX_BEHAVIOR_TREE__REGISTER_NODES_HPP_
-
-class NodeBuilder
-{
+namespace register_nodes {
+class NodeBuilder {
 public:
-  template<class TNodeClass>
-  static auto build()
-  {
-    return [](const std::string & name,  // NOLINT
-             const BT::NodeConfiguration & config) {
-             return std::make_unique<TNodeClass>(name, config);  //NOLINT
-           };
+  template <class TNodeClass> static auto build() {
+    return [](const std::string &name, // NOLINT
+              const BT::NodeConfiguration &config) {
+      return std::make_unique<TNodeClass>(name, config); // NOLINT
+    };
   }
 };
+}  // namespace register_nodes
+
 #define REGISTER_NODES(node_namespace, class_name) \
   BT_REGISTER_NODES(factory) { \
     factory.registerBuilder<node_namespace::class_name>(#class_name, \
-      NodeBuilder::build<node_namespace::class_name>()); \
+      register_nodes::NodeBuilder::build<node_namespace::class_name>()); \
   } \
 
 #endif  // ROBOTX_BEHAVIOR_TREE__REGISTER_NODES_HPP_
