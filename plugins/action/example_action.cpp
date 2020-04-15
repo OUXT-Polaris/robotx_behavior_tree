@@ -16,7 +16,6 @@
 #include <memory>
 
 #include "robotx_behavior_tree/action_node.hpp"
-#include "behavior_tree_action_builder/register_nodes.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -39,4 +38,5 @@ protected:
 };
 }  // namespace robotx_behavior_tree
 
+#include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
 REGISTER_NODES(robotx_behavior_tree, ExampleAction)
