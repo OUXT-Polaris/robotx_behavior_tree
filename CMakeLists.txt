@@ -13,12 +13,14 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(behavior_tree_action_builder REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 
 include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
 set(dependencies
   "rclcpp"
+  "behavior_tree_action_builder"
   "behaviortree_cpp_v3"
 )
 

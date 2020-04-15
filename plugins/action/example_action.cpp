@@ -16,7 +16,7 @@
 #include <memory>
 
 #include "robotx_behavior_tree/action_node.hpp"
-#include "robotx_behavior_tree/register_nodes.hpp"
+#include "behavior_tree_action_builder/register_nodes.hpp"
 
 namespace robotx_behavior_tree
 {
