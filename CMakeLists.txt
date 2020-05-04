@@ -14,6 +14,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(behavior_tree_action_builder REQUIRED)
+find_package(robotx_waypoint_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 
 include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
@@ -21,6 +22,7 @@ include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 set(dependencies
   "rclcpp"
   "behavior_tree_action_builder"
+  "robotx_waypoint_msgs"
   "behaviortree_cpp_v3"
 )
 
@@ -28,6 +30,9 @@ set(dependencies
 set(library_name ${PROJECT_NAME})
 
 add_library(example_action SHARED plugins/action/example_action.cpp)
+list(APPEND plugin_libs example_action)
+
+add_library(example_action SHARED plugins/action/go_action.cpp)
 list(APPEND plugin_libs example_action)
 
 foreach(plugin ${plugin_libs})
