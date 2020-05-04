@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
   <depend>behavior_tree_action_builder</depend>
   <depend>robotx_waypoint_msgs</depend>
   <depend>behaviortree_cpp_v3</depend>
