@@ -28,10 +28,9 @@ public:
   GoAction(
     const std::string & name,
     const BT::NodeConfiguration & config)
-  : nav2_behavior_tree::BtActionNode<robotx_waypoint_msgs::action::WayPoint>(name,"waypoint" , config)
-  {
-
-  }
+  : nav2_behavior_tree::BtActionNode<robotx_waypoint_msgs::action::WayPoint>(name, "waypoint",
+      config)
+  {}
 
   static BT::PortsList providedPorts()
   {
@@ -41,8 +40,7 @@ public:
 protected:
   void on_tick() override
   {
-    if(not getInput("target_pose", goal_.pose))
-    {
+    if (!getInput("target_pose", goal_.pose)) {
       RCLCPP_ERROR(node_->get_logger(), "target_pose is not provided");
     }
   }
