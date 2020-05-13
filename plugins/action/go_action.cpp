@@ -17,81 +17,37 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "robotx_waypoint_msgs/action/way_point.hpp"
 #include "behavior_tree_action_builder/action_node_with_action.hpp"
+#include "nav2_behavior_tree/bt_action_node.hpp"
 
 namespace robotx_behavior_tree
 {
 using WayPoint = robotx_waypoint_msgs::action::WayPoint;
-class GoAction : public behavior_tree_action_builder::ActionNodeWithAction<WayPoint>
+class GoAction : public nav2_behavior_tree::BtActionNode<robotx_waypoint_msgs::action::WayPoint>
 {
 public:
   GoAction(
     const std::string & name,
     const BT::NodeConfiguration & config)
-  :  behavior_tree_action_builder::ActionNodeWithAction<WayPoint>(name, config)
+  : nav2_behavior_tree::BtActionNode<robotx_waypoint_msgs::action::WayPoint>(name,"waypoint" , config)
   {
 
   }
 
   static BT::PortsList providedPorts()
   {
-    return {BT::InputPort<int>("test_input")};
+    return {BT::InputPort<geometry_msgs::msg::Pose>("target_pose")};
   }
 
 protected:
-  BT::NodeStatus tick() override
+  void on_tick() override
   {
-    if(result_){
-      RCLCPP_INFO(get_logger(), "SUCCESS");
-      return BT::NodeStatus::SUCCESS;
-    } else{
-      RCLCPP_INFO(get_logger(), "RUNNING");
-//      return BT::NodeStatus::SUCCESS;
-      return BT::NodeStatus::RUNNING;
+    if(not getInput("target_pose", goal_.pose))
+    {
+      RCLCPP_ERROR(node_->get_logger(), "target_pose is not provided");
     }
   }
-public:
-//  virtual void halt() override {}
-
-public:
-//  virtual BT::NodeStatus executeTick() override final {
-//    return result_ ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
-//  }
-protected:
-  virtual void callbackGoalResponce(
-    std::shared_future<GoalHandle::SharedPtr> future) override
-  {
-    if (auto goal_handle = future.get()) {
-      RCLCPP_INFO(get_logger(), "Goal was accepted");
-    } else {
-      RCLCPP_INFO(get_logger(), "Goal was rejected");
-    }
-  }
-  virtual void callbackFeedback(
-    GoalHandle::SharedPtr goal_handle,
-    const std::shared_ptr<WayPoint::Feedback> feedback) override
-  {
-    if (feedback->is_reached.data) {
-      RCLCPP_INFO(
-        get_logger(), "Feedback : not reached at %f , %f", feedback->pose_stamped.pose.position.x,
-        feedback->pose_stamped.pose.position.y);
-    } else {
-      RCLCPP_INFO(
-        get_logger(), "Feedback : reached at %f , %f", feedback->pose_stamped.pose.position.x,
-        feedback->pose_stamped.pose.position.y);
-    }
-  }
-  virtual void callbackResult(
-    const rclcpp_action::ClientGoalHandle<WayPoint>::WrappedResult & result)
-  override
-  {
-    result_ = result.result->is_reached.data;
-    std::cout << "result" << std::endl;
-  }
-
-  bool result_ = false;
-//  rclcpp::Node::SharedPtr node_;
 };
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
-REGISTER_NODES(robotx_behavior_tree,GoAction, go)
+REGISTER_NODES(robotx_behavior_tree, GoAction)
