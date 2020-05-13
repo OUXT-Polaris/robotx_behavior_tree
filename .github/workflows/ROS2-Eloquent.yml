@@ -17,7 +17,7 @@ jobs:
                   curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
                   sudo sh -c 'echo "deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-latest.list'
                   sudo apt update
-                  sudo apt install ros-eloquent-desktop
+                  sudo apt install ros-eloquent-desktop ros-eloquent-nav2-behavior-tree
                   source /opt/ros/eloquent/setup.bash
             - uses: actions/checkout@v2-beta
             - name: Copy repository
@@ -25,6 +25,7 @@ jobs:
                   mkdir -p ~/ros2_ws/src/robotx_behavior_tree
                   cp -rf . ~/ros2_ws/src/robotx_behavior_tree
                   git clone https://github.com/OUXT-Polaris/behavior_tree_action_builder.git ~/ros2_ws/src/behavior_tree_action_builder
+                  git clone https://github.com/OUXT-Polaris/robotx_waypoint_msgs ~/ros2_ws/src/robotx_waypoint_msgs
             - name: Install dependencies
               run: |
                   source /opt/ros/eloquent/setup.bash
