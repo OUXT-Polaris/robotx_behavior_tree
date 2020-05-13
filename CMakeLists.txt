@@ -35,7 +35,7 @@ add_library(example_action SHARED plugins/action/example_action.cpp)
 list(APPEND plugin_libs example_action)
 
 add_library(go_action SHARED plugins/action/go_action.cpp)
-list(APPEND plugin_libs example_action)
+list(APPEND plugin_libs go_action)
 
 foreach(plugin ${plugin_libs})
 ament_target_dependencies(${plugin} ${dependencies})
