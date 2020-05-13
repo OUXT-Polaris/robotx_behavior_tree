@@ -16,16 +16,18 @@
 #include <memory>
 
 #include "robotx_behavior_tree/action_node.hpp"
+#include "nav2_behavior_tree/bt_action_node.hpp"
+#include "robotx_waypoint_msgs/action/way_point.hpp"
 
 namespace robotx_behavior_tree
 {
-class ExampleAction : public ActionNode
+class ExampleAction : public nav2_behavior_tree::BtActionNode<>
 {
 public:
   ExampleAction(
     const std::string & name,
     const BT::NodeConfiguration & config)
-  :  ActionNode(name, config)
+  :   nav2_behavior_tree::BtActionNode(name, name, config)
   {}
 
   static BT::PortsList providedPorts()
@@ -39,4 +41,4 @@ protected:
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
-REGISTER_NODES(robotx_behavior_tree, ExampleAction, example)
+REGISTER_NODES(robotx_behavior_tree, ExampleAction)

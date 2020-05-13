@@ -31,8 +31,8 @@ set(dependencies
 
 set(library_name ${PROJECT_NAME})
 
-add_library(example_action SHARED plugins/action/example_action.cpp)
-list(APPEND plugin_libs example_action)
+#add_library(example_action SHARED plugins/action/example_action.cpp)
+#list(APPEND plugin_libs example_action)
 
 add_library(go_action SHARED plugins/action/go_action.cpp)
 list(APPEND plugin_libs go_action)
