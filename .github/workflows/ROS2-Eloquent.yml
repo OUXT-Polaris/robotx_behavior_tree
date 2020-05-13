@@ -25,7 +25,7 @@ jobs:
                   mkdir -p ~/ros2_ws/src/robotx_behavior_tree
                   cp -rf . ~/ros2_ws/src/robotx_behavior_tree
                   git clone https://github.com/OUXT-Polaris/behavior_tree_action_builder.git ~/ros2_ws/src/behavior_tree_action_builder
-                  git clone https://github.com/OUXT-Polaris/robotx_waypoint_msgs ~/ros2_ws/src/robotx_waypoint_msgs
+                  git clone https://github.com/OUXT-Polaris/robotx_waypoint_msgs.git ~/ros2_ws/src/robotx_waypoint_msgs
             - name: Install dependencies
               run: |
                   source /opt/ros/eloquent/setup.bash
