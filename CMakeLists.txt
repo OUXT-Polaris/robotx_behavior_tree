@@ -17,6 +17,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(behavior_tree_action_builder REQUIRED)
 find_package(robotx_waypoint_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(nav2_behavior_tree REQUIRED)
 
 include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -26,6 +27,7 @@ set(dependencies
   "behavior_tree_action_builder"
   "robotx_waypoint_msgs"
   "behaviortree_cpp_v3"
+  "nav2_behavior_tree"
 )
 
 
