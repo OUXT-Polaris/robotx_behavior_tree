@@ -29,7 +29,13 @@ public:
     const BT::NodeConfiguration & config)
   : nav2_behavior_tree::BtActionNode<robotx_waypoint_msgs::action::WayPoint>(name, "waypoint",
       config)
-  {}
+  {
+//    goal_pub_ = node_->create_publisher<geometry_msgs::msg::PoseStamped>(
+//      "/move_base_simple/goal", 1);
+    geometry_msgs::msg::Pose pose;
+//    pose.position.
+    this->config().blackboard->set("target_pose",pose);
+  }
 
   static BT::PortsList providedPorts()
   {
@@ -43,6 +49,9 @@ protected:
       RCLCPP_ERROR(node_->get_logger(), "target_pose is not provided");
     }
   }
+
+private:
+//  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
 };
 }  // namespace robotx_behavior_tree
 
