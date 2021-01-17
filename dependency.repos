@@ -1,1 +1,5 @@
 repositories:
+  behavior_tree_action_builder:
+    url: https://github.com/OUXT-Polaris/behavior_tree_action_builder.git
+    type: git
+    version: master
