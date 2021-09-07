@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "robotx_behavior_tree/action_node.hpp"
 
@@ -22,19 +22,15 @@ namespace robotx_behavior_tree
 class ExampleAction : public ActionNode
 {
 public:
-  ExampleAction(
-    const std::string & name,
-    const BT::NodeConfiguration & config)
-  :  ActionNode(name, config)
-  {}
-
-  static BT::PortsList providedPorts()
+  ExampleAction(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionNode(name, config)
   {
-    return {BT::InputPort<int>("test_input")};
   }
 
+  static BT::PortsList providedPorts() { return {BT::InputPort<int>("test_input")}; }
+
 protected:
-  BT::NodeStatus tick() override {return BT::NodeStatus::FAILURE;}
+  BT::NodeStatus tick() override { return BT::NodeStatus::FAILURE; }
 };
 }  // namespace robotx_behavior_tree
 

@@ -16,6 +16,7 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
+
 #include <string>
 
 namespace robotx_behavior_tree
@@ -23,10 +24,8 @@ namespace robotx_behavior_tree
 class ActionNode : public BT::SyncActionNode
 {
 public:
-  ActionNode(
-    const std::string & name,
-    const BT::NodeConfiguration & config)
-  :  BT::SyncActionNode(name, config)
+  ActionNode(const std::string & name, const BT::NodeConfiguration & config)
+  : BT::SyncActionNode(name, config)
   {
     setRegistrationID(name);
   }
