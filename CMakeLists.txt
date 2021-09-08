@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(behavior_tree_action_builder REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -22,6 +23,7 @@ set(dependencies
   "rclcpp"
   "behavior_tree_action_builder"
   "behaviortree_cpp_v3"
+  "geometry_msgs"
 )
 
 
@@ -29,6 +31,9 @@ set(library_name ${PROJECT_NAME})
 
 add_library(example_action SHARED plugins/action/example_action.cpp)
 list(APPEND plugin_libs example_action)
+
+add_library(send_goal_action SHARED plugins/action/send_goal_action.cpp)
+list(APPEND plugin_libs send_goal_action)
 
 foreach(plugin ${plugin_libs})
 ament_target_dependencies(${plugin} ${dependencies})
