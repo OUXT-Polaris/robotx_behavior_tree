@@ -14,10 +14,10 @@
 #ifndef ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 #define ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 
-#include <rclcpp/rclcpp.hpp>
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 
 namespace robotx_behavior_tree
