@@ -15,19 +15,23 @@
 #include <string>
 #include <memory>
 
+#include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace robotx_behavior_tree
 {
-class SendGoalAction : public ActionNode
+class SendGoalAction : public ActionROS2Node
 {
 public:
   SendGoalAction(
     const std::string & name,
     const BT::NodeConfiguration & config)
-  :  ActionNode(name, config)
-  {}
+  :  ActionROS2Node(name, config)
+  {
+    goal_pub_ =
+      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+  }
 
   static BT::PortsList providedPorts()
   {
@@ -35,7 +39,16 @@ public:
   }
 
 protected:
-  BT::NodeStatus tick() override {return BT::NodeStatus::FAILURE;}
+  BT::NodeStatus tick() override
+  {
+    auto goal = this->getInput<geometry_msgs::msg::PoseStamped>("goal");
+    if (goal) {
+      goal_pub_->publish(goal.value());
+    }
+
+    return BT::NodeStatus::SUCCESS;
+  }
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
 };
 }  // namespace robotx_behavior_tree
 
