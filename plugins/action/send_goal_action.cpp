@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
 #include <memory>
+#include <string>
 
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace robotx_behavior_tree
 {
 class SendGoalAction : public ActionROS2Node
 {
 public:
-  SendGoalAction(
-    const std::string & name,
-    const BT::NodeConfiguration & config)
-  :  ActionROS2Node(name, config)
+  SendGoalAction(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionROS2Node(name, config)
   {
     goal_pub_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
