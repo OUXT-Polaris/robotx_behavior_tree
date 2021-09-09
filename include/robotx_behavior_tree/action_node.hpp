@@ -14,6 +14,7 @@
 #ifndef ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 #define ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 
+#include <rclcpp/rclcpp.hpp>
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
@@ -26,6 +27,19 @@ class ActionNode : public BT::SyncActionNode
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config)
   : BT::SyncActionNode(name, config)
+  {
+    setRegistrationID(name);
+  }
+
+protected:
+  std::string name;
+};
+
+class ActionROS2Node : public BT::SyncActionNode, public rclcpp::Node
+{
+public:
+  ActionROS2Node(const std::string & name, const BT::NodeConfiguration & config)
+  : BT::SyncActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
   {
     setRegistrationID(name);
   }
