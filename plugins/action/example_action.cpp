@@ -27,10 +27,10 @@ public:
   {
   }
 
-  static BT::PortsList providedPorts() {return {BT::InputPort<int>("test_input")};}
+  static BT::PortsList providedPorts() { return {BT::InputPort<int>("test_input")}; }
 
 protected:
-  BT::NodeStatus tick() override {return BT::NodeStatus::FAILURE;}
+  BT::NodeStatus tick() override { return BT::NodeStatus::FAILURE; }
 };
 }  // namespace robotx_behavior_tree
 
