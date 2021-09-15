@@ -32,15 +32,16 @@ set(library_name ${PROJECT_NAME})
 add_library(example_action SHARED plugins/action/example_action.cpp)
 list(APPEND plugin_libs example_action)
 
-add_library(send_goal_action SHARED plugins/action/send_goal_action.cpp)
-list(APPEND plugin_libs send_goal_action)
+add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
+list(APPEND plugin_libs move_goal_action)
 
 foreach(plugin ${plugin_libs})
 ament_target_dependencies(${plugin} ${dependencies})
 target_compile_definitions(${plugin} PRIVATE BT_PLUGIN_EXPORT)
+ament_export_libraries(${plugin})
 endforeach()
 
-ament_export_libraries(${plugin_libs})
+#ament_export_libraries(${plugin_libs})
 
 install(TARGETS
   ${plugin_libs}
