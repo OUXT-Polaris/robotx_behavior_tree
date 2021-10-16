@@ -1,0 +1,43 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - example_action
+      - move_goal_action
+behavior:
+  description:
+    package: robotx_bt_planner
+    path : behavior_trees/example.xml
+  blackboard:
+    - input: next_goal
+      type: Position
+      eval: "add(1, 2*49)" # <- luaで評価
+variables:
+  objects:
+    - uuid: 00000000
+      attributes:
+        - red
+        - bouy
+      pose:
+        position:
+          x: 10
+          y: 0
+          z: 0
+        orientation:
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+    - uuid: 00000001
+      attributes:
+        - green
+        - bouy
+      pose:
+        position:
+          x: -10
+          y: 0
+          z: 0
+        orientation:
+          x: 0
+          y: 0
+          z: 0
+          w: 1

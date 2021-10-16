@@ -1,0 +1,21 @@
+repositories:
+  behavior_tree_action_builder:
+    url: https://github.com/OUXT-Polaris/behavior_tree_action_builder.git
+    type: git
+    version: master
+  robotx_behavior_tree:
+    url: https://github.com/OUXT-Polaris/robotx_behavior_tree.git
+    type: git
+    version: master
+  ouxt_common:
+    type: git
+    url: https://github.com/OUXT-Polaris/ouxt_common.git
+    version: master
+  sol_vendor:
+    type: git
+    url: https://github.com/OUXT-Polaris/sol_vendor.git
+    version: main
+  lua_vendor:
+    type: git
+    url: https://github.com/OUXT-Polaris/lua_vendor.git
+    version: main
