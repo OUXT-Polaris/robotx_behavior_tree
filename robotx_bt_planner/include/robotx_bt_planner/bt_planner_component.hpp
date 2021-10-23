@@ -25,7 +25,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_bt_planner/descriptor/data_structures.hpp"
 #include "robotx_bt_planner/descriptor/operators.hpp"
-#include "robotx_behavior_tree/srv/evaluation.hpp"
+#include "robotx_behavior_msgs/srv/evaluation.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -227,7 +227,7 @@ public:
   BT::Tree tree_;
   std::unique_ptr<BT::PublisherZMQ> publisher_zmq_;
   rclcpp::Node::SharedPtr client_node_;
-  rclcpp::Service<robotx_behavior_tree::srv::Evaluation> evaluation_server_;
+  rclcpp::Service<robotx_behavior_msgs::srv::Evaluation>::SharedPtr evaluation_server_;
 };
 }  // namespace robotx_bt_planner
 
