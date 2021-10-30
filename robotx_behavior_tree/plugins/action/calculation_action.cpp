@@ -1,4 +1,4 @@
-// Copyright (c) 2020, OUXT-Polaris
+// Copyright (c) 2021, OUXT-Polaris
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,28 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
-#define ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 
-#include <behaviortree_cpp_v3/action_node.h>
-#include <behaviortree_cpp_v3/bt_factory.h>
-
+#include <memory>
 #include <string>
+
+#include "robotx_behavior_tree/action_node.hpp"
 
 namespace robotx_behavior_tree
 {
-class ActionNode : public BT::SyncActionNode
+class CalculationAction : public ActionNode
 {
 public:
-  ActionNode(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::SyncActionNode(name, config)
+  ExampleAction(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionNode(name, config)
   {
-    setRegistrationID(name);
   }
 
+  static BT::PortsList providedPorts() { return {BT::InputPort<int>("test_input")}; }
+
 protected:
-  std::string name;
+  BT::NodeStatus tick() override { return BT::NodeStatus::FAILURE; }
 };
 }  // namespace robotx_behavior_tree
 
-#endif  // ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
+#include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
+REGISTER_NODES(robotx_behavior_tree, ExampleAction)
