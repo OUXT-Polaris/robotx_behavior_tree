@@ -102,7 +102,7 @@ struct EvaluationBlock : EvaluationBlockBase
     if (result.valid()) {
       this->result = static_cast<T>(result);
       board->set(name, this->result);
-      RCLCPP_INFO(rclcpp::get_logger("robotx_bt_planner"), getDebugString());
+      RCLCPP_INFO(rclcpp::get_logger("robotx_bt_planner"), getDebugString().c_str());
     } else {
       RCLCPP_INFO_STREAM(
         rclcpp::get_logger("robotx_bt_planner"), "Evaluation " << evaluation << " has failed!");
