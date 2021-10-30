@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>behavior_tree_action_builder</name>
+  <version>0.0.0</version>
+  <description>Utility functions for building behavior tree action</description>
+  <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>behaviortree_cpp_v3</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ouxt_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
