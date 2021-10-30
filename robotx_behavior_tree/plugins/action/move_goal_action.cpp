@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <optional>
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <string>
-
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 namespace robotx_behavior_tree
 {
@@ -109,6 +108,7 @@ protected:
     auto diff = transform2.inverse() * transform1;
     return diff.getRotation().getAngle();
   }
+
   tf2::Transform convertToTF2(const geometry_msgs::msg::Pose pose)
   {
     geometry_msgs::msg::Transform transform_msg;
@@ -132,4 +132,5 @@ protected:
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
+
 REGISTER_NODES(robotx_behavior_tree, MoveGoalAction)

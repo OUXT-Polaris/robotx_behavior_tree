@@ -23,9 +23,9 @@
 #include "behaviortree_cpp_v3/blackboard.h"
 #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
 #include "rclcpp/rclcpp.hpp"
+#include "robotx_behavior_msgs/srv/evaluation.hpp"
 #include "robotx_bt_planner/descriptor/data_structures.hpp"
 #include "robotx_bt_planner/descriptor/operators.hpp"
-#include "robotx_behavior_msgs/srv/evaluation.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -164,7 +164,8 @@ public:
         auto package_name = plugin["package"].as<std::string>();
         for (auto name : plugin["name"]) {
           std::string plugin_name = name.as<std::string>();
-          RCLCPP_INFO_STREAM(rclcpp::get_logger("robotx_bt_planner"), "LOAD PLUGIN : " << plugin_name);
+          RCLCPP_INFO_STREAM(
+            rclcpp::get_logger("robotx_bt_planner"), "LOAD PLUGIN : " << plugin_name);
           std::string plugin_filename = ament_index_cpp::get_package_share_directory(package_name) +
                                         "/../../lib/lib" + plugin_name + ".so";
           factory_.registerFromPlugin(plugin_filename);
