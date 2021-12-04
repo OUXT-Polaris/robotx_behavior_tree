@@ -7,8 +7,8 @@
                 <RetryUntilSuccesful num_attempts="">
                     <Action Color="{color}" ID="RecColor" Point="{color_point}"/>
                 </RetryUntilSuccesful>
-                <Action ID="GoTo" target_posint="{target_point}"/>
-                <Action ID="Go" TargetPoint="{target_point}"/>
+                <Action ID="GetTarget" target_posint="{target_point}"/>
+                <Action ID="GoTarget" TargetPoint="{target_point}"/>
             </Sequence>
             <Sequence>
                 <RetryUntilSuccesful num_attempts="">
@@ -24,11 +24,11 @@
         <Action ID="CulcAng">
             <output_port default="{lnchr_ang}" name="LuncherAng"/>
         </Action>
-        <Action ID="Go">
-            <inout_port default="{target_point}" name="TargetPoint"/>
-        </Action>
-        <Action ID="GoTo">
+        <Action ID="GetTarget">
             <output_port default="{target_point}" name="target_posint"/>
+        </Action>
+        <Action ID="GoTarget">
+            <inout_port default="{target_point}" name="TargetPoint"/>
         </Action>
         <Action ID="Launch">
             <input_port default="{lnchr_ang}" name="LauncherAng"/>
