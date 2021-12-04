@@ -7,31 +7,30 @@
                 <RetryUntilSuccesful num_attempts="">
                     <Action Color="{color}" ID="RecColor" Point="{color_point}"/>
                 </RetryUntilSuccesful>
-                <Action ID="GetTarget" target_posint="{target_point}"/>
-                <Action ID="GoTarget" TargetPoint="{target_point}"/>
+                <Action ID="MoveGoal" TargetPoint="{target_point}"/>
+                <ForceSuccess>
+                    <Action ID="Wait" WaitTime="{wait_time}"/>
+                </ForceSuccess>
             </Sequence>
             <Sequence>
                 <RetryUntilSuccesful num_attempts="">
                     <Action Hole="{hole_point}" ID="RecHole"/>
                 </RetryUntilSuccesful>
-                <Action ID="CulcAng" LuncherAng="{lnchr_ang}"/>
+                <Action ID="CalcLuncherAngle" LuncherAng="{lnchr_ang}"/>
                 <Action ID="Launch" LauncherAng="{lnchr_ang}"/>
             </Sequence>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
-        <Action ID="CulcAng">
+        <Action ID="CalcLuncherAngle">
             <output_port default="{lnchr_ang}" name="LuncherAng"/>
-        </Action>
-        <Action ID="GetTarget">
-            <output_port default="{target_point}" name="target_posint"/>
-        </Action>
-        <Action ID="GoTarget">
-            <inout_port default="{target_point}" name="TargetPoint"/>
         </Action>
         <Action ID="Launch">
             <input_port default="{lnchr_ang}" name="LauncherAng"/>
+        </Action>
+        <Action ID="MoveGoal">
+            <inout_port default="{target_point}" name="TargetPoint"/>
         </Action>
         <Action ID="PathPlan">
             <input_port default="{map}" name="Map"/>
@@ -45,6 +44,9 @@
         </Action>
         <Action ID="RecHole">
             <output_port default="{Hole}" name="Hole"/>
+        </Action>
+        <Action ID="Wait">
+            <input_port default="{wait_time}" name="WaitTime"/>
         </Action>
     </TreeNodesModel>
     <!-- ////////// -->

@@ -3,28 +3,24 @@
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Sequence>
-            <SubTree ID="PassGate"/>
-            <SubTree ID="PassGate"/>
-            <Action ID="Parking"/>
-        </Sequence>
-    </BehaviorTree>
-    <!-- ////////// -->
-    <BehaviorTree ID="PassGate">
-        <Sequence>
-            <Action ID="GetTarget" target_point="{gate_point}"/>
-            <Action ID="GoTarget" target_point="{gate_point}"/>
+            <Action ID="MoveGoal" TargetPoint="{target_point}"/>
+            <ForceSuccess>
+                <Action ID="Wait" WaitTime="{wait_time}"/>
+            </ForceSuccess>
+            <Action ID="MoveGoal" TargetPoint="{target_point}"/>
+            <ForceSuccess>
+                <Action ID="Wait" WaitTime="{wait_time}"/>
+            </ForceSuccess>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
-        <Action ID="GetTarget">
-            <output_port default="{gate_point}" name="target_point"/>
+        <Action ID="MoveGoal">
+            <inout_port default="{target_point}" name="TargetPoint"/>
         </Action>
-        <Action ID="GoTarget">
-            <input_port default="{gate_point}" name="target_point"/>
+        <Action ID="Wait">
+            <input_port default="{wait_time}" name="WaitTime"/>
         </Action>
-        <Action ID="Parking"/>
-        <SubTree ID="PassGate"/>
     </TreeNodesModel>
     <!-- ////////// -->
 </root>
