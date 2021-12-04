@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <SubTree ID="PassGate"/>
+            <SubTree ID="PassGate"/>
+            <Action ID="Parking"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="PassGate">
+        <Sequence>
+            <Action ID="GetTarget" target_point="{gate_point}"/>
+            <Action ID="GoTarget" target_point="{gate_point}"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="GetTarget">
+            <output_port default="{gate_point}" name="target_point"/>
+        </Action>
+        <Action ID="GoTarget">
+            <input_port default="{gate_point}" name="target_point"/>
+        </Action>
+        <Action ID="Parking"/>
+        <SubTree ID="PassGate"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

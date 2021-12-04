@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Sequence>
+                <RetryUntilSuccesful num_attempts="">
+                    <Action Color="{color}" ID="RecColor" Point="{color_point}"/>
+                </RetryUntilSuccesful>
+                <Action ID="GoTo" target_posint="{target_point}"/>
+                <Action ID="Go" TargetPoint="{target_point}"/>
+            </Sequence>
+            <Sequence>
+                <RetryUntilSuccesful num_attempts="">
+                    <Action Hole="{hole_point}" ID="RecHole"/>
+                </RetryUntilSuccesful>
+                <Action ID="CulcAng" LuncherAng="{lnchr_ang}"/>
+                <Action ID="Launch" LauncherAng="{lnchr_ang}"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CulcAng">
+            <output_port default="{lnchr_ang}" name="LuncherAng"/>
+        </Action>
+        <Action ID="Go">
+            <inout_port default="{target_point}" name="TargetPoint"/>
+        </Action>
+        <Action ID="GoTo">
+            <output_port default="{target_point}" name="target_posint"/>
+        </Action>
+        <Action ID="Launch">
+            <input_port default="{lnchr_ang}" name="LauncherAng"/>
+        </Action>
+        <Action ID="PathPlan">
+            <input_port default="{map}" name="Map"/>
+            <output_port default="{path}" name="Path"/>
+            <input_port default="{color_point}" name="Point"/>
+            <output_port default="{target_point}" name="TargetPoint"/>
+        </Action>
+        <Action ID="RecColor">
+            <input_port default="{color}" name="Color"/>
+            <output_port default="{point}" name="Point"/>
+        </Action>
+        <Action ID="RecHole">
+            <output_port default="{Hole}" name="Hole"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
