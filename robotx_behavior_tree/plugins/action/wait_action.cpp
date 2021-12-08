@@ -18,7 +18,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-
+using namespace std::chrono_literals;
 
 namespace robotx_behavior_tree
 {
@@ -28,49 +28,48 @@ public:
   WaitAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
-    declare_parameter("wait_time", "5.0");
+    declare_parameter("wait_time", 5.0);  //double
     get_parameter("wait_time", wait_time_);
   }
 
 protected:
   BT::NodeStatus tick() override
   {
-    using namespace std::chrono_literals;
-    rclcpp::WallRate loop_rate(1s);
-    count = 0;
-
-    if (wait_time_) {
-        RCLCPP_INFO(
-            get_logger(), "WaitAction : waiting %d second", wait_time_);
-    } 
-    else {
-        RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5s");
-        wait_time_ = 5;
+    if(!isSetWaitTime)
+        if (wait_time_) {
+            RCLCPP_INFO(
+                get_logger(), "WaitAction : waiting %f s", wait_time_);
+        } 
+        else {
+            RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5.0s");
+            wait_time_ = 5.0;
+        }
+        start = std::chrono::system_clock::now();
+        isSetWaitTime = true;
     }
+    
+    end = std::chrono::system_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 
-    while (count != wait_time_)
+    RCLCPP_INFO(
+        get_logger(), "WaitAction : %f second passed", elapsed);
+
+    if (elapsed == wait_time_) {
+        return BT::NodeStatus::SUCCESS;
+    }
+    else if(elapsed > wait_time_)
     {
-        loop_rate.sleep();
-        count += 1;
-        RCLCPP_INFO(
-            get_logger(), "WaitAction : %d second passed", count);
-        if (count == wait_time_) {
-            return BT::NodeStatus::SUCCESS;
-        }
-        else if(count > wait_time_)
-        {
-         RCLCPP_WARN(
+        RCLCPP_WARN(
             get_logger(), "WaitAction : OverTime!! Force to wake up");  
-            return BT::NodeStatus::SUCCESS;
-        }
-        return BT::NodeStatus::RUNNING;
+        return BT::NodeStatus::SUCCESS;
     }
-
     return BT::NodeStatus::RUNNING;  
   }
 
-  int wait_time_;
-  int count;
+  double wait_time_;
+  double elapsed;
+  bool isSetWaitTime = false;
+  std::chrono::system_clock::time_point start, end;
 };
 }  // namespace robotx_behavior_tree
 
