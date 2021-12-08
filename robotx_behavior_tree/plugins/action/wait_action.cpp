@@ -53,7 +53,7 @@ protected:
     RCLCPP_INFO(
         get_logger(), "WaitAction : %f second passed", elapsed);
 
-    if (elapsed => wait_time_) {
+    if (elapsed >= wait_time_) {
         return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;  
