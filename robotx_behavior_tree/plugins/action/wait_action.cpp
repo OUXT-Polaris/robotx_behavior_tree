@@ -18,7 +18,6 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-using namespace std::chrono_literals;
 
 namespace robotx_behavior_tree
 {
@@ -54,13 +53,7 @@ protected:
     RCLCPP_INFO(
         get_logger(), "WaitAction : %f second passed", elapsed);
 
-    if (elapsed == wait_time_) {
-        return BT::NodeStatus::SUCCESS;
-    }
-    else if(elapsed > wait_time_)
-    {
-        RCLCPP_WARN(
-            get_logger(), "WaitAction : OverTime!! Force to wake up");  
+    if (elapsed => wait_time_) {
         return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;  
