@@ -27,7 +27,7 @@ public:
   WaitAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
-    declare_parameter("wait_time", 5.0);  //double
+    declare_parameter("wait_time", 5000.0);  //double millisecond
     get_parameter("wait_time", wait_time_);
   }
 
@@ -37,11 +37,11 @@ protected:
     if(!isSetWaitTime)
         if (wait_time_) {
             RCLCPP_INFO(
-                get_logger(), "WaitAction : waiting %f s", wait_time_);
+                get_logger(), "WaitAction : waiting %f ms", wait_time_);
         } 
         else {
-            RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5.0s");
-            wait_time_ = 5.0;
+            RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
+            wait_time_ = 5000.0;
         }
         start = std::chrono::system_clock::now();
         isSetWaitTime = true;
@@ -51,10 +51,12 @@ protected:
     elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
 
     RCLCPP_INFO(
-        get_logger(), "WaitAction : %f second passed", elapsed);
+        get_logger(), "WaitAction : %f millisecond passed", elapsed);
 
     if (elapsed >= wait_time_) {
-        return BT::NodeStatus::SUCCESS;
+      RCLCPP_INFO(
+        get_logger(), "WaitAction : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;  
   }
