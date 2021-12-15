@@ -38,6 +38,12 @@ set(library_name ${PROJECT_NAME})
 add_library(example_action SHARED plugins/action/example_action.cpp)
 list(APPEND plugin_libs example_action)
 
+add_library(publish_action SHARED plugins/action/publish_action.cpp)
+list(APPEND plugin_libs publish_action)
+
+add_library(wait_action SHARED plugins/action/wait_action.cpp)
+list(APPEND plugin_libs wait_action)
+
 add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
 list(APPEND plugin_libs move_goal_action)
 

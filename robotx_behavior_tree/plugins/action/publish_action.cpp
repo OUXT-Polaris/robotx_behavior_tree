@@ -20,34 +20,28 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-#include "std_msgs/msg/bool"
-#include "std_msgs/msg/empty"
-#include "std_msgs/msg/float64"
-#include "std_msgs/msg/int64"
 
 namespace robotx_behavior_tree
 {
+template <typename Type>
 class PubSomeAction : public ActionROS2Node
 {
 public:
   PubSomeAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
-    declare_parameter("MsgType", "std_msgs::msg::Empty");
-    get_parameter("MsgType", msg_type_);
     declare_parameter("Topic", "/command");
     get_parameter("Topic", topic_);
     declare_parameter("Input", "command");
     get_parameter("Input", input_);
-    pub_some_ = this->create_publisher<msg_type_>(topic_, 1);
+    pub_some_ = this->create_publisher<Type>(topic_, 1);
   }
-
-  static BT::PortsList providedPorts() { return {BT::InputPort<msg_type_>(input_)}; }
+  static BT::PortsList providedPorts() { return {BT::InputPort<Type>(input_)}; }
 
 protected:
   BT::NodeStatus tick() override
   {
-    auto input = this->getInput<msg_type_>(input_);
+    auto input = this->getInput<Type>(input_);
     if (!has_published) {
       if (input) {
         pub_some_->publish(input.value());
@@ -60,10 +54,8 @@ protected:
     }
     return BT::NodeStatus::RUNNING;
   }
-
-  rclcpp::Publisher<msg_type_>::SharedPtr pub_some_;
+  rclcpp::Publisher<Type>::SharedPtr pub_some_;
   bool has_published = false;
-  std::string msg_type_;
   std::string topic_;
   std::string input_;
 };
