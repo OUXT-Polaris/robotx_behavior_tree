@@ -16,9 +16,9 @@
 #include <string>
 
 // some type of msgs
-#include "std_msgs/msg/empty.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
+#include "std_msgs/msg/empty.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -30,13 +30,13 @@ public:
   {
     declare_parameter("Topic", "/command");
     get_parameter("Topic", topic_);
-    pub_some_ = this->create_publisher<std_msgs::msg::Empty>(topic_, 1); // CHANGE when you use
+    pub_some_ = this->create_publisher<std_msgs::msg::Empty>(topic_, 1);  // CHANGE when you use
   }
 
 protected:
   BT::NodeStatus tick() override
   {
-    auto input = this->getInput<std_msgs::msg::Empty>("input_"); // CHANGE when you use
+    auto input = this->getInput<std_msgs::msg::Empty>("input_");  // CHANGE when you use
     if (!has_published) {
       if (input) {
         pub_some_->publish(input.value());
@@ -49,7 +49,7 @@ protected:
     }
     return BT::NodeStatus::RUNNING;
   }
-  rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_some_; // CHANGE when you use
+  rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_some_;  // CHANGE when you use
   bool has_published = false;
   std::string topic_;
 };

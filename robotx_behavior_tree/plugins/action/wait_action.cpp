@@ -34,10 +34,10 @@ public:
 protected:
   BT::NodeStatus tick() override
   {
-    if (!isSetWaitTime){
+    if (!isSetWaitTime) {
       if (wait_time_) {
         RCLCPP_INFO(get_logger(), "WaitAction : waiting %f ms", wait_time_);
-      }else {
+      } else {
         RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
         wait_time_ = 5000.0;
       }
@@ -61,7 +61,7 @@ protected:
   float elapsed;
   bool isSetWaitTime = false;
   std::chrono::system_clock::time_point start, end;
-};  
+};
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
