@@ -57,8 +57,8 @@ protected:
     return BT::NodeStatus::RUNNING;
   }
 
-  double wait_time_;
-  double elapsed;
+  float wait_time_;
+  float elapsed;
   bool isSetWaitTime = false;
   std::chrono::system_clock::time_point start, end;
 };  
