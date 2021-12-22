@@ -34,34 +34,34 @@ public:
 protected:
   BT::NodeStatus tick() override
   {
-    if (!isSetWaitTime)
+    if (!isSetWaitTime) {
       if (wait_time_) {
         RCLCPP_INFO(get_logger(), "WaitAction : waiting %f ms", wait_time_);
       } else {
         RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
         wait_time_ = 5000.0;
       }
-    start = std::chrono::system_clock::now();
-    isSetWaitTime = true;
+      start = std::chrono::system_clock::now();
+      isSetWaitTime = true;
+    }
+
+    end = std::chrono::system_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
+
+    if (elapsed >= wait_time_) {
+      RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
+    }
+    return BT::NodeStatus::RUNNING;
   }
 
-  end = std::chrono::system_clock::now();
-  elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-  RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
-
-  if (elapsed >= wait_time_) {
-    RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
-    return BT::NodeStatus::SUCCESS;
-  }
-  return BT::NodeStatus::RUNNING;
-}
-
-double wait_time_;
-double elapsed;
-bool isSetWaitTime = false;
-std::chrono::system_clock::time_point start, end;
-};  // namespace robotx_behavior_tree
+  float wait_time_;
+  float elapsed;
+  bool isSetWaitTime = false;
+  std::chrono::system_clock::time_point start, end;
+};
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
