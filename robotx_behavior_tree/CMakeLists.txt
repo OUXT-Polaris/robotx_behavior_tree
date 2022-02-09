@@ -41,6 +41,9 @@ list(APPEND plugin_libs example_action)
 add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
 list(APPEND plugin_libs move_goal_action)
 
+add_library(near_condition SHARED plugins/action/near_condition.cpp)
+list(APPEND plugin_libs near_condition)
+
 foreach(plugin ${plugin_libs})
 ament_target_dependencies(${plugin} ${dependencies})
 target_compile_definitions(${plugin} PRIVATE BT_PLUGIN_EXPORT)
