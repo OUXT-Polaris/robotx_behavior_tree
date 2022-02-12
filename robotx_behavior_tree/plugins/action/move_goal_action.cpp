@@ -44,8 +44,7 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<double>("goal_x"),
-      BT::InputPort<double>("goal_y"),
+      BT::InputPort<double>("goal_x"), BT::InputPort<double>("goal_y"),
       BT::InputPort<double>("goal_theta")};
   }
 
