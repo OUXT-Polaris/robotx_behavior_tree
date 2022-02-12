@@ -33,7 +33,8 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
 target_link_libraries(${PROJECT_NAME}_node ${YAML_CPP_LIBRARIES} ${behaviortree_cpp_v3_LIBRARIES} ${ZMQ_LIBRARIES})
 
 install(DIRECTORY behavior_trees DESTINATION share/${PROJECT_NAME})
-install(DIRECTORY example DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

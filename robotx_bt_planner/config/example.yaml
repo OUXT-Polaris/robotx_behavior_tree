@@ -6,7 +6,7 @@ plugins:
 behavior:
   description:
     package: robotx_bt_planner
-    path : behavior_trees/example.xml
+    path : behavior_trees/config.xml
   blackboard:
     - input: next_goal
       type: Position

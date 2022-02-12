@@ -1,0 +1,7 @@
+<root>
+    <BehaviorTree>
+        <Sequence>
+            <Action ID="MoveGoalAction" goal_x="50.0" goal_y="50.0" goal_theta="0.0"/>
+        </Sequence>
+    </BehaviorTree>
+</root>
