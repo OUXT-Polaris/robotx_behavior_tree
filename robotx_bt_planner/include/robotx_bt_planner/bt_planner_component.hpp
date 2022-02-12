@@ -180,7 +180,7 @@ public:
     RCLCPP_INFO(get_logger(), "=================================");
   }
 
-  bool loadTree(std::string xml_name)
+  bool loadTree()
   {
     if (node_["behavior"]["description"]) {
       auto description = node_["behavior"]["description"];
@@ -196,7 +196,7 @@ public:
       auto xml_string =
         std::string(std::istreambuf_iterator<char>(xml_file), std::istreambuf_iterator<char>());
       tree_ = factory_.createTreeFromText(xml_string, blackboard_);
-      RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", xml_name.c_str());
+      RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", file_path.c_str());
       return true;
     }
     return false;
