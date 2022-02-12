@@ -28,7 +28,7 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
 {
   declare_parameter<std::string>("config_package", "robotx_bt_planner");
   get_parameter("config_package", config_package_);
-  declare_parameter<std::string>("config_file", "example/config.yaml");
+  declare_parameter<std::string>("config_file", "config/example.yaml");
   get_parameter("config_file", config_file_);
   declare_parameter<double>("update_rate", 10.0);
   get_parameter("update_rate", update_rate_);
@@ -49,7 +49,7 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   blackboard_->set<std::chrono::milliseconds>("server_timeout", std::chrono::milliseconds(10));
 
   loadPlugins();
-  loadTree("example");
+  loadTree();
 
   publisher_zmq_ = std::make_unique<BT::PublisherZMQ>(tree_);
 

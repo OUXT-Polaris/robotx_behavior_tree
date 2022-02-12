@@ -33,7 +33,7 @@ public:
   MoveGoalAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config), buffer_(get_clock()), listener_(buffer_)
   {
-    declare_parameter("goal_tolerance", "0.5");
+    declare_parameter("goal_tolerance", 0.5);
     get_parameter("goal_tolerance", goal_tolerance_);
     declare_parameter("goal_angle_tolerance", 0.05);
     get_parameter("goal_angle_tolerance", goal_angle_tolerance_);
@@ -43,7 +43,10 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return {BT::InputPort<geometry_msgs::msg::PoseStamped>("goal")};
+    return {
+      BT::InputPort<double>("goal_x"),
+      BT::InputPort<double>("goal_y"),
+      BT::InputPort<double>("goal_theta")};
   }
 
   const std::optional<geometry_msgs::msg::Pose> getCurrentPose()
@@ -67,13 +70,22 @@ public:
 protected:
   BT::NodeStatus tick() override
   {
-    auto goal = this->getInput<geometry_msgs::msg::PoseStamped>("goal");
+    auto goal_x = this->getInput<double>("goal_x");
+    auto goal_y = this->getInput<double>("goal_y");
+    auto goal_theta = this->getInput<double>("goal_theta");
+
+    geometry_msgs::msg::PoseStamped goal;
+
     if (!has_goal_published) {
-      if (goal) {
-        goal_pub_->publish(goal.value());
+      if (goal_x && goal_y && goal_theta) {
+        goal.header.frame_id = "map";
+        goal.pose.position.x = goal_x.value();
+        goal.pose.position.y = goal_y.value();
+        goal.pose.position.z = 0.0;
+        goal.pose.orientation.w = 1.0;
+        goal_pub_->publish(goal);
         RCLCPP_INFO(
-          get_logger(), "MoveGoalAction : published goal [%f, %f]", goal.value().pose.position.x,
-          goal.value().pose.position.y);
+          get_logger(), "MoveGoalAction : published goal [%f, %f]", goal_x.value(), goal_y.value());
       } else {
         RCLCPP_WARN(get_logger(), "MoveGoalAction : Faild to pushish goal");
       }
@@ -83,8 +95,8 @@ protected:
     auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
     if (pose) {
-      double dist = getDistance(pose.value(), goal->pose);
-      double angle_dist = getAngleDiff(pose.value(), goal->pose);
+      double dist = getDistance(pose.value(), goal.pose);
+      double angle_dist = getAngleDiff(pose.value(), goal.pose);
       if (dist < goal_tolerance_ && angle_dist < goal_angle_tolerance_) {
         return BT::NodeStatus::SUCCESS;
       }
