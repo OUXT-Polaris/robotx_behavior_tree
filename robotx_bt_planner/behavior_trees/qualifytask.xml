@@ -11,4 +11,14 @@
             </ForceSuccess>
         </Sequence>
     </BehaviorTree>
+    <TreeNodesModel>
+        <Action ID="MoveGoalAction">
+            <input_port name="goal_x" type="double"/>
+            <input_port name="goal_y" type="double"/>
+            <input_port name="goal_theta" type="double"/>
+        </Action>
+        <Action ID="WaitAction">
+            <input_port name="wait_time" type="double"/>
+        </Action>
+    </TreeNodesModel>
 </root>

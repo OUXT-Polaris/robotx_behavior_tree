@@ -6,4 +6,4 @@ plugins:
 behavior:
   description:
     package: robotx_bt_planner
-    path : behavior_trees/qualifytask.xml
+    path: behavior_trees/qualifytask.xml
