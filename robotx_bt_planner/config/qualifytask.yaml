@@ -1,0 +1,9 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - move_goal_action
+      - wait_action
+behavior:
+  description:
+    package: robotx_bt_planner
+    path : behavior_trees/qualifytask.xml

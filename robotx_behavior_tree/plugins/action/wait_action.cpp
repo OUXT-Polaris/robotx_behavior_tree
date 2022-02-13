@@ -27,14 +27,22 @@ public:
   WaitAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
+    /*
     declare_parameter("wait_time", 5000.0);  //double millisecond
     get_parameter("wait_time", wait_time_);
+    */
+  }
+
+  static BT::PortsList providedPorts()
+  {
+    return {BT::InputPort<double>("wait_time")};
   }
 
 protected:
   BT::NodeStatus tick() override
   {
     if (!isSetWaitTime) {
+      wait_time_ = this->getInput<double>("wait_time");
       if (wait_time_) {
         RCLCPP_INFO(get_logger(), "WaitAction : waiting %f ms", wait_time_);
       } else {
