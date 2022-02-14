@@ -42,8 +42,9 @@ protected:
   BT::NodeStatus tick() override
   {
     if (!isSetWaitTime) {
-      wait_time_ = this->getInput<double>("wait_time");
-      if (wait_time_) {
+      auto wait_time = this->getInput<double>("wait_time");
+      if (wait_time) {
+        wait_time_ = wait_time.value();
         RCLCPP_INFO(get_logger(), "WaitAction : waiting %f ms", wait_time_);
       } else {
         RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
