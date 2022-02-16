@@ -33,10 +33,7 @@ public:
     */
   }
 
-  static BT::PortsList providedPorts()
-  {
-    return {BT::InputPort<double>("wait_time")};
-  }
+  static BT::PortsList providedPorts() { return {BT::InputPort<double>("wait_time")}; }
 
 protected:
   BT::NodeStatus tick() override
