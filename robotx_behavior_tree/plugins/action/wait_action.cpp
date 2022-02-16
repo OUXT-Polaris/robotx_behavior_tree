@@ -51,16 +51,20 @@ protected:
       isSetWaitTime = true;
     }
 
-    end = std::chrono::system_clock::now();
-    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    while (elapsed <= wait_time_) {
+      end = std::chrono::system_clock::now();
+      elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
-
+      RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
+    }
+    RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
+    return BT::NodeStatus::SUCCESS;
+    /*
     if (elapsed >= wait_time_) {
       RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
       return BT::NodeStatus::SUCCESS;
     }
-    return BT::NodeStatus::RUNNING;
+    */
   }
 
   float wait_time_;
