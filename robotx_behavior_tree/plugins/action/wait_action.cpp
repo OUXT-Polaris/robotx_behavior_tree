@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <unistd.h>
+
 #include <chrono>
 #include <memory>
 #include <string>
@@ -47,17 +49,20 @@ protected:
         RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
         wait_time_ = 5000.0;
       }
-      start = std::chrono::system_clock::now();
       isSetWaitTime = true;
     }
 
-    while (elapsed <= wait_time_) {
-      end = std::chrono::system_clock::now();
-      elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    if (!success) {
+      do {
+        sleep(1);
+        count += 1;
+        elapsed = 1000 * count;
+        RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
+      } while (elapsed < wait_time_);
 
-      RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
+      RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
+      success = true;
     }
-    RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
     return BT::NodeStatus::SUCCESS;
     /*
     if (elapsed >= wait_time_) {
@@ -67,9 +72,11 @@ protected:
     */
   }
 
-  float wait_time_;
-  float elapsed;
+  double wait_time_;
+  double elapsed;
+  int count = 0;
   bool isSetWaitTime = false;
+  bool success = false;
   std::chrono::system_clock::time_point start, end;
 };
 }  // namespace robotx_behavior_tree
