@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <RetryUntilSuccesful num_attempts="">
+                <Action ID="Subscribe" TargetPoint="{pinger}"/>
+            </RetryUntilSuccesful>
+            <Action ID="MoveGoal" TargetPoint="{pinger}"/>
+            <RetryUntilSuccesful num_attempts="">
+                <Action ID="Subscribe" TargetPoint="{buoy}"/>
+            </RetryUntilSuccesful>
+            <Action ID="MoveGoal" TargetPoint="{buoy}"/>
+            <Action ID="Trun" TurnPoint="{buoy}"/>
+            <Action ID="MoveGoal" TargetPoint="{pinger}"/>
+            <ForceSuccess>
+                <Action ID="Wait" WaitTime="{wait_time}"/>
+            </ForceSuccess>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="Subscribe">
+            <inout_port default="{target}" name="TargetPoint"/>
+        </Action>
+        <Action ID="MoveGoal">
+            <input_port default="{target}" name="TargetPoint"/>
+        </Action>
+        <Action ID="Trun">
+            <input_port default="{center}" name="CenterPoint"/>
+        </Action>
+        <Action ID="Wait">
+            <input_port default="{wait_time}" name="WaitTime"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>

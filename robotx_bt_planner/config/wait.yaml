@@ -1,0 +1,8 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - wait_action
+behavior:
+  description:
+    package: robotx_bt_planner
+    path : behavior_trees/wait.xml
