@@ -1,15 +1,19 @@
 <root main_tree_to_execute = "Turn" >
     <BehaviorTree ID="Turn">
         <Sequence>
-            <!-- subscribe buoy position-->
+            <!-- subscribe buoy position -->
             <RetryUntilSuccesful num_attempts="">
-                <Action ID="SubscribeAction" TargetPoint="{buoy}"/>
+            <!-- subscribe v position, vehicle position and set pose_v, pose -->
+                <Action ID="SubscribeAction"/>
             </RetryUntilSuccesful>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <!-- set turn raduis and direction -->
+            <!-- dir = 1 (left) or -1 (right) -->
+            <Action ID="SetTrunAction" radius="3.0" dir="-1" pose_x="{pose_x}" pose_y="{pose_y}" pose_v_x="{pose_v_x}" pose_v_x="{pose_v_x}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x1}" goal_y="{goal_y1}" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x2}" goal_y="{goal_y2}" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x3}" goal_y="{goal_y3}" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x4}" goal_y="{goal_y4}" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x5}" goal_y="{goal_y5}" goal_theta="0.0"/>
         </Sequence>        
     </BehaviorTree>
 </root>
