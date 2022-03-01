@@ -47,6 +47,9 @@ list(APPEND plugin_libs wait_action)
 add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
 list(APPEND plugin_libs move_goal_action)
 
+add_library(set_turn_action SHARED plugins/action/set_turn_action.cpp)
+list(APPEND plugin_libs set_turn_action)
+
 foreach(plugin ${plugin_libs})
 ament_target_dependencies(${plugin} ${dependencies})
 target_compile_definitions(${plugin} PRIVATE BT_PLUGIN_EXPORT)

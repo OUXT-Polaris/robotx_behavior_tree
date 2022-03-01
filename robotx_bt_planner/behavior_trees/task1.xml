@@ -1,37 +1,25 @@
 <?xml version="1.0"?>
-<root main_tree_to_execute="BehaviorTree">
-    <!-- ////////// -->
-    <BehaviorTree ID="BehaviorTree">
+<root main_tree_to_execute="Task1">
+
+    <!-- include turn subtree -->
+    <include ros_pkg="robotx_bt_plannner" path="behavior_trees/turn.xml"/>
+    
+    <BehaviorTree ID="Task1">
         <Sequence>
+            <!-- subscribe pinger gate position -->
             <RetryUntilSuccesful num_attempts="">
-                <Action ID="Subscribe" TargetPoint="{pinger}"/>
+                <Action ID="SubscribeAction"/> 
             </RetryUntilSuccesful>
-            <Action ID="MoveGoal" TargetPoint="{pinger}"/>
-            <RetryUntilSuccesful num_attempts="">
-                <Action ID="Subscribe" TargetPoint="{buoy}"/>
-            </RetryUntilSuccesful>
-            <Action ID="MoveGoal" TargetPoint="{buoy}"/>
-            <Action ID="Trun" TurnPoint="{buoy}"/>
-            <Action ID="MoveGoal" TargetPoint="{pinger}"/>
-            <ForceSuccess>
-                <Action ID="Wait" WaitTime="{wait_time}"/>
-            </ForceSuccess>
+
+            <!-- move to pinger gate -->
+            <Action ID="MoveGoalActiuon" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+
+            <!-- turn around a buoy -->
+            <Subtree ID="Turn"/>
+
+            <!-- move to exit pinger gate  -->
+            <Action ID="MoveGoalActiuon" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            
         </Sequence>
     </BehaviorTree>
-    <!-- ////////// -->
-    <TreeNodesModel>
-        <Action ID="Subscribe">
-            <inout_port default="{target}" name="TargetPoint"/>
-        </Action>
-        <Action ID="MoveGoal">
-            <input_port default="{target}" name="TargetPoint"/>
-        </Action>
-        <Action ID="Trun">
-            <input_port default="{center}" name="CenterPoint"/>
-        </Action>
-        <Action ID="Wait">
-            <input_port default="{wait_time}" name="WaitTime"/>
-        </Action>
-    </TreeNodesModel>
-    <!-- ////////// -->
 </root>
