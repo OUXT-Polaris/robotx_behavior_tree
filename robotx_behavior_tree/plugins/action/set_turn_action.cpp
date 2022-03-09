@@ -55,17 +55,15 @@ protected:
 
       radius_ = radius.value();
 
-      if(dir.value() == "left")
-      {
+      if (dir.value() == "left") {
         dir_ = 1;
         RCLCPP_INFO(get_logger(), "SetTurnAction : turning left");
-      }
-      else if(dir.value() == "right")
-      { 
-        dir_ = -1; 
+      } else if (dir.value() == "right") {
+        dir_ = -1;
         RCLCPP_INFO(get_logger(), "SetTurnAction : turning right");
+      } else {
+        RCLCPP_ERROR(get_logger(), "SetTurnAction : invalid dir");
       }
-      else{ RCLCPP_ERROR(get_logger(), "SetTurnAction : invalid dir"); }
 
       pose_x_ = pose_x.value();
       pose_y_ = pose_y.value();
