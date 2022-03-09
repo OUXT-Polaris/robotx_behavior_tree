@@ -37,7 +37,7 @@ public:
             BT::OutputPort<double>("goal_x3"), BT::OutputPort<double>("goal_y3"),
             BT::OutputPort<double>("goal_x4"), BT::OutputPort<double>("goal_y4"),
             BT::OutputPort<double>("goal_x5"), BT::OutputPort<double>("goal_y5"),
-            BT::InputPort<double>("radius"),   BT::InputPort<int>("dir"),
+            BT::InputPort<double>("radius"),   BT::InputPort<std::string>("dir"),
             BT::InputPort<double>("pose_x"),   BT::InputPort<int>("pose_y"),
             BT::InputPort<double>("pose_v_x"), BT::InputPort<int>("pose_v_y")};
   }
@@ -47,14 +47,24 @@ protected:
   {
     if (!isSet) {
       auto radius = this->getInput<double>("rasius");
-      auto dir = this->getInput<int>("turn");
-      auto pose_x = this->getInput<double>("rasius");
-      auto pose_y = this->getInput<double>("turn");
-      auto pose_v_x = this->getInput<double>("rasius");
-      auto pose_v_y = this->getInput<double>("turn");
+      auto dir = this->getInput<std::string>("turn");
+      auto pose_x = this->getInput<double>("pose_x");
+      auto pose_y = this->getInput<double>("pose_y");
+      auto pose_v_x = this->getInput<double>("pose_v_x");
+      auto pose_v_y = this->getInput<double>("pose_v_y");
 
       radius_ = radius.value();
-      dir_ = dir.value();
+
+      if (dir.value() == "left") {
+        dir_ = 1;
+        RCLCPP_INFO(get_logger(), "SetTurnAction : turning left");
+      } else if (dir.value() == "right") {
+        dir_ = -1;
+        RCLCPP_INFO(get_logger(), "SetTurnAction : turning right");
+      } else {
+        RCLCPP_ERROR(get_logger(), "SetTurnAction : invalid dir");
+      }
+
       pose_x_ = pose_x.value();
       pose_y_ = pose_y.value();
       pose_v_x_ = pose_v_x.value();

@@ -7,8 +7,8 @@
                 <Action ID="SubscribeAction"/>
             </RetryUntilSuccesful>
             <!-- set turn raduis and direction -->
-            <!-- dir = 1 (left) or -1 (right) -->
-            <Action ID="SetTrunAction" radius="3.0" dir="-1" pose_x="{pose_x}" pose_y="{pose_y}" pose_v_x="{pose_v_x}" pose_v_y="{pose_v_y}"/>
+            <!-- dir = left or right -->
+            <Action ID="SetTrunAction" radius="3.0" dir="left" pose_x="{pose_x}" pose_y="{pose_y}" pose_v_x="{pose_v_x}" pose_v_y="{pose_v_y}"/>
             <Action ID="MoveGoalAction" goal_x="{goal_x1}" goal_y="{goal_y1}" goal_theta="0.0"/>
             <Action ID="MoveGoalAction" goal_x="{goal_x2}" goal_y="{goal_y2}" goal_theta="0.0"/>
             <Action ID="MoveGoalAction" goal_x="{goal_x3}" goal_y="{goal_y3}" goal_theta="0.0"/>
