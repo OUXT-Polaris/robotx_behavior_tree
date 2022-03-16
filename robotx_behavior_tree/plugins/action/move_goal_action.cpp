@@ -111,7 +111,7 @@ protected:
         dist = getDistance(pose.value(), goal.pose);
         angle_dist = getAngleDiff(pose.value(), goal.pose);
       }
-    } while (!(dist < goal_tolerance_ /*&& angle_dist < goal_angle_tolerance_*/));
+    } while (!(dist < goal_tolerance_ /* && angle_dist < goal_angle_tolerance_ */));
 
     RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
 
