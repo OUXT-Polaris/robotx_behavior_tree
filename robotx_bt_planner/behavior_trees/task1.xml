@@ -2,23 +2,29 @@
 <root main_tree_to_execute="Task1">
 
     <!-- include turn subtree -->
-    <include ros_pkg="robotx_bt_plannner" path="behavior_trees/turn.xml"/>
+    
+    <include path="/home/kenta/ouxt_automation/robotx_ws/src/planning/robotx_behavior_tree/robotx_bt_planner/behavior_trees/turn.xml"/>
     
     <BehaviorTree ID="Task1">
         <Sequence>
             <!-- subscribe pinger gate position -->
+            <!--
             <RetryUntilSuccesful num_attempts="">
                 <Action ID="SubscribeAction"/> 
             </RetryUntilSuccesful>
-
+            -->
+            <Action ID="WaitAction" wait_time="3000.0"/>
+ 
             <!-- move to pinger gate -->
-            <Action ID="MoveGoalActiuon" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
 
             <!-- turn around a buoy -->
-            <Subtree ID="Turn"/>
+            
+            <SubTree ID="Turn"/>
+           
 
             <!-- move to exit pinger gate  -->
-            <Action ID="MoveGoalActiuon" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
             
         </Sequence>
     </BehaviorTree>
