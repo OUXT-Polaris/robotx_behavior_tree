@@ -1,0 +1,10 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - move_goal_action
+      - wait_action
+      - set_turn_action
+behavior:
+  description:
+    package: robotx_bt_planner
+    path: behavior_trees/task1.xml

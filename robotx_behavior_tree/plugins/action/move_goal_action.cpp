@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <tf2/LinearMath/Matrix3x3.h>
+
 #include <cmath>
 #include <memory>
 #include <optional>
 #include <string>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/quaternion.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
@@ -33,9 +37,9 @@ public:
   MoveGoalAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config), buffer_(get_clock()), listener_(buffer_)
   {
-    declare_parameter("goal_tolerance", 0.5);
+    declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
-    declare_parameter("goal_angle_tolerance", 0.05);
+    declare_parameter("goal_angle_tolerance", 0.08);
     get_parameter("goal_angle_tolerance", goal_angle_tolerance_);
     goal_pub_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
@@ -76,32 +80,42 @@ protected:
     geometry_msgs::msg::PoseStamped goal;
 
     if (!has_goal_published) {
+      tf2::Quaternion tf_quat;
+      tf_quat.setRPY(0.0, 0.0, goal_theta.value());
+
       if (goal_x && goal_y && goal_theta) {
         goal.header.frame_id = "map";
         goal.pose.position.x = goal_x.value();
         goal.pose.position.y = goal_y.value();
         goal.pose.position.z = 0.0;
-        goal.pose.orientation.w = 1.0;
+
+        goal.pose.orientation.w = tf_quat.w();
+        goal.pose.orientation.x = tf_quat.x();
+        goal.pose.orientation.y = tf_quat.y();
+        goal.pose.orientation.z = tf_quat.z();
+
         goal_pub_->publish(goal);
         RCLCPP_INFO(
-          get_logger(), "MoveGoalAction : published goal [%f, %f]", goal_x.value(), goal_y.value());
+          get_logger(), "MoveGoalAction : published goal [%f, %f, %f]", goal_x.value(),
+          goal_y.value(), goal_theta.value());
       } else {
         RCLCPP_WARN(get_logger(), "MoveGoalAction : Faild to pushish goal");
       }
       has_goal_published = true;
     }
 
-    auto pose = getCurrentPose();
-    get_parameter("goal_tolerance", goal_tolerance_);
-    if (pose) {
-      double dist = getDistance(pose.value(), goal.pose);
-      double angle_dist = getAngleDiff(pose.value(), goal.pose);
-      if (dist < goal_tolerance_ && angle_dist < goal_angle_tolerance_) {
-        return BT::NodeStatus::SUCCESS;
+    do {
+      auto pose = getCurrentPose();
+      get_parameter("goal_tolerance", goal_tolerance_);
+      if (pose) {
+        dist = getDistance(pose.value(), goal.pose);
+        angle_dist = getAngleDiff(pose.value(), goal.pose);
       }
-    }
+    } while (!(dist < goal_tolerance_ /* && angle_dist < goal_angle_tolerance_ */));
 
-    return BT::NodeStatus::RUNNING;
+    RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
+
+    return BT::NodeStatus::SUCCESS;
   }
 
   double getDistance(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
@@ -136,9 +150,12 @@ protected:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
+  bool success = false;
   bool has_goal_published = false;
   double goal_tolerance_;
   double goal_angle_tolerance_;
+  double dist;
+  double angle_dist;
 };
 }  // namespace robotx_behavior_tree
 

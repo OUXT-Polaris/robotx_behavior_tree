@@ -2,18 +2,35 @@
     <BehaviorTree ID="Turn">
         <Sequence>
             <!-- subscribe buoy position -->
-            <RetryUntilSuccesful num_attempts="">
             <!-- subscribe v position, vehicle position and set pose_v, pose -->
+            <!--
+            <RetryUntilSuccesful num_attempts="">
                 <Action ID="SubscribeAction"/>
             </RetryUntilSuccesful>
+            -->
+            <Action ID="WaitAction" wait_time="3000.0"/>
+           
             <!-- set turn raduis and direction -->
             <!-- dir = left or right -->
-            <Action ID="SetTrunAction" radius="3.0" dir="left" pose_x="{pose_x}" pose_y="{pose_y}" pose_v_x="{pose_v_x}" pose_v_y="{pose_v_y}"/>
-            <Action ID="MoveGoalAction" goal_x="{goal_x1}" goal_y="{goal_y1}" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="{goal_x2}" goal_y="{goal_y2}" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="{goal_x3}" goal_y="{goal_y3}" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="{goal_x4}" goal_y="{goal_y4}" goal_theta="0.0"/>
-            <Action ID="MoveGoalAction" goal_x="{goal_x5}" goal_y="{goal_y5}" goal_theta="0.0"/>
+            <Action ID="SetTurnAction" radius="3.0" dir="left" pose_x="10" pose_y="5" pose_v_x="20" pose_v_y="20" 
+                        goal_x1="{goal_x1}" goal_y1="{goal_y1}" goal_theta1="{goal_theta1}"
+                        goal_x2="{goal_x2}" goal_y2="{goal_y2}" goal_theta2="{goal_theta2}"
+                        goal_x3="{goal_x3}" goal_y3="{goal_y3}" goal_theta3="{goal_theta3}"
+                        goal_x4="{goal_x4}" goal_y4="{goal_y4}" goal_theta4="{goal_theta4}"
+                        goal_x5="{goal_x5}" goal_y5="{goal_y5}" goal_theta5="{goal_theta5}"
+                        goal_x6="{goal_x6}" goal_y6="{goal_y6}" goal_theta6="{goal_theta6}"
+                        goal_x7="{goal_x7}" goal_y7="{goal_y7}" goal_theta7="{goal_theta7}"
+                        goal_x8="{goal_x8}" goal_y8="{goal_y8}" goal_theta8="{goal_theta8}"/>
+            
+
+            <Action ID="MoveGoalAction" goal_x="{goal_x1}" goal_y="{goal_y1}" goal_theta="{goal_theta1}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x2}" goal_y="{goal_y2}" goal_theta="{goal_theta2}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x3}" goal_y="{goal_y3}" goal_theta="{goal_theta3}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x4}" goal_y="{goal_y4}" goal_theta="{goal_theta4}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x5}" goal_y="{goal_y5}" goal_theta="{goal_theta5}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x6}" goal_y="{goal_y6}" goal_theta="{goal_theta6}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x7}" goal_y="{goal_y7}" goal_theta="{goal_theta7}"/>
+            <Action ID="MoveGoalAction" goal_x="{goal_x8}" goal_y="{goal_y8}" goal_theta="{goal_theta8}"/>
         </Sequence>        
     </BehaviorTree>
 </root>

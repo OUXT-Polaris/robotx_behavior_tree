@@ -32,22 +32,29 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return {BT::OutputPort<double>("goal_x1"), BT::OutputPort<double>("goal_y1"),
-            BT::OutputPort<double>("goal_x2"), BT::OutputPort<double>("goal_y2"),
-            BT::OutputPort<double>("goal_x3"), BT::OutputPort<double>("goal_y3"),
-            BT::OutputPort<double>("goal_x4"), BT::OutputPort<double>("goal_y4"),
-            BT::OutputPort<double>("goal_x5"), BT::OutputPort<double>("goal_y5"),
-            BT::InputPort<double>("radius"),   BT::InputPort<std::string>("dir"),
-            BT::InputPort<double>("pose_x"),   BT::InputPort<int>("pose_y"),
-            BT::InputPort<double>("pose_v_x"), BT::InputPort<int>("pose_v_y")};
+    return {BT::OutputPort<double>("goal_x1"),     BT::OutputPort<double>("goal_y1"),
+            BT::OutputPort<double>("goal_theta1"), BT::OutputPort<double>("goal_x2"),
+            BT::OutputPort<double>("goal_y2"),     BT::OutputPort<double>("goal_theta2"),
+            BT::OutputPort<double>("goal_x3"),     BT::OutputPort<double>("goal_y3"),
+            BT::OutputPort<double>("goal_theta3"), BT::OutputPort<double>("goal_x4"),
+            BT::OutputPort<double>("goal_y4"),     BT::OutputPort<double>("goal_theta4"),
+            BT::OutputPort<double>("goal_x5"),     BT::OutputPort<double>("goal_y5"),
+            BT::OutputPort<double>("goal_theta5"), BT::OutputPort<double>("goal_x6"),
+            BT::OutputPort<double>("goal_y6"),     BT::OutputPort<double>("goal_theta6"),
+            BT::OutputPort<double>("goal_x7"),     BT::OutputPort<double>("goal_y7"),
+            BT::OutputPort<double>("goal_theta7"), BT::OutputPort<double>("goal_x8"),
+            BT::OutputPort<double>("goal_y8"),     BT::OutputPort<double>("goal_theta8"),
+            BT::InputPort<double>("radius"),       BT::InputPort<std::string>("dir"),
+            BT::InputPort<double>("pose_x"),       BT::InputPort<int>("pose_y"),
+            BT::InputPort<double>("pose_v_x"),     BT::InputPort<int>("pose_v_y")};
   }
 
 protected:
   BT::NodeStatus tick() override
   {
     if (!isSet) {
-      auto radius = this->getInput<double>("rasius");
-      auto dir = this->getInput<std::string>("turn");
+      auto radius = this->getInput<double>("radius");
+      auto dir = this->getInput<std::string>("dir");
       auto pose_x = this->getInput<double>("pose_x");
       auto pose_y = this->getInput<double>("pose_y");
       auto pose_v_x = this->getInput<double>("pose_v_x");
@@ -73,27 +80,59 @@ protected:
       isSet = true;
     }
 
+    int N = 8;  // vertex
     if (!success) {
       thetap_ = std::atan2(pose_v_y_ - pose_y_, pose_v_x_ - pose_x_);
-      std::vector<double> goal(9);
-      for (int i = 0; i < 5; i++) {
-        goal[i] =
-          std::cos(-thetap_) * (pose_v_x_ - radius_ * std::cos((36 + 72 * i) * 3.14 / 180)) -
-          std::sin(-thetap_) * (pose_v_y_ - radius_ * dir_ * std::sin((36 + 72 * i) * 3.14 / 180));
-        goal[i + 1] =
-          std::sin(-thetap_) * (pose_v_x_ - radius_ * std::cos((36 + 72 * i) * 3.14 / 180)) +
-          std::cos(-thetap_) * (pose_v_y_ - radius_ * dir_ * std::sin((36 + 72 * i) * 3.14 / 180));
+      std::vector<double> goalx(N);
+      std::vector<double> goaly(N);
+      std::vector<double> goaltheta(N);
+      double o = 360 / N;
+      for (int i = 0; i < N; i++) {
+        goalx[i] =
+          std::cos(-thetap_) * (pose_v_x_ - radius_ * std::cos((o / 2 + o * i) * 3.14 / 180)) -
+          std::sin(-thetap_) *
+            (pose_v_y_ - radius_ * dir_ * std::sin((o / 2 + o * i) * 3.14 / 180));
+        goaly[i] =
+          std::sin(-thetap_) * (pose_v_x_ - radius_ * std::cos((o / 2 + o * i) * 3.14 / 180)) +
+          std::cos(-thetap_) *
+            (pose_v_y_ - radius_ * dir_ * std::sin((o / 2 + o * i) * 3.14 / 180));
       }
-      setOutput<double>("goal_x1", goal[0]);
-      setOutput<double>("goal_y1", goal[1]);
-      setOutput<double>("goal_x2", goal[2]);
-      setOutput<double>("goal_y2", goal[3]);
-      setOutput<double>("goal_x3", goal[4]);
-      setOutput<double>("goal_y3", goal[5]);
-      setOutput<double>("goal_x4", goal[6]);
-      setOutput<double>("goal_y4", goal[7]);
-      setOutput<double>("goal_x5", goal[8]);
-      setOutput<double>("goal_y5", goal[9]);
+      for (int j = 0; j < (N - 1); j++) {
+        goaltheta[j] = std::atan2(goaly[j + 1] - goaly[j], goalx[j + 1] - goalx[j]);
+      }
+      goaltheta[N - 1] = goaltheta[N - 2];
+
+      setOutput<double>("goal_x1", goalx[0]);
+      setOutput<double>("goal_y1", goaly[0]);
+      setOutput<double>("goal_theta1", goaltheta[0]);
+
+      setOutput<double>("goal_x2", goalx[1]);
+      setOutput<double>("goal_y2", goaly[1]);
+      setOutput<double>("goal_theta2", goaltheta[1]);
+
+      setOutput<double>("goal_x3", goalx[2]);
+      setOutput<double>("goal_y3", goaly[2]);
+      setOutput<double>("goal_theta3", goaltheta[2]);
+
+      setOutput<double>("goal_x4", goalx[3]);
+      setOutput<double>("goal_y4", goaly[3]);
+      setOutput<double>("goal_theta4", goaltheta[3]);
+
+      setOutput<double>("goal_x5", goalx[4]);
+      setOutput<double>("goal_y5", goaly[4]);
+      setOutput<double>("goal_theta5", goaltheta[4]);
+
+      setOutput<double>("goal_x6", goalx[5]);
+      setOutput<double>("goal_y6", goaly[5]);
+      setOutput<double>("goal_theta6", goaltheta[5]);
+
+      setOutput<double>("goal_x7", goalx[6]);
+      setOutput<double>("goal_y7", goaly[6]);
+      setOutput<double>("goal_theta7", goaltheta[6]);
+
+      setOutput<double>("goal_x8", goalx[7]);
+      setOutput<double>("goal_y8", goaly[7]);
+      setOutput<double>("goal_theta8", goaltheta[7]);
 
       RCLCPP_INFO(get_logger(), "SetTurnAction : SUCCESS");
       success = true;
