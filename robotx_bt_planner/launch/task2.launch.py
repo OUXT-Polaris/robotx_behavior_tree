@@ -128,7 +128,7 @@ def generate_launch_description():
             executable='robotx_bt_planner_node',
             name='robotx_bt_planner_node',
             parameters=[{'config_package':'robotx_bt_planner',
-                         'config_file':'config/task1.yaml',
+                         'config_file':'config/task2.yaml',
                          'update_rate':20.0}]
         )])
 

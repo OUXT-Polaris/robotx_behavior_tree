@@ -7,4 +7,4 @@ plugins:
 behavior:
   description:
     package: robotx_bt_planner
-    path: behavior_trees/task1.xml
+    path: behavior_trees/task2.xml
