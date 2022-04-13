@@ -21,8 +21,8 @@ set(dependencies
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/Evaluation.srv"
   "msg/TaskObject.msg"
+  "srv/Evaluation.srv"
 )
 
 #install
