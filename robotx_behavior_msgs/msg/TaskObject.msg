@@ -29,5 +29,5 @@ float32 x
 float32 y
 float32[<=1] theta 
 bool detected
-float32 last_detected
+builtin_interfaces/Time last_detected
 float32 reliability
