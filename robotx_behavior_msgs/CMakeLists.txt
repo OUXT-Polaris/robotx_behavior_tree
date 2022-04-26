@@ -22,6 +22,7 @@ set(dependencies
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TaskObject.msg"
+  "msg/TaskObjectsArray.msg"
   "srv/Evaluation.srv"
 )
 
