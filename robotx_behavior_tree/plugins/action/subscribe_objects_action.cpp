@@ -37,8 +37,7 @@ public:
 protected:
   BT::NodeStatus tick() override
   {
-    
-    return BT::NodeStatus::RUNNING;
+    return BT::NodeStatus::success;
   }
 
   void topic_callback(const robotx_behavor_msgs::msg::TaskObjectsArray::SharedPtr msg)
