@@ -16,8 +16,8 @@
 #include <string>
 // some type of msgs
 #include "rclcpp/rclcpp.hpp"
-#include "robotx_behavior_tree/action_node.hpp"
 #include "robotx_behavior_msgs/msg/task_objects_array.hpp"
+#include "robotx_behavior_tree/action_node.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -28,25 +28,23 @@ public:
   : ActionROS2Node(name, config)
   {
     subscription_ = this->create_subscription<robotx_behavor_msgs::msg::TaskObjectsArray>(
-    "/TaskObjectsArray", 2, std::bind(&SubscribeObjectsAction::topic_callback, this, std::placeholders::_1));
+      "/TaskObjectsArray", 2,
+      std::bind(&SubscribeObjectsAction::topic_callback, this, std::placeholders::_1));
   }
 
-
-  static BT::PortsList providedPorts() { return {BT::OutputPort<robotx_behavor_msgs::msg::TaskObjectsArray>("task_objects")}; }
+  static BT::PortsList providedPorts()
+  {
+    return {BT::OutputPort<robotx_behavor_msgs::msg::TaskObjectsArray>("task_objects")};
+  }
 
 protected:
-  BT::NodeStatus tick() override
-  {
-    return BT::NodeStatus::success;
-  }
+  BT::NodeStatus tick() override { return BT::NodeStatus::success; }
 
   void topic_callback(const robotx_behavor_msgs::msg::TaskObjectsArray::SharedPtr msg)
-  { 
-    task_objects_ = msg; 
+  {
+    task_objects_ = msg;
     setOutput<robotx_behavor_msgs::msg::TaskObjectsArray>("task_objects", task_objects_);
   };
-
-
 
   rclcpp::Subscription<robotx_behavor_msgs::msg::TaskObjectsArray>::SharedPtr subscription_;
   robotx_behavor_msgs::msg::TaskObjectsArray task_objects_;
