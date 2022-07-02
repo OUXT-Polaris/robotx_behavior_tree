@@ -26,6 +26,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TaskObject.msg"
   "msg/TaskObjectsArray.msg"
   "srv/Evaluation.srv"
+  DEPENDENCIES builtin_interfaces std_msgs
 )
 
 #install
