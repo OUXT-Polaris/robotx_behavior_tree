@@ -1,10 +1,10 @@
 name: BuildTest
 
-on:
-  schedule:
-    - cron: 0 0 * * *
-  pull_request:
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: 0 0 * * *
+#   pull_request:
+#   workflow_dispatch:
 
 jobs:
   build_and_test:
