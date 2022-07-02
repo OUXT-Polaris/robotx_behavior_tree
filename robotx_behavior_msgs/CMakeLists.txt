@@ -13,11 +13,13 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(dependencies
   "rclcpp"
   "std_msgs"
+  "builtin_interfaces"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
