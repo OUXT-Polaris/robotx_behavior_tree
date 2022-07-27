@@ -11,6 +11,7 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
   <depend>ament_index_cpp</depend>
   <depend>yaml-cpp</depend>
   <depend>lua_vendor</depend>
