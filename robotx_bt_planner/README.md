@@ -1,4 +1,4 @@
-# robotx_bt_planner [![BuildTest](https://github.com/OUXT-Polaris/robotx_bt_planner/actions/workflows/BuildTest.yaml/badge.svg)](https://github.com/OUXT-Polaris/robotx_bt_planner/actions/workflows/BuildTest.yaml)
+# robotx_bt_planner [![BuildTest](https://github.com/OUXT-Polaris/robotx_behavior_tree/actions/workflows/BuildTest.yaml/badge.svg)](https://github.com/OUXT-Polaris/robotx_behavior_tree/actions/workflows/BuildTest.yaml)
 
 ## directories
 ~~~
