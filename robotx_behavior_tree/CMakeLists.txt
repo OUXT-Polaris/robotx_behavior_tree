@@ -11,52 +11,22 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(behavior_tree_action_builder REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
+#include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
-set(dependencies
-  "rclcpp"
-  "behavior_tree_action_builder"
-  "behaviortree_cpp_v3"
-  "geometry_msgs"
-  "tf2"
-  "tf2_ros"
-  "tf2_geometry_msgs"
-)
+#set(library_name ${PROJECT_NAME})
 
+ament_auto_add_library(example_action SHARED plugins/action/example_action.cpp)
 
-set(library_name ${PROJECT_NAME})
+ament_auto_add_library(publish_action SHARED plugins/action/publish_action.cpp)
 
-add_library(example_action SHARED plugins/action/example_action.cpp)
-list(APPEND plugin_libs example_action)
+ament_auto_add_library(wait_action SHARED plugins/action/wait_action.cpp)
 
-add_library(publish_action SHARED plugins/action/publish_action.cpp)
-list(APPEND plugin_libs publish_action)
+ament_auto_add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
 
-add_library(wait_action SHARED plugins/action/wait_action.cpp)
-list(APPEND plugin_libs wait_action)
-
-add_library(move_goal_action SHARED plugins/action/move_goal_action.cpp)
-list(APPEND plugin_libs move_goal_action)
-
-add_library(set_turn_action SHARED plugins/action/set_turn_action.cpp)
-list(APPEND plugin_libs set_turn_action)
-
-foreach(plugin ${plugin_libs})
-ament_target_dependencies(${plugin} ${dependencies})
-target_compile_definitions(${plugin} PRIVATE BT_PLUGIN_EXPORT)
-ament_export_libraries(${plugin})
-endforeach()
-
-#ament_export_libraries(${plugin_libs})
+ament_auto_add_library(set_turn_action SHARED plugins/action/set_turn_action.cpp)
 
 install(TARGETS
   ${plugin_libs}
@@ -66,21 +36,8 @@ install(TARGETS
 )
 
 if(BUILD_TESTING)
-find_package(ament_lint_auto REQUIRED)
-# the following line skips the linter which checks for copyrights
-# uncomment the line when a copyright and license is not present in all source files
-#set (ament_cmake_copyright_FOUND TRUE)
-# the following line skips cpplint (only works in a git repo)
-# uncomment the line when this package is not in a git repo
-#set (ament_cmake_cpplint_FOUND TRUE)
-ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_libraries(
-  ${library_name}
-  ${plugin_libs}
-)
-
-ament_export_dependencies(${dependencies})
-
-ament_package()
+ament_auto_package()

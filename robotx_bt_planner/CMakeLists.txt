@@ -17,7 +17,6 @@ add_compile_options(-fPIC)
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(robotx_behavior_tree REQUIRED)
 
 ament_auto_find_build_dependencies()
 
