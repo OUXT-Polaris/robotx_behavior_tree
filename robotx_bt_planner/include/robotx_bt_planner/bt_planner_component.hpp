@@ -17,6 +17,7 @@
 
 #include <fstream>
 #include <memory>
+#include <robotx_behavior_msgs/msg/task_objects_array.hpp>
 #include <string>
 #include <vector>
 
@@ -215,8 +216,10 @@ public:
     }
   }
 
+private:
   std::string config_file_;
   std::string config_package_;
+  std::string task_object_topic_;
   float update_rate_;
   YAML::Node node_;
   Format format_;
@@ -229,6 +232,9 @@ public:
   std::unique_ptr<BT::PublisherZMQ> publisher_zmq_;
   rclcpp::Node::SharedPtr client_node_;
   rclcpp::Service<robotx_behavior_msgs::srv::Evaluation>::SharedPtr evaluation_server_;
+  rclcpp::Subscription<robotx_behavior_msgs::msg::TaskObjectsArray>::SharedPtr
+    task_objects_array_sub_;
+  void taskObjectsArrayCallback(const robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr data);
 };
 }  // namespace robotx_bt_planner
 

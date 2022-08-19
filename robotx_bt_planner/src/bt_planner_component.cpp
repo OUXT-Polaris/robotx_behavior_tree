@@ -31,6 +31,8 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   declare_parameter<std::string>("config_file", "config/example.yaml");
   get_parameter("config_file", config_file_);
   declare_parameter<double>("update_rate", 10.0);
+  declare_parameter<std::string>("task_object_topic", "/perception/task_objects");
+  get_parameter("task_object_topic", task_object_topic_);
   get_parameter("update_rate", update_rate_);
 
   std::string config_path =
@@ -56,6 +58,12 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   using std::literals::chrono_literals::operator""s;
   auto interval = 1s / update_rate_;
   timer_ = create_wall_timer(500ms, std::bind(&BTPlannerComponent::timerCallback, this));
+}
+
+void BTPlannerComponent::taskObjectsArrayCallback(
+  const robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr data)
+{
+  blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr>("task_objects", data);
 }
 }  // namespace robotx_bt_planner
 

@@ -7,7 +7,7 @@
   <maintainer email="pythagora.yoshimoto@gmail.com">Kotaro Yoshimoto</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>rclcpp</depend>
   <depend>behavior_tree_action_builder</depend>
