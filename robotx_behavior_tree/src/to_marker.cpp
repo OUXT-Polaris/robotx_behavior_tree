@@ -32,7 +32,7 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
       model.mesh_use_embedded_materials = false;
       model.mesh_resource =
-        "package://robotx_behavior_msgs/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
+        "package://robotx_behavior_tree/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
@@ -44,7 +44,7 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
       model.mesh_use_embedded_materials = false;
       model.mesh_resource =
-        "package://robotx_behavior_msgs/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
+        "package://robotx_behavior_tree/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
