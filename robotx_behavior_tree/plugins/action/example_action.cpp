@@ -30,7 +30,8 @@ public:
   static BT::PortsList providedPorts() { return {BT::InputPort<int>("test_input")}; }
 
 protected:
-  BT::NodeStatus tick() override { return BT::NodeStatus::FAILURE; }
+  BT::NodeStatus onStart() override { return BT::NodeStatus::RUNNING; }
+  BT::NodeStatus onRunning() override { return BT::NodeStatus::FAILURE; }
 };
 }  // namespace robotx_behavior_tree
 

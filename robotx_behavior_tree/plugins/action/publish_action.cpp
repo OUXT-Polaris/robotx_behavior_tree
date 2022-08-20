@@ -36,7 +36,8 @@ public:
   static BT::PortsList providedPorts() { return {BT::InputPort<std_msgs::msg::Empty>("imput_")}; }
 
 protected:
-  BT::NodeStatus tick() override
+  BT::NodeStatus onStart() override { return BT::NodeStatus::RUNNING; }
+  BT::NodeStatus onRunning() override
   {
     auto input = this->getInput<std_msgs::msg::Empty>("input_");  // CHANGE when you use
     if (!has_published) {
@@ -51,6 +52,7 @@ protected:
     }
     return BT::NodeStatus::RUNNING;
   }
+
   rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_some_;  // CHANGE when you use
   bool has_published = false;
   std::string topic_;

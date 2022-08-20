@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <memory>
+#include <robotx_behavior_tree/to_marker.hpp>
 #include <set>
 #include <string>
 
@@ -31,12 +32,17 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   declare_parameter<std::string>("config_file", "config/example.yaml");
   get_parameter("config_file", config_file_);
   declare_parameter<double>("update_rate", 10.0);
+  get_parameter("update_rate", update_rate_);
   declare_parameter<std::string>("task_object_topic", "/perception/task_objects");
   get_parameter("task_object_topic", task_object_topic_);
-  get_parameter("update_rate", update_rate_);
+  declare_parameter<std::string>("marker_topic", "/perception/task_objects/marker");
+  get_parameter("marker_topic", marker_topic_);
+  declare_parameter<bool>("publish_marker", true);
+  get_parameter("publish_marker", publish_marker_);
 
   std::string config_path =
     ament_index_cpp::get_package_share_directory(config_package_) + "/" + config_file_;
+  RCLCPP_INFO_STREAM(get_logger(), "start loading config file : " << config_path);
   loadConfig(config_path);
   RCLCPP_INFO(get_logger(), "config file loaded!");
 
@@ -50,6 +56,13 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_);
   blackboard_->set<std::chrono::milliseconds>("server_timeout", std::chrono::milliseconds(10));
 
+  if (publish_marker_) {
+    marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(marker_topic_, 1);
+  }
+  task_objects_array_sub_ =
+    this->create_subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>(
+      task_object_topic_, 1,
+      std::bind(&BTPlannerComponent::taskObjectsArrayCallback, this, std::placeholders::_1));
   loadPlugins();
   loadTree();
 
@@ -61,9 +74,13 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
 }
 
 void BTPlannerComponent::taskObjectsArrayCallback(
-  const robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr data)
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data)
 {
-  blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr>("task_objects", data);
+  if (publish_marker_) {
+    marker_pub_->publish(robotx_behavior_tree::toMarker(data));
+  }
+  blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>(
+    "task_objects", data);
 }
 }  // namespace robotx_bt_planner
 

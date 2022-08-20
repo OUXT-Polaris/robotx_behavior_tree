@@ -25,11 +25,10 @@ set(dependencies
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TaskObject.msg"
   "msg/TaskObjectsArray.msg"
+  "msg/TaskObjectsArrayStamped.msg"
   "srv/Evaluation.srv"
   DEPENDENCIES builtin_interfaces std_msgs
 )
-
-#install
 
 if(BUILD_TESTING)
 find_package(ament_lint_auto REQUIRED)

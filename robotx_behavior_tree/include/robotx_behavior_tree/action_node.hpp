@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #ifndef ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 #define ROBOTX_BEHAVIOR_TREE__ACTION_NODE_HPP_
 
@@ -22,29 +23,31 @@
 
 namespace robotx_behavior_tree
 {
-class ActionNode : public BT::SyncActionNode
+class ActionNode : public BT::StatefulActionNode
 {
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::SyncActionNode(name, config)
+  : BT::StatefulActionNode(name, config)
   {
     setRegistrationID(name);
   }
 
 protected:
+  void onHalted() override {}
   std::string name;
 };
 
-class ActionROS2Node : public BT::SyncActionNode, public rclcpp::Node
+class ActionROS2Node : public BT::StatefulActionNode, public rclcpp::Node
 {
 public:
   ActionROS2Node(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::SyncActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
+  : BT::StatefulActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
   {
     setRegistrationID(name);
   }
 
 protected:
+  void onHalted() override {}
   std::string name;
 };
 }  // namespace robotx_behavior_tree

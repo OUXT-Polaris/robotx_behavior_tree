@@ -8,7 +8,7 @@
                 <Action ID="SubscribeAction"/>
             </RetryUntilSuccesful>
             -->
-            <Action ID="WaitAction" wait_time="3000.0"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
            
             <!-- set turn raduis and direction -->
             <!-- dir = left or right -->

@@ -71,51 +71,49 @@ public:
   }
 
 protected:
-  BT::NodeStatus tick() override
+  BT::NodeStatus onStart() override
   {
     auto goal_x = this->getInput<double>("goal_x");
     auto goal_y = this->getInput<double>("goal_y");
     auto goal_theta = this->getInput<double>("goal_theta");
+    tf2::Quaternion tf_quat;
+    tf_quat.setRPY(0.0, 0.0, goal_theta.value());
 
-    geometry_msgs::msg::PoseStamped goal;
+    if (goal_x && goal_y && goal_theta) {
+      goal.header.frame_id = "map";
+      goal.pose.position.x = goal_x.value();
+      goal.pose.position.y = goal_y.value();
+      goal.pose.position.z = 0.0;
 
-    if (!has_goal_published) {
-      tf2::Quaternion tf_quat;
-      tf_quat.setRPY(0.0, 0.0, goal_theta.value());
+      goal.pose.orientation.w = tf_quat.w();
+      goal.pose.orientation.x = tf_quat.x();
+      goal.pose.orientation.y = tf_quat.y();
+      goal.pose.orientation.z = tf_quat.z();
 
-      if (goal_x && goal_y && goal_theta) {
-        goal.header.frame_id = "map";
-        goal.pose.position.x = goal_x.value();
-        goal.pose.position.y = goal_y.value();
-        goal.pose.position.z = 0.0;
-
-        goal.pose.orientation.w = tf_quat.w();
-        goal.pose.orientation.x = tf_quat.x();
-        goal.pose.orientation.y = tf_quat.y();
-        goal.pose.orientation.z = tf_quat.z();
-
-        goal_pub_->publish(goal);
-        RCLCPP_INFO(
-          get_logger(), "MoveGoalAction : published goal [%f, %f, %f]", goal_x.value(),
-          goal_y.value(), goal_theta.value());
-      } else {
-        RCLCPP_WARN(get_logger(), "MoveGoalAction : Faild to pushish goal");
-      }
-      has_goal_published = true;
+      goal_pub_->publish(goal);
+      RCLCPP_INFO(
+        get_logger(), "MoveGoalAction : published goal [%f, %f, %f]", goal_x.value(),
+        goal_y.value(), goal_theta.value());
+      return BT::NodeStatus::RUNNING;
+    } else {
+      RCLCPP_WARN(get_logger(), "MoveGoalAction : Faild to pushish goal");
+      return BT::NodeStatus::FAILURE;
     }
+  }
 
-    do {
-      auto pose = getCurrentPose();
-      get_parameter("goal_tolerance", goal_tolerance_);
-      if (pose) {
-        dist = getDistance(pose.value(), goal.pose);
-        angle_dist = getAngleDiff(pose.value(), goal.pose);
-      }
-    } while (!(dist < goal_tolerance_ /* && angle_dist < goal_angle_tolerance_ */));
-
-    RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
-
-    return BT::NodeStatus::SUCCESS;
+  BT::NodeStatus onRunning() override
+  {
+    auto pose = getCurrentPose();
+    get_parameter("goal_tolerance", goal_tolerance_);
+    if (pose) {
+      dist = getDistance(pose.value(), goal.pose);
+      angle_dist = getAngleDiff(pose.value(), goal.pose);
+    }
+    if (dist < goal_tolerance_) {
+      RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
+    }
+    return BT::NodeStatus::RUNNING;
   }
 
   double getDistance(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
@@ -150,12 +148,11 @@ protected:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
-  bool success = false;
-  bool has_goal_published = false;
   double goal_tolerance_;
   double goal_angle_tolerance_;
   double dist;
   double angle_dist;
+  geometry_msgs::msg::PoseStamped goal;
 };
 }  // namespace robotx_behavior_tree
 

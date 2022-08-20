@@ -13,7 +13,7 @@
                 <Action ID="SubscribeAction"/> 
             </RetryUntilSuccesful>
             -->
-            <Action ID="WaitAction" wait_time="3000.0"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
  
             <!-- move to pinger gate -->
             <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
