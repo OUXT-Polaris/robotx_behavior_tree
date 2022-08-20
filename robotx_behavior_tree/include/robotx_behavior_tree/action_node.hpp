@@ -53,6 +53,17 @@ public:
     return {
       BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects")};
   }
+  static BT::PortsList appendPorts(const BT::PortsList & ports1, const BT::PortsList & ports2)
+  {
+    BT::PortsList ports = {};
+    for (const auto & port : ports1) {
+      ports.emplace(port.first, port.second);
+    }
+    for (const auto & port : ports2) {
+      ports.emplace(port.first, port.second);
+    }
+    return ports;
+  }
 
 protected:
   void onHalted() override {}

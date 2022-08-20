@@ -34,21 +34,23 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return {BT::OutputPort<double>("goal_x1"),     BT::OutputPort<double>("goal_y1"),
-            BT::OutputPort<double>("goal_theta1"), BT::OutputPort<double>("goal_x2"),
-            BT::OutputPort<double>("goal_y2"),     BT::OutputPort<double>("goal_theta2"),
-            BT::OutputPort<double>("goal_x3"),     BT::OutputPort<double>("goal_y3"),
-            BT::OutputPort<double>("goal_theta3"), BT::OutputPort<double>("goal_x4"),
-            BT::OutputPort<double>("goal_y4"),     BT::OutputPort<double>("goal_theta4"),
-            BT::OutputPort<double>("goal_x5"),     BT::OutputPort<double>("goal_y5"),
-            BT::OutputPort<double>("goal_theta5"), BT::OutputPort<double>("goal_x6"),
-            BT::OutputPort<double>("goal_y6"),     BT::OutputPort<double>("goal_theta6"),
-            BT::OutputPort<double>("goal_x7"),     BT::OutputPort<double>("goal_y7"),
-            BT::OutputPort<double>("goal_theta7"), BT::OutputPort<double>("goal_x8"),
-            BT::OutputPort<double>("goal_y8"),     BT::OutputPort<double>("goal_theta8"),
-            BT::InputPort<double>("radius"),       BT::InputPort<std::string>("dir"),
-            BT::InputPort<double>("pose_x"),       BT::InputPort<int>("pose_y"),
-            BT::InputPort<double>("pose_v_x"),     BT::InputPort<int>("pose_v_y")};
+    return appendPorts(
+      ActionROS2Node::providedPorts(),
+      {BT::OutputPort<double>("goal_x1"),     BT::OutputPort<double>("goal_y1"),
+       BT::OutputPort<double>("goal_theta1"), BT::OutputPort<double>("goal_x2"),
+       BT::OutputPort<double>("goal_y2"),     BT::OutputPort<double>("goal_theta2"),
+       BT::OutputPort<double>("goal_x3"),     BT::OutputPort<double>("goal_y3"),
+       BT::OutputPort<double>("goal_theta3"), BT::OutputPort<double>("goal_x4"),
+       BT::OutputPort<double>("goal_y4"),     BT::OutputPort<double>("goal_theta4"),
+       BT::OutputPort<double>("goal_x5"),     BT::OutputPort<double>("goal_y5"),
+       BT::OutputPort<double>("goal_theta5"), BT::OutputPort<double>("goal_x6"),
+       BT::OutputPort<double>("goal_y6"),     BT::OutputPort<double>("goal_theta6"),
+       BT::OutputPort<double>("goal_x7"),     BT::OutputPort<double>("goal_y7"),
+       BT::OutputPort<double>("goal_theta7"), BT::OutputPort<double>("goal_x8"),
+       BT::OutputPort<double>("goal_y8"),     BT::OutputPort<double>("goal_theta8"),
+       BT::InputPort<double>("radius"),       BT::InputPort<std::string>("dir"),
+       BT::InputPort<double>("pose_x"),       BT::InputPort<int>("pose_y"),
+       BT::InputPort<double>("pose_v_x"),     BT::InputPort<int>("pose_v_y")});
   }
 
 protected:
@@ -64,7 +66,7 @@ protected:
         RCLCPP_INFO(get_logger(), "SetTurnAction : turning right");
       } else {
         RCLCPP_ERROR(get_logger(), "SetTurnAction : invalid dir");
-        BT::NodeStatus::FAILURE;
+        return BT::NodeStatus::FAILURE;
       }
     }
     auto radius = this->getInput<double>("radius");
@@ -79,7 +81,7 @@ protected:
       pose_v_x_ = pose_v_x.value();
       pose_v_y_ = pose_v_y.value();
     } else {
-      BT::NodeStatus::FAILURE;
+      return BT::NodeStatus::FAILURE;
     }
     return BT::NodeStatus::RUNNING;
   }

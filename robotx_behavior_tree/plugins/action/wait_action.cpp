@@ -35,7 +35,10 @@ public:
     */
   }
 
-  static BT::PortsList providedPorts() { return {BT::InputPort<double>("wait_time")}; }
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<double>("wait_time")});
+  }
 
 protected:
   BT::NodeStatus onStart() override

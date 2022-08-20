@@ -33,7 +33,11 @@ public:
     pub_some_ = this->create_publisher<std_msgs::msg::Empty>(topic_, 1);  // CHANGE when you use
   }
 
-  static BT::PortsList providedPorts() { return {BT::InputPort<std_msgs::msg::Empty>("imput_")}; }
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(
+      ActionROS2Node::providedPorts(), {BT::InputPort<std_msgs::msg::Empty>("imput_")});
+  }
 
 protected:
   BT::NodeStatus onStart() override { return BT::NodeStatus::RUNNING; }
