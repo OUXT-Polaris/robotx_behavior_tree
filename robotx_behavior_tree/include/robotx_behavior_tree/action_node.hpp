@@ -19,6 +19,8 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <rclcpp/rclcpp.hpp>
+#include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
+#include <stdexcept>
 #include <string>
 
 namespace robotx_behavior_tree
@@ -46,9 +48,25 @@ public:
     setRegistrationID(name);
   }
 
+  static BT::PortsList providedPorts()
+  {
+    return {
+      BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects")};
+  }
+
 protected:
   void onHalted() override {}
   std::string name;
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr getTaskObjects() const
+  {
+    const auto ret =
+      this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
+    if (ret) {
+      ret.value();
+    } else {
+      throw std::runtime_error("Task objects were not subscribed.");
+    }
+  }
 };
 }  // namespace robotx_behavior_tree
 
