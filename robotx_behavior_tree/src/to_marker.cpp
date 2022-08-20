@@ -11,3 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <robotx_behavior_tree/to_marker.hpp>
+
+const visualization_msgs::msg::MarkerArray toMarker(
+  const robotx_behavior_msgs::msg::TaskObjects & objects)
+{
+  switch (objects.object_kind) {
+    case robotx_behavior_msgs::msg::TaskObjects::BUOY_RED:
+      break;
+    case robotx_behavior_msgs::msg::TaskObjects::BUOY_GREEN:
+      break;
+    case robotx_behavior_msgs::msg::TaskObjects::BUOY_WHITE:
+      break;
+    case robotx_behavior_msgs::msg::TaskObjects::BUOY_BLACK:
+      break;
+  }
+}
+
+const visualization_msgs::msg::MarkerArray toMarker(
+  const robotx_behavior_msgs::msg::TaskObjectsArray & objects)
+{
+}
