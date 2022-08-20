@@ -26,22 +26,56 @@ const visualization_msgs::msg::MarkerArray toMarker(
   switch (object.object_kind) {
     case robotx_behavior_msgs::msg::TaskObject::BUOY_RED:
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-      model.mesh_resource = "package://robotx_behavior_msgs/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
+      model.mesh_resource =
+        "package://robotx_behavior_msgs/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
+      model.pose.position.x = object.x;
+      model.pose.position.y = object.y;
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN:
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-      model.mesh_resource = "package://robotx_behavior_msgs/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
+      model.mesh_use_embedded_materials = true;
+      model.mesh_resource =
+        "package://robotx_behavior_msgs/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
+      model.pose.position.x = object.x;
+      model.pose.position.y = object.y;
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE:
+      model.type = visualization_msgs::msg::Marker::CYLINDER;
+      model.mesh_use_embedded_materials = true;
+      model.scale.x = 0.6;
+      model.scale.y = 0.6;
+      model.scale.z = 1.0;
+      model.pose.position.x = object.x;
+      model.pose.position.y = object.y;
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK:
+      model.type = visualization_msgs::msg::Marker::SPHERE;
+      model.scale.x = 0.5;
+      model.scale.y = 0.5;
+      model.scale.z = 0.5;
+      model.pose.position.x = object.x;
+      model.pose.position.y = object.y;
       break;
+  }
+  msg.markers.emplace_back(model);
+  return msg;
+}
+
+const visualization_msgs::msg::MarkerArray toMarker(
+  const std::vector<robotx_behavior_msgs::msg::TaskObject> & objects,
+  const std_msgs::msg::Header & header)
+{
+  visualization_msgs::msg::MarkerArray msg;
+  for (const auto & object : objects) {
+    const auto marker_array = toMarker(object, header);
+    std::copy(
+      marker_array.markers.begin(), marker_array.markers.end(), std::back_inserter(msg.markers));
   }
   return msg;
 }
@@ -49,13 +83,11 @@ const visualization_msgs::msg::MarkerArray toMarker(
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObjectsArray & objects, const std_msgs::msg::Header & header)
 {
-  visualization_msgs::msg::MarkerArray msg;
-  return msg;
+  return toMarker(objects.task_objects, header);
 }
 
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects)
 {
-  visualization_msgs::msg::MarkerArray msg;
-  return msg;
+  return toMarker(objects.task_objects, objects.header);
 }
