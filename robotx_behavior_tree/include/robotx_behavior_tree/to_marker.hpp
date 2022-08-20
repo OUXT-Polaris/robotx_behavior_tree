@@ -16,6 +16,8 @@
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+namespace robotx_behavior_tree
+{
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObject & objects, const std_msgs::msg::Header & header,
   double max_alpha = 0.9);
@@ -27,3 +29,7 @@ const visualization_msgs::msg::MarkerArray toMarker(
   double max_alpha = 0.9);
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects, double max_alpha = 0.9);
+const visualization_msgs::msg::MarkerArray toMarker(
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr objects,
+  double max_alpha = 0.9);
+}  // namespace robotx_behavior_tree

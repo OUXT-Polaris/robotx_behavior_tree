@@ -15,6 +15,8 @@
 #include <color_names/color_names.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 
+namespace robotx_behavior_tree
+{
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObject & object, const std_msgs::msg::Header & header,
   double max_alpha)
@@ -100,3 +102,10 @@ const visualization_msgs::msg::MarkerArray toMarker(
 {
   return toMarker(objects.task_objects, objects.header, max_alpha);
 }
+
+const visualization_msgs::msg::MarkerArray toMarker(
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr objects, double max_alpha)
+{
+  return toMarker(objects->task_objects, objects->header, max_alpha);
+}
+}  // namespace robotx_behavior_tree

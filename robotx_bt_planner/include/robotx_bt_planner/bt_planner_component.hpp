@@ -20,6 +20,7 @@
 #include <robotx_behavior_msgs/msg/task_objects_array.hpp>
 #include <string>
 #include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include "behaviortree_cpp_v3/blackboard.h"
 #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
@@ -220,7 +221,9 @@ private:
   std::string config_file_;
   std::string config_package_;
   std::string task_object_topic_;
+  std::string marker_topic_;
   float update_rate_;
+  bool publish_marker_;
   YAML::Node node_;
   Format format_;
   sol::state lua_;
@@ -234,7 +237,9 @@ private:
   rclcpp::Service<robotx_behavior_msgs::srv::Evaluation>::SharedPtr evaluation_server_;
   rclcpp::Subscription<robotx_behavior_msgs::msg::TaskObjectsArray>::SharedPtr
     task_objects_array_sub_;
-  void taskObjectsArrayCallback(const robotx_behavior_msgs::msg::TaskObjectsArray::SharedPtr data);
+  void taskObjectsArrayCallback(
+    const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };
 }  // namespace robotx_bt_planner
 
