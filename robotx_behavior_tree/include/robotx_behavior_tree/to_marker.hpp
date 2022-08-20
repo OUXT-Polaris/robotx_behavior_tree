@@ -17,12 +17,13 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObject & objects, const std_msgs::msg::Header & header);
+  const robotx_behavior_msgs::msg::TaskObject & objects, const std_msgs::msg::Header & header,
+  double max_alpha = 0.9);
 const visualization_msgs::msg::MarkerArray toMarker(
   const std::vector<robotx_behavior_msgs::msg::TaskObject> & objects,
-  const std_msgs::msg::Header & header);
+  const std_msgs::msg::Header & header, double max_alpha = 0.9);
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjectsArray & objects,
-  const std_msgs::msg::Header & header);
+  const robotx_behavior_msgs::msg::TaskObjectsArray & objects, const std_msgs::msg::Header & header,
+  double max_alpha = 0.9);
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects);
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects, double max_alpha = 0.9);

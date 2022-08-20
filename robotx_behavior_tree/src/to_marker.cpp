@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <color_names/color_names.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObject & object, const std_msgs::msg::Header & header)
+  const robotx_behavior_msgs::msg::TaskObject & object, const std_msgs::msg::Header & header,
+  double max_alpha)
 {
   visualization_msgs::msg::MarkerArray msg;
   visualization_msgs::msg::Marker model;
@@ -26,6 +28,7 @@ const visualization_msgs::msg::MarkerArray toMarker(
   switch (object.object_kind) {
     case robotx_behavior_msgs::msg::TaskObject::BUOY_RED:
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+      model.mesh_use_embedded_materials = false;
       model.mesh_resource =
         "package://robotx_behavior_msgs/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
@@ -33,10 +36,11 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.scale.z = 1.0;
       model.pose.position.x = object.x;
       model.pose.position.y = object.y;
+      model.color = color_names::makeColorMsg("red", max_alpha * object.reliability);
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN:
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
-      model.mesh_use_embedded_materials = true;
+      model.mesh_use_embedded_materials = false;
       model.mesh_resource =
         "package://robotx_behavior_msgs/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
       model.scale.x = 1.0;
@@ -44,23 +48,27 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.scale.z = 1.0;
       model.pose.position.x = object.x;
       model.pose.position.y = object.y;
+      model.color = color_names::makeColorMsg("green", max_alpha * object.reliability);
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE:
       model.type = visualization_msgs::msg::Marker::CYLINDER;
-      model.mesh_use_embedded_materials = true;
+      model.mesh_use_embedded_materials = false;
       model.scale.x = 0.6;
       model.scale.y = 0.6;
       model.scale.z = 1.0;
       model.pose.position.x = object.x;
       model.pose.position.y = object.y;
+      model.color = color_names::makeColorMsg("white", max_alpha * object.reliability);
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK:
       model.type = visualization_msgs::msg::Marker::SPHERE;
+      model.mesh_use_embedded_materials = false;
       model.scale.x = 0.5;
       model.scale.y = 0.5;
       model.scale.z = 0.5;
       model.pose.position.x = object.x;
       model.pose.position.y = object.y;
+      model.color = color_names::makeColorMsg("black", max_alpha * object.reliability);
       break;
   }
   msg.markers.emplace_back(model);
@@ -69,11 +77,11 @@ const visualization_msgs::msg::MarkerArray toMarker(
 
 const visualization_msgs::msg::MarkerArray toMarker(
   const std::vector<robotx_behavior_msgs::msg::TaskObject> & objects,
-  const std_msgs::msg::Header & header)
+  const std_msgs::msg::Header & header, double max_alpha)
 {
   visualization_msgs::msg::MarkerArray msg;
   for (const auto & object : objects) {
-    const auto marker_array = toMarker(object, header);
+    const auto marker_array = toMarker(object, header, max_alpha);
     std::copy(
       marker_array.markers.begin(), marker_array.markers.end(), std::back_inserter(msg.markers));
   }
@@ -81,13 +89,14 @@ const visualization_msgs::msg::MarkerArray toMarker(
 }
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjectsArray & objects, const std_msgs::msg::Header & header)
+  const robotx_behavior_msgs::msg::TaskObjectsArray & objects, const std_msgs::msg::Header & header,
+  double max_alpha)
 {
-  return toMarker(objects.task_objects, header);
+  return toMarker(objects.task_objects, header, max_alpha);
 }
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects)
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects, double max_alpha)
 {
-  return toMarker(objects.task_objects, objects.header);
+  return toMarker(objects.task_objects, objects.header, max_alpha);
 }
