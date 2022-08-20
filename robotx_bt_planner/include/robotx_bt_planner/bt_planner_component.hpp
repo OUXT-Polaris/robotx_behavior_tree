@@ -17,7 +17,7 @@
 
 #include <fstream>
 #include <memory>
-#include <robotx_behavior_msgs/msg/task_objects_array.hpp>
+#include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
 #include <string>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -235,7 +235,7 @@ private:
   std::unique_ptr<BT::PublisherZMQ> publisher_zmq_;
   rclcpp::Node::SharedPtr client_node_;
   rclcpp::Service<robotx_behavior_msgs::srv::Evaluation>::SharedPtr evaluation_server_;
-  rclcpp::Subscription<robotx_behavior_msgs::msg::TaskObjectsArray>::SharedPtr
+  rclcpp::Subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>::SharedPtr
     task_objects_array_sub_;
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);

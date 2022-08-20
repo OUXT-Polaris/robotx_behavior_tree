@@ -23,29 +23,31 @@
 
 namespace robotx_behavior_tree
 {
-class ActionNode : public BT::SyncActionNode
+class ActionNode : public BT::StatefulActionNode
 {
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::SyncActionNode(name, config)
+  : BT::StatefulActionNode(name, config)
   {
     setRegistrationID(name);
   }
 
 protected:
+  void onHalted() override {}
   std::string name;
 };
 
-class ActionROS2Node : public BT::SyncActionNode, public rclcpp::Node
+class ActionROS2Node : public BT::StatefulActionNode, public rclcpp::Node
 {
 public:
   ActionROS2Node(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::SyncActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
+  : BT::StatefulActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
   {
     setRegistrationID(name);
   }
 
 protected:
+  void onHalted() override {}
   std::string name;
 };
 }  // namespace robotx_behavior_tree

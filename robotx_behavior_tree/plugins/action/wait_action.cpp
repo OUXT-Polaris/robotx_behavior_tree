@@ -38,46 +38,32 @@ public:
   static BT::PortsList providedPorts() { return {BT::InputPort<double>("wait_time")}; }
 
 protected:
-  BT::NodeStatus tick() override
+  BT::NodeStatus onStart() override
   {
-    if (!isSetWaitTime) {
-      auto wait_time = this->getInput<double>("wait_time");
-      if (wait_time) {
-        wait_time_ = wait_time.value();
-        RCLCPP_INFO(get_logger(), "WaitAction : waiting %f ms", wait_time_);
-      } else {
-        RCLCPP_WARN(get_logger(), "WaitAction : Faild to get wait_time. Force to wait 5000.0ms");
-        wait_time_ = 5000.0;
-      }
-      isSetWaitTime = true;
+    auto wait_time = this->getInput<double>("wait_time");
+    start_time = get_clock()->now();
+    if (wait_time) {
+      RCLCPP_INFO(get_logger(), "WaitAction : waiting %f sec", wait_time.value());
+      threshold_duration = wait_time.value();
+    } else {
+      return BT::NodeStatus::FAILURE;
     }
+    return BT::NodeStatus::RUNNING;
+  }
 
-    if (!success) {
-      do {
-        sleep(1);
-        count += 1;
-        elapsed = 1000 * count;
-        RCLCPP_INFO(get_logger(), "WaitAction : %f millisecond passed", elapsed);
-      } while (elapsed < wait_time_);
-
-      RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
-      success = true;
-    }
-    return BT::NodeStatus::SUCCESS;
-    /*
-    if (elapsed >= wait_time_) {
-      RCLCPP_INFO(get_logger(), "WaitAction : SUCCESS");
+  BT::NodeStatus onRunning() override
+  {
+    elapsed = (get_clock()->now() - start_time).seconds();
+    if (elapsed >= threshold_duration) {
       return BT::NodeStatus::SUCCESS;
     }
-    */
+    return BT::NodeStatus::RUNNING;
   }
 
   double wait_time_;
   double elapsed;
-  int count = 0;
-  bool isSetWaitTime = false;
-  bool success = false;
-  std::chrono::system_clock::time_point start, end;
+  rclcpp::Time start_time;
+  double threshold_duration;
 };
 }  // namespace robotx_behavior_tree
 

@@ -1,7 +1,7 @@
 <root main_tree_to_execute = "MainTree" >
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="WaitAction" wait_time="5000.0"/>
+            <Action ID="WaitAction" wait_time="5.0"/>
             <Action ID="WaitAction" wait_time="6000.0"/>
         </Sequence>        
     </BehaviorTree>
