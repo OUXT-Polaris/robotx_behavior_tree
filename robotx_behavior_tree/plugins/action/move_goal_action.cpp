@@ -47,9 +47,10 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return {
-      BT::InputPort<double>("goal_x"), BT::InputPort<double>("goal_y"),
-      BT::InputPort<double>("goal_theta")};
+    return appendPorts(
+      ActionROS2Node::providedPorts(),
+      {BT::InputPort<double>("goal_x"), BT::InputPort<double>("goal_y"),
+       BT::InputPort<double>("goal_theta")});
   }
 
   const std::optional<geometry_msgs::msg::Pose> getCurrentPose()
