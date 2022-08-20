@@ -15,21 +15,47 @@
 #include <robotx_behavior_tree/to_marker.hpp>
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObject & objects)
+  const robotx_behavior_msgs::msg::TaskObject & object, const std_msgs::msg::Header & header)
 {
-  switch (objects.object_kind) {
+  visualization_msgs::msg::MarkerArray msg;
+  visualization_msgs::msg::Marker model;
+  model.header = header;
+  model.ns = std::to_string(object.unique_id);
+  model.id = 0;
+  model.action = visualization_msgs::msg::Marker::ADD;
+  switch (object.object_kind) {
     case robotx_behavior_msgs::msg::TaskObject::BUOY_RED:
+      model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+      model.mesh_resource = "package://robotx_behavior_msgs/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
+      model.scale.x = 1.0;
+      model.scale.y = 1.0;
+      model.scale.z = 1.0;
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN:
+      model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
+      model.mesh_resource = "package://robotx_behavior_msgs/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
+      model.scale.x = 1.0;
+      model.scale.y = 1.0;
+      model.scale.z = 1.0;
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE:
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK:
       break;
   }
+  return msg;
 }
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjectsArray & objects)
+  const robotx_behavior_msgs::msg::TaskObjectsArray & objects, const std_msgs::msg::Header & header)
 {
+  visualization_msgs::msg::MarkerArray msg;
+  return msg;
+}
+
+const visualization_msgs::msg::MarkerArray toMarker(
+  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped & objects)
+{
+  visualization_msgs::msg::MarkerArray msg;
+  return msg;
 }
