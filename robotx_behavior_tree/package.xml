@@ -19,6 +19,7 @@
   <depend>visualization_msgs</depend>
   <depend>robotx_behavior_msgs</depend>
   <depend>color_names</depend>
+  <depend>quaternion_operation</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ouxt_lint_common</test_depend>
