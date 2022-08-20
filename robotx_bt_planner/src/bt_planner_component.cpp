@@ -37,6 +37,7 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
 
   std::string config_path =
     ament_index_cpp::get_package_share_directory(config_package_) + "/" + config_file_;
+  RCLCPP_INFO_STREAM(get_logger(), "start loading config file : " << config_path);
   loadConfig(config_path);
   RCLCPP_INFO(get_logger(), "config file loaded!");
 
