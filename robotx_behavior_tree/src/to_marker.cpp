@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <bits/stdc++.h>
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <color_names/color_names.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 
@@ -27,12 +30,13 @@ const visualization_msgs::msg::MarkerArray toMarker(
   model.ns = std::to_string(object.unique_id);
   model.id = 0;
   model.action = visualization_msgs::msg::Marker::ADD;
+  geometry_msgs::msg::Vector3 model_rpy;
   switch (object.object_kind) {
     case robotx_behavior_msgs::msg::TaskObject::BUOY_RED:
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
       model.mesh_use_embedded_materials = false;
       model.mesh_resource =
-        "package://robotx_behavior_tree/models/mb_marker_buoy_red/meshes/mb_marker_buoy.dae";
+        "package://robotx_behavior_tree/models/surmark950410/mesh/surmark950410.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
@@ -44,7 +48,7 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
       model.mesh_use_embedded_materials = false;
       model.mesh_resource =
-        "package://robotx_behavior_tree/models/mb_marker_buoy_green/meshes/mb_marker_buoy.dae";
+        "package://robotx_behavior_tree/models/surmark950400/mesh/surmark950400.dae";
       model.scale.x = 1.0;
       model.scale.y = 1.0;
       model.scale.z = 1.0;
@@ -53,8 +57,10 @@ const visualization_msgs::msg::MarkerArray toMarker(
       model.color = color_names::makeColorMsg("green", max_alpha * object.reliability);
       break;
     case robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE:
-      model.type = visualization_msgs::msg::Marker::CYLINDER;
+      model.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
       model.mesh_use_embedded_materials = false;
+      model.mesh_resource =
+        "package://robotx_behavior_tree/models/surmark46104/mesh/surmark46104.dae";
       model.scale.x = 0.6;
       model.scale.y = 0.6;
       model.scale.z = 1.0;
