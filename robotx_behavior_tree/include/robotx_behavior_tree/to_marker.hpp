@@ -16,6 +16,6 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjects & objects);
+  const robotx_behavior_msgs::msg::TaskObject & objects);
 const visualization_msgs::msg::MarkerArray toMarker(
   const robotx_behavior_msgs::msg::TaskObjectsArray & objects);

@@ -15,16 +15,16 @@
 #include <robotx_behavior_tree/to_marker.hpp>
 
 const visualization_msgs::msg::MarkerArray toMarker(
-  const robotx_behavior_msgs::msg::TaskObjects & objects)
+  const robotx_behavior_msgs::msg::TaskObject & objects)
 {
   switch (objects.object_kind) {
-    case robotx_behavior_msgs::msg::TaskObjects::BUOY_RED:
+    case robotx_behavior_msgs::msg::TaskObject::BUOY_RED:
       break;
-    case robotx_behavior_msgs::msg::TaskObjects::BUOY_GREEN:
+    case robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN:
       break;
-    case robotx_behavior_msgs::msg::TaskObjects::BUOY_WHITE:
+    case robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE:
       break;
-    case robotx_behavior_msgs::msg::TaskObjects::BUOY_BLACK:
+    case robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK:
       break;
   }
 }
