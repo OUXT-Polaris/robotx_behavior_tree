@@ -127,8 +127,7 @@ public:
 
   void timerCallback()
   {
-    RCLCPP_INFO_STREAM(this->get_logger(), "tick" << tree_.nodes.size());
-
+    // RCLCPP_INFO_STREAM(this->get_logger(), "tick" << tree_.nodes.size());
     evaluationCallback();
     tree_.rootNode()->executeTick();
   }
