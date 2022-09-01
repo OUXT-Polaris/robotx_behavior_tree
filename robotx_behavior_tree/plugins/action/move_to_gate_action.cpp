@@ -32,7 +32,7 @@ protected:
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoy;
     const auto task_objects_array = getTaskObjects();
     try {
-      for (size_t i = 0; i < static_cast<int>(task_objects_array->task_objects.size()); i++) {
+      for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
         if (task_objects_array->task_objects[i].object_kind == 1) {
           green_buoy.push_back(task_objects_array->task_objects[i]);
         } else if (task_objects_array->task_objects[i].object_kind == 2) {
