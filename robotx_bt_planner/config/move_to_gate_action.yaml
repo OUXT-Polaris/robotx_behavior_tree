@@ -1,0 +1,8 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - move_to_gate_action
+  behavior:
+    description:
+      package: robotx_bt_planner
+      path : behavior_trees/move_to_gate.xml
