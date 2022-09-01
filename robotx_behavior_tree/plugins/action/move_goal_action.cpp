@@ -95,9 +95,6 @@ protected:
       RCLCPP_INFO(
         get_logger(), "MoveGoalAction : published goal [%f, %f, %f]", goal_x.value(),
         goal_y.value(), goal_theta.value());
-      //debug nagao
-      const auto hoge = getTaskObjects();
-      RCLCPP_INFO(get_logger(),"hogehogehgoe: %d", hoge->task_objects.size());
       return BT::NodeStatus::RUNNING;
     } else {
       RCLCPP_WARN(get_logger(), "MoveGoalAction : Faild to pushish goal");
@@ -107,10 +104,6 @@ protected:
 
   BT::NodeStatus onRunning() override
   {
-    // const auto hoge = getTaskObjects();
-    // RCLCPP_INFO(get_logger(),"hogehogehgoe: %d", hoge);
-    // std::cout << "hogehogehoge" << std::endl;
-    // std::cout << hoge << std::endl;
     auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
     if (pose) {
