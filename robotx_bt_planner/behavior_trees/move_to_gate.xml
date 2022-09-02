@@ -1,7 +1,7 @@
 <root main_tree_to_execute = "MainTree">
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="MoveToGateActtion"/>
+            <Action ID="MoveToGateAction"/>
         </Sequence>
     </BehaviorTree>
 </root>
