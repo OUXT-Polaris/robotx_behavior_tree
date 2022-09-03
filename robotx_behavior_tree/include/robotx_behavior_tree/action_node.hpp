@@ -73,7 +73,7 @@ protected:
     const auto ret =
       this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
     if (ret) {
-      ret.value();
+      return ret.value();
     } else {
       throw std::runtime_error("Task objects were not subscribed.");
     }
