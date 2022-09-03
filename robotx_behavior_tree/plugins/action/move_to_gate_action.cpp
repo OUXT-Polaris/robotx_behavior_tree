@@ -16,7 +16,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <typeinfo>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -37,40 +36,55 @@ public:
     declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_pub_gate_ =
-      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", rclcpp::QoS(1).reliable().transient_local());
+      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
   }
+
+private:
+  rclcpp::TimerBase::SharedPtr update_position_timer_;
+  float buoy1_x;
+  float buoy1_y;
+  float buoy2_x;
+  float buoy2_y;
+  float goal_x;
+  float goal_y;
+  float goal_theta;
+
+  float distance;
+  double goal_tolerance_;
+
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener listener_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
+  geometry_msgs::msg::PoseStamped goal_;
 
 protected:
   BT::NodeStatus onStart() override
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoy;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoy;
-    
+
     try {
       const auto task_objects_array = getTaskObjects();
       // return BT::NodeStatus::FAILURE;
       // for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
       //   if (task_objects_array->task_objects[i].object_kind == 1) {
       //     green_buoy.push_back(task_objects_array->task_objects[i]);
-      //   } 
+      //   }
       //   if (task_objects_array->task_objects[i].object_kind == 2) {
       //     red_buoy.push_back(task_objects_array->task_objects[i]);
       //   }
       // }
-     // RCLCPP_INFO(get_logger(), "hogehogehoge : %d", task_objects_array->task_objects.size());
+      // RCLCPP_INFO(get_logger(), "hogehogehoge : %d", task_objects_array->task_objects.size());
 
       // buoy1_x = green_buoy[0].x;
       // buoy1_y = green_buoy[0].y;
       // buoy2_x = red_buoy[0].x;
       // buoy2_y = red_buoy[0].y;
 
-      //for debug
       buoy1_x = 10.0;
       buoy1_y = 0.0;
       buoy2_x = 10.0;
       buoy2_y = 10.0;
-
-      
 
       goal_x = (buoy1_x + buoy2_x) / 2.0;
       goal_y = (buoy1_y + buoy2_y) / 2.0;
@@ -79,40 +93,17 @@ protected:
       RCLCPP_INFO(get_logger(), "goal_x : %f", goal_x);
       RCLCPP_INFO(get_logger(), "goal_y : %f", goal_y);
 
-      goal.header.frame_id = "map";
-      goal.pose.position.x = goal_x;
-      goal.pose.position.y = goal_y;
-      goal.pose.position.z = 0.0;
+      goal_.header.frame_id = "map";
+      goal_.pose.position.x = goal_x;
+      goal_.pose.position.y = goal_y;
+      goal_.pose.position.z = 0.0;
 
-      goal.pose.orientation.w = 0.0;
-      goal.pose.orientation.x = 0.0;
-      goal.pose.orientation.y = 0.0;
-      goal.pose.orientation.z = 0.0;
-
-      
-
-      goal_pub_gate_->publish(goal);
+      goal_.pose.orientation.w = 1.0;
+      goal_.pose.orientation.x = 0.0;
+      goal_.pose.orientation.y = 0.0;
+      goal_.pose.orientation.z = 0.0;
 
       return BT::NodeStatus::RUNNING;
-
-      // if (goal_x && goal_y && goal_theta) {
-      //   goal.header.frame_id = "map";
-      //   goal.pose.position.x = goal_x;
-      //   goal.pose.position.y = goal_y;
-      //   goal.pose.position.z = 0.0;
-
-      //   goal.pose.orientation.w = 0.0;
-      //   goal.pose.orientation.x = 0.0;
-      //   goal.pose.orientation.y = 0.0;
-      //   goal.pose.orientation.z = 0.0;
-
-      //   goal_pub_gate_->publish(goal);
-
-      //   RCLCPP_INFO(get_logger(), "Published! goal to through the gate");
-      //   return BT::NodeStatus::RUNNING;
-      // }else{
-      //   return BT::NodeStatus::FAILURE;
-      // }
 
     } catch (const std::runtime_error & error) {
       RCLCPP_WARN_STREAM(get_logger(), error.what());
@@ -131,8 +122,11 @@ protected:
     //   return BT::NodeStatus::SUCCESS;
     // }
     // return BT::NodeStatus::RUNNING;
-    RCLCPP_INFO(get_logger(), "BBBBBBBBBB");
+    // RCLCPP_INFO(get_logger(), "BBBBBBBBBB");
     //return BT::NodeStatus::SUCCESS;
+
+    goal_.header.stamp = get_clock()->now();
+    goal_pub_gate_->publish(goal_);
     return BT::NodeStatus::RUNNING;
   }
 
@@ -163,22 +157,6 @@ protected:
     }
     return std::nullopt;
   }
-
-  float buoy1_x;
-  float buoy1_y;
-  float buoy2_x;
-  float buoy2_y;
-  float goal_x;
-  float goal_y;
-  float goal_theta;
-
-  float distance;
-  double goal_tolerance_;
-
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener listener_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
-  geometry_msgs::msg::PoseStamped goal;
 };
 }  // namespace robotx_behavior_tree
 
