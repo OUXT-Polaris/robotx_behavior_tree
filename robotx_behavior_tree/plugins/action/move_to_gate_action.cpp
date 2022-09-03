@@ -16,6 +16,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <typeinfo>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -35,8 +36,8 @@ public:
   {
     declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
-    goal_pub_ =
-      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+    goal_pub_gate_ =
+      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", rclcpp::QoS(1).reliable().transient_local());
   }
 
 protected:
@@ -44,52 +45,79 @@ protected:
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoy;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoy;
-    const auto task_objects_array = getTaskObjects();
-    if(task_objects_array){
-        RCLCPP_INFO(get_logger(), "AAAAAAAAAAAA");
-        return BT::NodeStatus::RUNNING;
+    
+    try {
+      const auto task_objects_array = getTaskObjects();
+      // return BT::NodeStatus::FAILURE;
+      // for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
+      //   if (task_objects_array->task_objects[i].object_kind == 1) {
+      //     green_buoy.push_back(task_objects_array->task_objects[i]);
+      //   } 
+      //   if (task_objects_array->task_objects[i].object_kind == 2) {
+      //     red_buoy.push_back(task_objects_array->task_objects[i]);
+      //   }
+      // }
+     // RCLCPP_INFO(get_logger(), "hogehogehoge : %d", task_objects_array->task_objects.size());
+
+      // buoy1_x = green_buoy[0].x;
+      // buoy1_y = green_buoy[0].y;
+      // buoy2_x = red_buoy[0].x;
+      // buoy2_y = red_buoy[0].y;
+
+      //for debug
+      buoy1_x = 10.0;
+      buoy1_y = 0.0;
+      buoy2_x = 10.0;
+      buoy2_y = 10.0;
+
+      
+
+      goal_x = (buoy1_x + buoy2_x) / 2.0;
+      goal_y = (buoy1_y + buoy2_y) / 2.0;
+      goal_theta = 0.0;
+
+      RCLCPP_INFO(get_logger(), "goal_x : %f", goal_x);
+      RCLCPP_INFO(get_logger(), "goal_y : %f", goal_y);
+
+      goal.header.frame_id = "map";
+      goal.pose.position.x = goal_x;
+      goal.pose.position.y = goal_y;
+      goal.pose.position.z = 0.0;
+
+      goal.pose.orientation.w = 0.0;
+      goal.pose.orientation.x = 0.0;
+      goal.pose.orientation.y = 0.0;
+      goal.pose.orientation.z = 0.0;
+
+      
+
+      goal_pub_gate_->publish(goal);
+
+      return BT::NodeStatus::RUNNING;
+
+      // if (goal_x && goal_y && goal_theta) {
+      //   goal.header.frame_id = "map";
+      //   goal.pose.position.x = goal_x;
+      //   goal.pose.position.y = goal_y;
+      //   goal.pose.position.z = 0.0;
+
+      //   goal.pose.orientation.w = 0.0;
+      //   goal.pose.orientation.x = 0.0;
+      //   goal.pose.orientation.y = 0.0;
+      //   goal.pose.orientation.z = 0.0;
+
+      //   goal_pub_gate_->publish(goal);
+
+      //   RCLCPP_INFO(get_logger(), "Published! goal to through the gate");
+      //   return BT::NodeStatus::RUNNING;
+      // }else{
+      //   return BT::NodeStatus::FAILURE;
+      // }
+
+    } catch (const std::runtime_error & error) {
+      RCLCPP_WARN_STREAM(get_logger(), error.what());
+      return BT::NodeStatus::FAILURE;
     }
-    // try {
-    //   for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
-    //     if (task_objects_array->task_objects[i].object_kind == 1) {
-    //       green_buoy.push_back(task_objects_array->task_objects[i]);
-    //     } else if (task_objects_array->task_objects[i].object_kind == 2) {
-    //       red_buoy.push_back(task_objects_array->task_objects[i]);
-    //     } else {
-    //     }
-    //   }
-
-    //   buoy1_x = green_buoy[0].x;
-    //   buoy1_y = green_buoy[0].y;
-    //   buoy2_x = red_buoy[0].x;
-    //   buoy2_y = red_buoy[0].y;
-
-    //   goal_x = (buoy1_x + buoy2_x) / 2;
-    //   goal_y = (buoy1_y + buoy2_y) / 2;
-    //   goal_theta = 0.0;
-
-    //   if (goal_x && goal_y && goal_theta) {
-    //     goal.header.frame_id = "map";
-    //     goal.pose.position.x = goal_x;
-    //     goal.pose.position.y = goal_y;
-    //     goal.pose.position.z = 0.0;
-
-    //     goal.pose.orientation.w = 0.0;
-    //     goal.pose.orientation.x = 0.0;
-    //     goal.pose.orientation.y = 0.0;
-    //     goal.pose.orientation.z = 0.0;
-
-    //     goal_pub_->publish(goal);
-
-    //     RCLCPP_INFO(get_logger(), "Published! goal to through the gate");
-    //     return BT::NodeStatus::RUNNING;
-    //   }
-    //   return BT::NodeStatus::FAILURE;
-
-    // } catch (rclcpp::exceptions::InvalidTopicNameError & error) {
-    //   std::cerr << error.what() << '\n';
-    //   return BT::NodeStatus::FAILURE;
-    // }
   }
   BT::NodeStatus onRunning() override
   {
@@ -104,7 +132,8 @@ protected:
     // }
     // return BT::NodeStatus::RUNNING;
     RCLCPP_INFO(get_logger(), "BBBBBBBBBB");
-    return BT::NodeStatus::SUCCESS;
+    //return BT::NodeStatus::SUCCESS;
+    return BT::NodeStatus::RUNNING;
   }
 
   double getDistance(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
@@ -146,10 +175,10 @@ protected:
   float distance;
   double goal_tolerance_;
 
-  geometry_msgs::msg::PoseStamped goal;
   tf2_ros::Buffer buffer_;
   tf2_ros::TransformListener listener_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
+  geometry_msgs::msg::PoseStamped goal;
 };
 }  // namespace robotx_behavior_tree
 
