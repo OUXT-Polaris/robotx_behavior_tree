@@ -1,7 +1,7 @@
 <root main_tree_to_execute = "MainTree" >
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" planner_status="{planner_status}" task_objects="{task_objects}" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
         </Sequence>
     </BehaviorTree>
 </root>

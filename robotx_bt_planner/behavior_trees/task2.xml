@@ -13,10 +13,10 @@
                 <Action ID="SubscribeAction"/> 
             </RetryUntilSuccesful>
             -->
-            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="WaitAction" planner_status="{planner_status}" task_objects="{task_objects}" wait_time="3.0"/>
  
             <!-- move to pinger gate -->
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" planner_status="{planner_status}" task_objects="{task_objects}" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
 
             <!-- turn around a buoy -->
             
@@ -24,7 +24,7 @@
            
 
             <!-- move to exit pinger gate  -->
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
+            <Action ID="MoveGoalAction" planner_status="{planner_status}" task_objects="{task_objects}" goal_x="10.0" goal_y="5.0" goal_theta="0.0"/>
             
         </Sequence>
     </BehaviorTree>

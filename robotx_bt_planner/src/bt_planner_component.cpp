@@ -63,6 +63,18 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
     this->create_subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>(
       task_object_topic_, 1,
       std::bind(&BTPlannerComponent::taskObjectsArrayCallback, this, std::placeholders::_1));
+#define CONNECT_TO_BLACKBOARD(TYPE, SUBSCRIPTION, TOPIC, BLACKBOARD_KEY)                       \
+  SUBSCRIPTION = this->create_subscription<TYPE>(TOPIC, 1, [this](const TYPE::SharedPtr msg) { \
+    blackboard_->set<TYPE::SharedPtr>(BLACKBOARD_KEY, msg);                                    \
+  });
+
+  CONNECT_TO_BLACKBOARD(
+    hermite_path_msgs::msg::PlannerStatus, planner_status_sub_,
+    "/local_waypoint_server/planner_status", "planner_status");
+#undef CONNECT_TO_BLACKBOARD
+
+  // registerPlannerStatusSubscription();
+  // planner_status_sub_;
   loadPlugins();
   loadTree();
 

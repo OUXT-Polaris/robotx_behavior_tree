@@ -16,6 +16,7 @@
 #define ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
 
 #include <fstream>
+#include <hermite_path_msgs/msg/planner_status.hpp>
 #include <memory>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
 #include <string>
@@ -239,7 +240,8 @@ private:
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-};
+  rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
+};  // namespace robotx_bt_planner
 }  // namespace robotx_bt_planner
 
 #endif  // ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
