@@ -1,3 +1,4 @@
+s
 // Copyright (c) 2020, OUXT-Polaris
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +21,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
+#include
 #include <stdexcept>
 #include <string>
 
@@ -51,6 +53,7 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
+      BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects"),
       BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects")};
   }
   static BT::PortsList appendPorts(const BT::PortsList & ports1, const BT::PortsList & ports2)

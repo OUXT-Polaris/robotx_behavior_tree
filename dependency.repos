@@ -19,3 +19,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/quaternion_operation.git
     version: ros2
+  hermite_path_planner:
+    type: git
+    url: https://github.com/OUXT-Polaris/hermite_path_planner.git
+    version: ros2
