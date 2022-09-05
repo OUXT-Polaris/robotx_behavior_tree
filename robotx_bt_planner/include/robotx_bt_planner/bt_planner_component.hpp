@@ -240,6 +240,9 @@ private:
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
+
+  /*
 #define DEFINE_ROS_SUBSCRIPTION(NAME_SNAKE, NAME_CAMEL, TYPE, TOPIC, BLACKBOARD_KEY)           \
   rclcpp::Subscription<TYPE>::SharedPtr NAME_SNAKE_sub_;                                       \
   void register##NAME_CAMELSubscription()                                                      \
@@ -252,8 +255,9 @@ private:
 
   DEFINE_ROS_SUBSCRIPTION(
     planner_status, PlannerStatus, hermite_path_msgs::msg::PlannerStatus,
-    "/local_waypoint_server/planner_status", "planner_status");
+    "/local_waypoint_server/planner_status", "planner_status")
 #undef DEFINE_ROS_SUBSCRIPTION
+*/
 };  // namespace robotx_bt_planner
 }  // namespace robotx_bt_planner
 
