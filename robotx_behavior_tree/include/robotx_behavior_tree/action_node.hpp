@@ -91,7 +91,8 @@ protected:
     return std::nullopt;                             \
   }
 
-  DEFINE_GET_INPUT(PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "task_objects");
+  DEFINE_GET_INPUT(
+    PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
 #undef DEFINE_GET_INPUT
 };
 }  // namespace robotx_behavior_tree
