@@ -7,7 +7,7 @@
             </ForceSuccess>
             <Action ID="MoveGoalAction" planner_status="{planner_status}" task_objects="{task_objects}" goal_x="200.0" goal_y="5.0" goal_theta="0.0"/>
             <ForceSuccess>
-                <Action ID="WaitAction" planner_status="{planner_status}" task_objects="{task_objects}" planner_status="{planner_status}" task_objects="{task_objects}" wait_time="5.0"/>
+                <Action ID="WaitAction" planner_status="{planner_status}" task_objects="{task_objects}" wait_time="5.0"/>
             </ForceSuccess>
         </Sequence>
     </BehaviorTree>
