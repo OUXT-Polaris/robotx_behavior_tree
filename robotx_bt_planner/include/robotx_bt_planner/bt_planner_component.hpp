@@ -16,6 +16,7 @@
 #define ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
 
 #include <fstream>
+#include <hermite_path_msgs/msg/planner_status.hpp>
 #include <memory>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
 #include <string>
@@ -239,7 +240,21 @@ private:
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-};
+#define DEFINE_ROS_SUBSCRIPTION(NAME_SNAKE, NAME_CAMEL, TYPE, TOPIC, BLACKBOARD_KEY)           \
+  rclcpp::Subscription<TYPE>::SharedPtr NAME_SNAKE_sub_;                                       \
+  void register##NAME_CAMELSubscription()                                                      \
+  {                                                                                            \
+    NAME_SNAKE_sub_ =                                                                          \
+      this->create_subscription<TYPE::SharedPtr>(TOPIC, 1, [this](const TYPE::SharedPtr msg) { \
+        blackboard_->set<TYPE::SharedPtr>(BLACKBOARD_KEY, msg);                                \
+      });                                                                                      \
+  }
+
+  DEFINE_ROS_SUBSCRIPTION(
+    planner_status, PlannerStatus, hermite_path_msgs::msg::PlannerStatus,
+    "/local_waypoint_server/planner_status", "planner_status");
+#undef DEFINE_ROS_SUBSCRIPTION
+};  // namespace robotx_bt_planner
 }  // namespace robotx_bt_planner
 
 #endif  // ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
