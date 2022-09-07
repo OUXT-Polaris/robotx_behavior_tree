@@ -172,7 +172,8 @@ bool BTPlannerComponent::loadTree()
 
     auto xml_string =
       std::string(std::istreambuf_iterator<char>(xml_file), std::istreambuf_iterator<char>());
-    addRosPorts(xml_string);
+    xml_string = addRosPorts(xml_string);
+    RCLCPP_INFO_STREAM(get_logger(), "behavior xml : \n\n" << xml_string);
     tree_ = factory_.createTreeFromText(xml_string, blackboard_);
     RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", file_path.c_str());
     return true;
@@ -226,7 +227,8 @@ std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) cons
     boost::filesystem::create_directory(boost::filesystem::path("/tmp/robotx_bt_planner"));
   }
   doc.save_file(xml_behavior_filename.c_str());
-  return "";
+  std::ifstream ifs(xml_behavior_filename);
+  return std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
 }
 
 }  // namespace robotx_bt_planner
