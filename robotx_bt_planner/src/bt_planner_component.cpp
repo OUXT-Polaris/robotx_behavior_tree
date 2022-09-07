@@ -181,13 +181,23 @@ void BTPlannerComponent::evaluationCallback()
   }
 }
 
-struct walker : pugi::xml_tree_walker
+struct Walker : pugi::xml_tree_walker
 {
+  Walker(const std::vector<std::string> & ports) : ports(ports) {}
+
+  const std::vector<std::string> ports;
+
   virtual bool for_each(pugi::xml_node & node)
   {
     if (node.type() != pugi::node_element) return true;
     for (int i = 0; i < depth(); ++i) {
-      RCLCPP_ERROR_STREAM(rclcpp::get_logger("log"), node.name() << " " << node.child_value());
+      if (node.name() == std::string("Action")) {
+        for (const auto & port : ports) {
+          if (node.attribute(port.c_str()).as_string() != std::string("{" + port + "}")) {
+            node.append_attribute(port.c_str()) = std::string("{" + port + "}").c_str();
+          }
+        }
+      }
     }
     return true;  // continue traversal
   }
@@ -200,9 +210,9 @@ std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) cons
   if (!result) {
     throw std::runtime_error("Failed to parse xml string, \n" + xml_string);
   }
-  walker walker;
+  Walker walker({"planner_status", "task_objects"});
   doc.traverse(walker);
-  // const auto tree = doc.child("root").child("BehaviorTree");
+  doc.save_file("/tmp/tmp.xml");
   return "";
 }
 
