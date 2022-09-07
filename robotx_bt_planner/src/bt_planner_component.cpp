@@ -14,6 +14,12 @@
 
 #include "robotx_bt_planner/bt_planner_component.hpp"
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <fstream>
 #include <memory>
 #include <pugixml.hpp>
@@ -212,7 +218,14 @@ std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) cons
   }
   Walker walker({"planner_status", "task_objects"});
   doc.traverse(walker);
-  doc.save_file("/tmp/tmp.xml");
+  const std::string xml_behavior_filename =
+    "/tmp/robotx_bt_planner/" +
+    boost::lexical_cast<std::string>(boost::uuids::random_generator()()) + "_generated.xml";
+  RCLCPP_INFO_STREAM(get_logger(), xml_behavior_filename);
+  if (!boost::filesystem::exists("/tmp/robotx_bt_planner")) {
+    boost::filesystem::create_directory(boost::filesystem::path("/tmp/robotx_bt_planner"));
+  }
+  doc.save_file(xml_behavior_filename.c_str());
   return "";
 }
 
