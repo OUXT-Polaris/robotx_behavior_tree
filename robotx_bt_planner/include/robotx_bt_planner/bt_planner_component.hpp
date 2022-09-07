@@ -129,19 +129,7 @@ public:
   void loadConfig(const std::string & file_path);
   void loadPlugins();
   bool loadTree();
-
-  void evaluationCallback()
-  {
-    //    for(auto key : blackboard_->getKeys()){
-    //      std::string key_str(key);
-    //      auto a = blackboard_->getAny(key_str)->
-    //      auto value = blackboard_->getAny(key_str);
-    //      value->type().
-    //    }
-    for (auto & block : evaluation_blocks_) {
-      block->evaluate(lua_, blackboard_);
-    }
-  }
+  void evaluationCallback();
 
 private:
   std::string config_file_;

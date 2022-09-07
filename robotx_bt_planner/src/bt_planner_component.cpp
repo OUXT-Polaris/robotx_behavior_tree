@@ -171,6 +171,13 @@ bool BTPlannerComponent::loadTree()
   }
   return false;
 }
+
+void BTPlannerComponent::evaluationCallback()
+{
+  for (auto & block : evaluation_blocks_) {
+    block->evaluate(lua_, blackboard_);
+  }
+}
 }  // namespace robotx_bt_planner
 
 #include <rclcpp_components/register_node_macro.hpp>  // NOLINT
