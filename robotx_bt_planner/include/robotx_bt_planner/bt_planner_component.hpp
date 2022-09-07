@@ -155,6 +155,7 @@ private:
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
+  std::string addRosPorts(const std::string & xml_string) const;
 };  // namespace robotx_bt_planner
 }  // namespace robotx_bt_planner
 

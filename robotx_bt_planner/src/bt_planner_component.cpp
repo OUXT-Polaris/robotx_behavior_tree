@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <memory>
+#include <pugixml.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 #include <set>
 #include <string>
@@ -177,6 +178,12 @@ void BTPlannerComponent::evaluationCallback()
   for (auto & block : evaluation_blocks_) {
     block->evaluate(lua_, blackboard_);
   }
+}
+
+std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) const
+{
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_string(xml_string.c_str());
 }
 }  // namespace robotx_bt_planner
 
