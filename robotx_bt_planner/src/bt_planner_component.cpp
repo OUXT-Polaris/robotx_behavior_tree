@@ -166,6 +166,7 @@ bool BTPlannerComponent::loadTree()
 
     auto xml_string =
       std::string(std::istreambuf_iterator<char>(xml_file), std::istreambuf_iterator<char>());
+    addRosPorts(xml_string);
     tree_ = factory_.createTreeFromText(xml_string, blackboard_);
     RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", file_path.c_str());
     return true;
@@ -180,11 +181,31 @@ void BTPlannerComponent::evaluationCallback()
   }
 }
 
+struct walker : pugi::xml_tree_walker
+{
+  virtual bool for_each(pugi::xml_node & node)
+  {
+    if (node.type() != pugi::node_element) return true;
+    for (int i = 0; i < depth(); ++i) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("log"), node.name() << " " << node.child_value());
+    }
+    return true;  // continue traversal
+  }
+};
+
 std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) const
 {
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_string(xml_string.c_str());
+  if (!result) {
+    throw std::runtime_error("Failed to parse xml string, \n" + xml_string);
+  }
+  walker walker;
+  doc.traverse(walker);
+  // const auto tree = doc.child("root").child("BehaviorTree");
+  return "";
 }
+
 }  // namespace robotx_bt_planner
 
 #include <rclcpp_components/register_node_macro.hpp>  // NOLINT
