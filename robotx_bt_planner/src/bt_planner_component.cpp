@@ -23,6 +23,7 @@
 #include <fstream>
 #include <memory>
 #include <pugixml.hpp>
+#include <robotx_behavior_tree/action_node.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 #include <set>
 #include <string>
@@ -210,6 +211,15 @@ struct Walker : pugi::xml_tree_walker
   }
 };
 
+std::vector<std::string> BTPlannerComponent::getRosPorts() const
+{
+  std::vector<std::string> ret;
+  for (const auto & port : robotx_behavior_tree::ActionROS2Node::providedPorts()) {
+    ret.emplace_back(port.first);
+  }
+  return ret;
+}
+
 std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) const
 {
   pugi::xml_document doc;
@@ -217,7 +227,7 @@ std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) cons
   if (!result) {
     throw std::runtime_error("Failed to parse xml string, \n" + xml_string);
   }
-  Walker walker({"planner_status", "task_objects"});
+  Walker walker(getRosPorts());
   doc.traverse(walker);
   const std::string xml_behavior_filename =
     "/tmp/robotx_bt_planner/" +
