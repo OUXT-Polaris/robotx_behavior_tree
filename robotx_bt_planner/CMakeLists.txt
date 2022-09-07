@@ -17,6 +17,7 @@ add_compile_options(-fPIC)
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 ament_auto_find_build_dependencies()
 
@@ -29,7 +30,7 @@ ament_auto_add_library(calculation_action SHARED src/plugin/calculation_action.c
 
 ament_auto_add_executable(${PROJECT_NAME}_node src/bt_planner_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
-target_link_libraries(${PROJECT_NAME}_node ${YAML_CPP_LIBRARIES} ${behaviortree_cpp_v3_LIBRARIES} ${ZMQ_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_node ${YAML_CPP_LIBRARIES} ${behaviortree_cpp_v3_LIBRARIES} ${ZMQ_LIBRARIES} pugixml Boost::filesystem)
 
 install(DIRECTORY behavior_trees DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})

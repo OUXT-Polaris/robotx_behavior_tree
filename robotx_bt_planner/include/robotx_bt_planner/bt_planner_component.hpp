@@ -125,97 +125,11 @@ public:
   ROBOTX_BT_PLANNER_PUBLIC
   explicit BTPlannerComponent(const rclcpp::NodeOptions & options);
   ~BTPlannerComponent() {}
-
-  void timerCallback()
-  {
-    // RCLCPP_INFO_STREAM(this->get_logger(), "tick" << tree_.nodes.size());
-    evaluationCallback();
-    tree_.rootNode()->executeTick();
-  }
-
-  void loadConfig(std::string file_path)
-  {
-    node_ = YAML::LoadFile(file_path);
-    node_ >> format_;
-
-    RCLCPP_INFO(get_logger(), "open sol library");
-    lua_.open_libraries(sol::lib::base);
-    addPresetFunctions(lua_);
-
-    if (node_["behavior"]["blackboard"]) {
-      RCLCPP_INFO(get_logger(), "loading blackboard config");
-      for (auto board : node_["behavior"]["blackboard"]) {
-        if (!board["eval"]) {
-          continue;
-        }
-
-        // TODO(HansRobo) : make custom type evaluation
-        auto evaluation = std::make_shared<EvaluationBlock<double>>();
-        evaluation->name = board["input"].as<std::string>();
-        evaluation->evaluation = board["eval"].as<std::string>();
-        this->evaluation_blocks_.emplace_back(evaluation);
-        RCLCPP_INFO_STREAM(get_logger(), "loading evaluation : " << evaluation->name);
-      }
-    }
-  }
-
-  void loadPlugins()
-  {
-    if (node_["plugins"]) {
-      for (auto plugin : node_["plugins"]) {
-        auto package_name = plugin["package"].as<std::string>();
-        for (auto name : plugin["name"]) {
-          std::string plugin_name = name.as<std::string>();
-          RCLCPP_INFO_STREAM(
-            rclcpp::get_logger("robotx_bt_planner"), "LOAD PLUGIN : " << plugin_name);
-          std::string plugin_filename = ament_index_cpp::get_package_share_directory(package_name) +
-                                        "/../../lib/lib" + plugin_name + ".so";
-          factory_.registerFromPlugin(plugin_filename);
-        }
-      }
-    }
-    RCLCPP_INFO(get_logger(), "REGISTERED PLUGINS : ");
-    RCLCPP_INFO(get_logger(), "=================================");
-    for (auto builder : factory_.builders()) {
-      RCLCPP_INFO_STREAM(get_logger(), "" << builder.first);
-    }
-    RCLCPP_INFO(get_logger(), "=================================");
-  }
-
-  bool loadTree()
-  {
-    if (node_["behavior"]["description"]) {
-      auto description = node_["behavior"]["description"];
-      std::string package = description["package"].as<std::string>();
-      std::string path = description["path"].as<std::string>();
-      std::string file_path = ament_index_cpp::get_package_share_directory(package) + "/" + path;
-      std::ifstream xml_file(file_path);
-      if (!xml_file.good()) {
-        RCLCPP_ERROR(get_logger(), "Couldn't open input XML file: %s", file_path.c_str());
-        return false;
-      }
-
-      auto xml_string =
-        std::string(std::istreambuf_iterator<char>(xml_file), std::istreambuf_iterator<char>());
-      tree_ = factory_.createTreeFromText(xml_string, blackboard_);
-      RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", file_path.c_str());
-      return true;
-    }
-    return false;
-  }
-
-  void evaluationCallback()
-  {
-    //    for(auto key : blackboard_->getKeys()){
-    //      std::string key_str(key);
-    //      auto a = blackboard_->getAny(key_str)->
-    //      auto value = blackboard_->getAny(key_str);
-    //      value->type().
-    //    }
-    for (auto & block : evaluation_blocks_) {
-      block->evaluate(lua_, blackboard_);
-    }
-  }
+  void timerCallback();
+  void loadConfig(const std::string & file_path);
+  void loadPlugins();
+  bool loadTree();
+  void evaluationCallback();
 
 private:
   std::string config_file_;
@@ -241,6 +155,8 @@ private:
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
+  std::string addRosPorts(const std::string & xml_string) const;
+  std::vector<std::string> getRosPorts() const;
 };  // namespace robotx_bt_planner
 }  // namespace robotx_bt_planner
 

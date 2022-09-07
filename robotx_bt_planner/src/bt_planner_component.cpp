@@ -14,8 +14,16 @@
 
 #include "robotx_bt_planner/bt_planner_component.hpp"
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <fstream>
 #include <memory>
+#include <pugixml.hpp>
+#include <robotx_behavior_tree/action_node.hpp>
 #include <robotx_behavior_tree/to_marker.hpp>
 #include <set>
 #include <string>
@@ -94,6 +102,145 @@ void BTPlannerComponent::taskObjectsArrayCallback(
   blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>(
     "task_objects", data);
 }
+
+void BTPlannerComponent::loadConfig(const std::string & file_path)
+{
+  node_ = YAML::LoadFile(file_path);
+  node_ >> format_;
+
+  RCLCPP_INFO(get_logger(), "open sol library");
+  lua_.open_libraries(sol::lib::base);
+  addPresetFunctions(lua_);
+
+  if (node_["behavior"]["blackboard"]) {
+    RCLCPP_INFO(get_logger(), "loading blackboard config");
+    for (auto board : node_["behavior"]["blackboard"]) {
+      if (!board["eval"]) {
+        continue;
+      }
+
+      // TODO(HansRobo) : make custom type evaluation
+      auto evaluation = std::make_shared<EvaluationBlock<double>>();
+      evaluation->name = board["input"].as<std::string>();
+      evaluation->evaluation = board["eval"].as<std::string>();
+      this->evaluation_blocks_.emplace_back(evaluation);
+      RCLCPP_INFO_STREAM(get_logger(), "loading evaluation : " << evaluation->name);
+    }
+  }
+}
+
+void BTPlannerComponent::timerCallback()
+{
+  evaluationCallback();
+  tree_.rootNode()->executeTick();
+}
+
+void BTPlannerComponent::loadPlugins()
+{
+  if (node_["plugins"]) {
+    for (auto plugin : node_["plugins"]) {
+      auto package_name = plugin["package"].as<std::string>();
+      for (auto name : plugin["name"]) {
+        std::string plugin_name = name.as<std::string>();
+        RCLCPP_INFO_STREAM(
+          rclcpp::get_logger("robotx_bt_planner"), "LOAD PLUGIN : " << plugin_name);
+        std::string plugin_filename = ament_index_cpp::get_package_share_directory(package_name) +
+                                      "/../../lib/lib" + plugin_name + ".so";
+        factory_.registerFromPlugin(plugin_filename);
+      }
+    }
+  }
+  RCLCPP_INFO(get_logger(), "REGISTERED PLUGINS : ");
+  RCLCPP_INFO(get_logger(), "=================================");
+  for (auto builder : factory_.builders()) {
+    RCLCPP_INFO_STREAM(get_logger(), "" << builder.first);
+  }
+  RCLCPP_INFO(get_logger(), "=================================");
+}
+
+bool BTPlannerComponent::loadTree()
+{
+  if (node_["behavior"]["description"]) {
+    auto description = node_["behavior"]["description"];
+    std::string package = description["package"].as<std::string>();
+    std::string path = description["path"].as<std::string>();
+    std::string file_path = ament_index_cpp::get_package_share_directory(package) + "/" + path;
+    std::ifstream xml_file(file_path);
+    if (!xml_file.good()) {
+      RCLCPP_ERROR(get_logger(), "Couldn't open input XML file: %s", file_path.c_str());
+      return false;
+    }
+
+    auto xml_string =
+      std::string(std::istreambuf_iterator<char>(xml_file), std::istreambuf_iterator<char>());
+    xml_string = addRosPorts(xml_string);
+    RCLCPP_INFO_STREAM(get_logger(), "behavior xml : \n\n" << xml_string);
+    tree_ = factory_.createTreeFromText(xml_string, blackboard_);
+    RCLCPP_INFO(get_logger(), "behavior tree loaded: %s", file_path.c_str());
+    return true;
+  }
+  return false;
+}
+
+void BTPlannerComponent::evaluationCallback()
+{
+  for (auto & block : evaluation_blocks_) {
+    block->evaluate(lua_, blackboard_);
+  }
+}
+
+struct Walker : pugi::xml_tree_walker
+{
+  Walker(const std::vector<std::string> & ports) : ports(ports) {}
+
+  const std::vector<std::string> ports;
+
+  virtual bool for_each(pugi::xml_node & node)
+  {
+    if (node.type() != pugi::node_element) return true;
+    for (int i = 0; i < depth(); ++i) {
+      if (node.name() == std::string("Action")) {
+        for (const auto & port : ports) {
+          if (node.attribute(port.c_str()).as_string() != std::string("{" + port + "}")) {
+            node.append_attribute(port.c_str()) = std::string("{" + port + "}").c_str();
+          }
+        }
+      }
+    }
+    return true;  // continue traversal
+  }
+};
+
+std::vector<std::string> BTPlannerComponent::getRosPorts() const
+{
+  std::vector<std::string> ret;
+  for (const auto & port : robotx_behavior_tree::ActionROS2Node::providedPorts()) {
+    ret.emplace_back(port.first);
+  }
+  return ret;
+}
+
+std::string BTPlannerComponent::addRosPorts(const std::string & xml_string) const
+{
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_string(xml_string.c_str());
+  if (!result) {
+    throw std::runtime_error("Failed to parse xml string, \n" + xml_string);
+  }
+  Walker walker(getRosPorts());
+  doc.traverse(walker);
+  const std::string xml_behavior_filename =
+    "/tmp/robotx_bt_planner/" +
+    boost::lexical_cast<std::string>(boost::uuids::random_generator()()) + "_generated.xml";
+  RCLCPP_INFO_STREAM(get_logger(), xml_behavior_filename);
+  if (!boost::filesystem::exists("/tmp/robotx_bt_planner")) {
+    boost::filesystem::create_directory(boost::filesystem::path("/tmp/robotx_bt_planner"));
+  }
+  doc.save_file(xml_behavior_filename.c_str());
+  std::ifstream ifs(xml_behavior_filename);
+  return std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+}
+
 }  // namespace robotx_bt_planner
 
 #include <rclcpp_components/register_node_macro.hpp>  // NOLINT
