@@ -12,7 +12,8 @@
            
             <!-- set turn raduis and direction -->
             <!-- dir = left or right -->
-            <Action ID="SetTurnAction" radius="3.0" dir="left" pose_x="10" pose_y="5" pose_v_x="20" pose_v_y="20" 
+            <Action ID="SetTurnAction"
+                        radius="3.0" dir="left" pose_x="10" pose_y="5" pose_v_x="20" pose_v_y="20" 
                         goal_x1="{goal_x1}" goal_y1="{goal_y1}" goal_theta1="{goal_theta1}"
                         goal_x2="{goal_x2}" goal_y2="{goal_y2}" goal_theta2="{goal_theta2}"
                         goal_x3="{goal_x3}" goal_y3="{goal_y3}" goal_theta3="{goal_theta3}"

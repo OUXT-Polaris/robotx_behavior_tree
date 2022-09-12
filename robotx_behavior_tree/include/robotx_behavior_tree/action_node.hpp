@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <hermite_path_msgs/msg/planner_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
 #include <stdexcept>
@@ -51,7 +52,8 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects")};
+      BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects"),
+      BT::InputPort<hermite_path_msgs::msg::PlannerStatus::SharedPtr>("planner_status")};
   }
   static BT::PortsList appendPorts(const BT::PortsList & ports1, const BT::PortsList & ports2)
   {
@@ -78,6 +80,20 @@ protected:
       throw std::runtime_error("Task objects were not subscribed.");
     }
   }
+
+#define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
+  std::optional<TYPE> get##NAME() const              \
+  {                                                  \
+    const auto ret = getInput<TYPE>(BLACKBOARD_KEY); \
+    if (ret) {                                       \
+      return ret.value();                            \
+    }                                                \
+    return std::nullopt;                             \
+  }
+
+  DEFINE_GET_INPUT(
+    PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
+#undef DEFINE_GET_INPUT
 };
 }  // namespace robotx_behavior_tree
 

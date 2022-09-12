@@ -24,6 +24,7 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
+#include "hermite_path_msgs/msg/planner_status.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -57,15 +58,18 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
-  
-
-
 
 protected:
   BT::NodeStatus onStart() override
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
+
+    const auto aaa = getPlannerStatus();
+    if(aaa){
+      RCLCPP_INFO(get_logger(), "status : %d", aaa.value()->status);
+    }
+
 
     try {
       const auto task_objects_array = getTaskObjects();
@@ -168,14 +172,15 @@ protected:
   BT::NodeStatus onRunning() override
   {
     auto pose = getCurrentPose();
-    // get_parameter("goal_tolerance", goal_tolerance_);
-    // if (pose) {
-    //   distance = getDistance(pose.value(), goal.pose);
-    // }
-    // if (distance < goal_tolerance_) {
-    //   RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
-    //   return BT::NodeStatus::SUCCESS;
-    // }
+    get_parameter("goal_tolerance", goal_tolerance_);
+    if (pose) {
+      distance_ = getDistance(pose.value(), goal_.pose);
+    }
+    RCLCPP_INFO(get_logger(), "distance from goal: %f", distance_);
+    if (distance_ < goal_tolerance_) {
+      RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
+    }
     // return BT::NodeStatus::RUNNING;
     // RCLCPP_INFO(get_logger(), "BBBBBBBBBB");
     //return BT::NodeStatus::SUCCESS;
