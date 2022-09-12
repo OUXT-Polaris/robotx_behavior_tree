@@ -18,13 +18,13 @@
 #include <vector>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "hermite_path_msgs/msg/planner_status.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_msgs/msg/task_object.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
-#include "hermite_path_msgs/msg/planner_status.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -58,7 +58,6 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
-
 protected:
   BT::NodeStatus onStart() override
   {
@@ -66,21 +65,22 @@ protected:
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
 
     const auto aaa = getPlannerStatus();
-    if(aaa){
+    if (aaa) {
       RCLCPP_INFO(get_logger(), "status : %d", aaa.value()->status);
     }
 
-
     try {
       const auto task_objects_array = getTaskObjects();
-      if(task_objects_array){
+      if (task_objects_array) {
         RCLCPP_INFO(get_logger(), "hogehogehoge");
-        RCLCPP_INFO(get_logger(), "task object size : %ld", task_objects_array->task_objects.size());
+        RCLCPP_INFO(
+          get_logger(), "task object size : %ld", task_objects_array->task_objects.size());
       }
 
       // return BT::NodeStatus::FAILURE;
       for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
-        RCLCPP_INFO(get_logger(), "task_object_kind : %d", task_objects_array->task_objects[i].object_kind);
+        RCLCPP_INFO(
+          get_logger(), "task_object_kind : %d", task_objects_array->task_objects[i].object_kind);
         RCLCPP_INFO(get_logger(), "task_object_x : [%f]", task_objects_array->task_objects[i].x);
         RCLCPP_INFO(get_logger(), "task_object_y : [%f]", task_objects_array->task_objects[i].y);
         if (task_objects_array->task_objects[i].object_kind == 1) {
@@ -99,46 +99,45 @@ protected:
       RCLCPP_INFO(get_logger(), "green_buoy_x_1 : [%f]", green_buoy_x);
       RCLCPP_INFO(get_logger(), "green_buoy_y_1 : [%f]", green_buoy_y);
 
-      for(size_t i=0;i < red_buoys_array.size(); i++){
+      for (size_t i = 0; i < red_buoys_array.size(); i++) {
         RCLCPP_INFO(get_logger(), "red_buoys_array_x : [%f]", red_buoys_array[i].x);
         RCLCPP_INFO(get_logger(), "red_buoys_array_y : [%f]", red_buoys_array[i].y);
         //RCLCPP_INFO(get_logger(), "red_buoys_array_z : [%f]", red_buoys_array[i].z);
         distance_ = calculateDistance(red_buoys_array[i].x, red_buoys_array[i].y);
 
-        if(red_buoy_x == 0.0 && i==0){
+        if (red_buoy_x == 0.0 && i == 0) {
           red_buoy_x = red_buoys_array[i].x;
         }
-        if(red_buoy_x > red_buoys_array[i].x) {
+        if (red_buoy_x > red_buoys_array[i].x) {
           red_buoy_x = red_buoys_array[i].x;
         }
-        
-        if(red_buoy_y == 0.0 && i==0){
+
+        if (red_buoy_y == 0.0 && i == 0) {
           red_buoy_y = red_buoys_array[i].y;
         }
-        if(red_buoy_y > red_buoys_array[i].y){
+        if (red_buoy_y > red_buoys_array[i].y) {
           red_buoy_y = red_buoys_array[i].y;
         }
       }
 
-      for(size_t i=0;i < green_buoys_array.size(); i++){
+      for (size_t i = 0; i < green_buoys_array.size(); i++) {
         RCLCPP_INFO(get_logger(), "green_buoys_array_x : [%f]", green_buoys_array[i].x);
         RCLCPP_INFO(get_logger(), "green_buoys_array_y : [%f]", green_buoys_array[i].y);
 
-        if(green_buoy_x == 0.0 && i==0){
+        if (green_buoy_x == 0.0 && i == 0) {
           green_buoy_x = green_buoys_array[i].x;
         }
-        if(green_buoy_x > green_buoys_array[i].x){
-            green_buoy_x = green_buoys_array[i].x;
+        if (green_buoy_x > green_buoys_array[i].x) {
+          green_buoy_x = green_buoys_array[i].x;
         }
 
-        if(green_buoy_y == 0.0 && i==0){
+        if (green_buoy_y == 0.0 && i == 0) {
           green_buoy_y = green_buoys_array[i].y;
         }
-        if(green_buoy_y > green_buoys_array[i].y) {
+        if (green_buoy_y > green_buoys_array[i].y) {
           green_buoy_y = green_buoys_array[i].y;
         }
       }
-
 
       RCLCPP_INFO(get_logger(), "red_buoy_x_2 : [%f]", red_buoy_x);
       RCLCPP_INFO(get_logger(), "red_buoy_y_2 : [%f]", red_buoy_y);
@@ -211,9 +210,9 @@ protected:
       pose.position.y = transform_stamped.transform.translation.y;
       pose.position.z = transform_stamped.transform.translation.z;
       pose.orientation = transform_stamped.transform.rotation;
-      RCLCPP_INFO(get_logger(),  "position_x : [%f]", pose.position.x);
-      RCLCPP_INFO(get_logger(),  "position_y : [%f]", pose.position.y);
-      RCLCPP_INFO(get_logger(),  "position_z : [%f]", pose.position.z);
+      RCLCPP_INFO(get_logger(), "position_x : [%f]", pose.position.x);
+      RCLCPP_INFO(get_logger(), "position_y : [%f]", pose.position.y);
+      RCLCPP_INFO(get_logger(), "position_z : [%f]", pose.position.z);
       return pose;
     } catch (tf2::ExtrapolationException & ex) {
       RCLCPP_ERROR(get_logger(), ex.what());
