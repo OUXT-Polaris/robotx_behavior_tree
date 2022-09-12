@@ -101,26 +101,21 @@ protected:
         //RCLCPP_INFO(get_logger(), "red_buoys_array_z : [%f]", red_buoys_array[i].z);
         distance_ = calculateDistance(red_buoys_array[i].x, red_buoys_array[i].y);
 
-
         if(red_buoy_x == 0.0 && i==0){
           red_buoy_x = red_buoys_array[i].x;
         }
         if(red_buoy_x > red_buoys_array[i].x) {
           red_buoy_x = red_buoys_array[i].x;
-        } else{
-          red_buoy_x = 0.0;
         }
-
+        
         if(red_buoy_y == 0.0 && i==0){
           red_buoy_y = red_buoys_array[i].y;
         }
         if(red_buoy_y > red_buoys_array[i].y){
           red_buoy_y = red_buoys_array[i].y;
-        } else {
-          red_buoy_y = 0.0;
         }
       }
-      
+
       for(size_t i=0;i < green_buoys_array.size(); i++){
         RCLCPP_INFO(get_logger(), "green_buoys_array_x : [%f]", green_buoys_array[i].x);
         RCLCPP_INFO(get_logger(), "green_buoys_array_y : [%f]", green_buoys_array[i].y);
@@ -130,18 +125,16 @@ protected:
         }
         if(green_buoy_x > green_buoys_array[i].x){
             green_buoy_x = green_buoys_array[i].x;
-        } else {
-          green_buoy_x = 0.0;
         }
+
         if(green_buoy_y == 0.0 && i==0){
           green_buoy_y = green_buoys_array[i].y;
         }
         if(green_buoy_y > green_buoys_array[i].y) {
           green_buoy_y = green_buoys_array[i].y;
-        } else {
-          green_buoy_y = 0.0;
         }
       }
+
 
       RCLCPP_INFO(get_logger(), "red_buoy_x_2 : [%f]", red_buoy_x);
       RCLCPP_INFO(get_logger(), "red_buoy_y_2 : [%f]", red_buoy_y);
@@ -174,7 +167,7 @@ protected:
   }
   BT::NodeStatus onRunning() override
   {
-    // auto pose = getCurrentPose();
+    auto pose = getCurrentPose();
     // get_parameter("goal_tolerance", goal_tolerance_);
     // if (pose) {
     //   distance = getDistance(pose.value(), goal.pose);

@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <robotx_bt_planner/bt_planner_component.hpp>
-#include <glog/logging.h>
 
 int main(int argc, char ** argv)
 {
