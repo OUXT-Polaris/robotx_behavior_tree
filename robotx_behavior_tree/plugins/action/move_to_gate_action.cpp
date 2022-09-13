@@ -58,7 +58,6 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
-
 protected:
   BT::NodeStatus onStart() override
   {
@@ -185,10 +184,9 @@ protected:
     RCLCPP_INFO(get_logger(), "distance from goal: %f", distance_);
 
     goal_.header.stamp = get_clock()->now();
-    if(status_planner.value()->status != 1){
+    if (status_planner.value()->status != 1) {
       goal_pub_gate_->publish(goal_);
       RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
-    
     }
 
     RCLCPP_INFO(get_logger(), "status : %d", status_planner.value()->status);
