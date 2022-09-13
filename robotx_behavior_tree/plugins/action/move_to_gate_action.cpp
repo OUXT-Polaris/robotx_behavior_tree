@@ -170,34 +170,28 @@ protected:
   }
   BT::NodeStatus onRunning() override
   {
-    int cnt = 0;
     const auto status_planner = getPlannerStatus();
-    if(cnt == 0){
-      RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
-    }
     const auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
-
-    goal_.header.stamp = get_clock()->now();
-    if(status_planner.value() == 0){
-      goal_pub_gate_->publish(goal_);
-      if(cnt == 0){
-        RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
-      }
-    }
 
     if (pose) {
       distance_ = getDistance(pose.value(), goal_.pose);
     }
-    RCLCPP_INFO(get_logger(), "distance from goal: %f", distance_);
 
     if (distance_ < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
     }
+    RCLCPP_INFO(get_logger(), "distance from goal: %f", distance_);
+
+    goal_.header.stamp = get_clock()->now();
+    if(status_planner.value()->status != 1){
+      goal_pub_gate_->publish(goal_);
+      RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
+    
+    }
 
     RCLCPP_INFO(get_logger(), "status : %d", status_planner.value()->status);
-    cnt++;
 
     return BT::NodeStatus::RUNNING;
   }
