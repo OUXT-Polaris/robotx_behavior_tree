@@ -61,8 +61,6 @@ private:
 protected:
   BT::NodeStatus onStart() override
   {
-    std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
-    std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
     const auto status_planner = getPlannerStatus();
 
     if (status_planner) {
@@ -77,79 +75,6 @@ protected:
       }
 
       // return BT::NodeStatus::FAILURE;
-      for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
-        RCLCPP_INFO(
-          get_logger(), "task_object_kind : %d", task_objects_array->task_objects[i].object_kind);
-        RCLCPP_INFO(get_logger(), "task_object_x : [%f]", task_objects_array->task_objects[i].x);
-        RCLCPP_INFO(get_logger(), "task_object_y : [%f]", task_objects_array->task_objects[i].y);
-        if (task_objects_array->task_objects[i].object_kind == 1) {
-          red_buoys_array.push_back(task_objects_array->task_objects[i]);
-        }
-        if (task_objects_array->task_objects[i].object_kind == 2) {
-          green_buoys_array.push_back(task_objects_array->task_objects[i]);
-        }
-      }
-
-      RCLCPP_INFO(get_logger(), "red_buoys_array_size : [%ld]", red_buoys_array.size());
-      RCLCPP_INFO(get_logger(), "green_buoys_array_size : [%ld]", green_buoys_array.size());
-
-      RCLCPP_INFO(get_logger(), "red_buoy_x_1 : [%f]", red_buoy_x);
-      RCLCPP_INFO(get_logger(), "red_buoy_y_1 : [%f]", red_buoy_y);
-      RCLCPP_INFO(get_logger(), "green_buoy_x_1 : [%f]", green_buoy_x);
-      RCLCPP_INFO(get_logger(), "green_buoy_y_1 : [%f]", green_buoy_y);
-
-      for (size_t i = 0; i < red_buoys_array.size(); i++) {
-        RCLCPP_INFO(get_logger(), "red_buoys_array_x : [%f]", red_buoys_array[i].x);
-        RCLCPP_INFO(get_logger(), "red_buoys_array_y : [%f]", red_buoys_array[i].y);
-        //RCLCPP_INFO(get_logger(), "red_buoys_array_z : [%f]", red_buoys_array[i].z);
-        distance_ = calculateDistance(red_buoys_array[i].x, red_buoys_array[i].y);
-
-        if (red_buoy_x == 0.0 && i == 0) {
-          red_buoy_x = red_buoys_array[i].x;
-        }
-        if (red_buoy_x > red_buoys_array[i].x) {
-          red_buoy_x = red_buoys_array[i].x;
-        }
-
-        if (red_buoy_y == 0.0 && i == 0) {
-          red_buoy_y = red_buoys_array[i].y;
-        }
-        if (red_buoy_y > red_buoys_array[i].y) {
-          red_buoy_y = red_buoys_array[i].y;
-        }
-      }
-
-      for (size_t i = 0; i < green_buoys_array.size(); i++) {
-        RCLCPP_INFO(get_logger(), "green_buoys_array_x : [%f]", green_buoys_array[i].x);
-        RCLCPP_INFO(get_logger(), "green_buoys_array_y : [%f]", green_buoys_array[i].y);
-
-        if (green_buoy_x == 0.0 && i == 0) {
-          green_buoy_x = green_buoys_array[i].x;
-        }
-        if (green_buoy_x > green_buoys_array[i].x) {
-          green_buoy_x = green_buoys_array[i].x;
-        }
-
-        if (green_buoy_y == 0.0 && i == 0) {
-          green_buoy_y = green_buoys_array[i].y;
-        }
-        if (green_buoy_y > green_buoys_array[i].y) {
-          green_buoy_y = green_buoys_array[i].y;
-        }
-      }
-
-      RCLCPP_INFO(get_logger(), "red_buoy_x_2 : [%f]", red_buoy_x);
-      RCLCPP_INFO(get_logger(), "red_buoy_y_2 : [%f]", red_buoy_y);
-      RCLCPP_INFO(get_logger(), "green_buoy_x_2 : [%f]", green_buoy_x);
-      RCLCPP_INFO(get_logger(), "green_buoy_y_2 : [%f]", green_buoy_y);
-
-      goal_x = (red_buoy_x + green_buoy_x) / 2.0;
-      goal_y = (red_buoy_y + green_buoy_y) / 2.0;
-      goal_theta = 0.0;
-
-      RCLCPP_INFO(get_logger(), "goal_x : %f", goal_x);
-      RCLCPP_INFO(get_logger(), "goal_y : %f", goal_y);
-
       goal_.header.frame_id = "map";
       goal_.pose.position.x = goal_x;
       goal_.pose.position.y = goal_y;
@@ -232,6 +157,72 @@ protected:
     auto dy = y - static_cast<float>(pose->position.y);
 
     return std::sqrt(dx * dx + dy * dy);
+  }
+
+  const std::optional<std::vector<float>> GetGenterGate(robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_objects_array)
+  {
+    std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
+    std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
+
+    std::vector<float> goal_points;
+
+    for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
+        if (task_objects_array->task_objects[i].object_kind == 1) {
+          red_buoys_array.push_back(task_objects_array->task_objects[i]);
+        }
+        if (task_objects_array->task_objects[i].object_kind == 2) {
+          green_buoys_array.push_back(task_objects_array->task_objects[i]);
+        }
+      }
+
+      RCLCPP_INFO(get_logger(), "red_buoys_array_size : [%ld]", red_buoys_array.size());
+      RCLCPP_INFO(get_logger(), "green_buoys_array_size : [%ld]", green_buoys_array.size());
+
+      for (size_t i = 0; i < red_buoys_array.size(); i++) {
+        RCLCPP_INFO(get_logger(), "red_buoys_array_x : [%f]", red_buoys_array[i].x);
+        RCLCPP_INFO(get_logger(), "red_buoys_array_y : [%f]", red_buoys_array[i].y);
+        //RCLCPP_INFO(get_logger(), "red_buoys_array_z : [%f]", red_buoys_array[i].z);
+        distance_ = calculateDistance(red_buoys_array[i].x, red_buoys_array[i].y);
+
+        if (red_buoy_x == 0.0 && i == 0) {
+          red_buoy_x = red_buoys_array[i].x;
+        }
+        if (red_buoy_x > red_buoys_array[i].x) {
+          red_buoy_x = red_buoys_array[i].x;
+        }
+
+        if (red_buoy_y == 0.0 && i == 0) {
+          red_buoy_y = red_buoys_array[i].y;
+        }
+        if (red_buoy_y > red_buoys_array[i].y) {
+          red_buoy_y = red_buoys_array[i].y;
+        }
+      }
+
+      for (size_t i = 0; i < green_buoys_array.size(); i++) {
+        if (green_buoy_x == 0.0 && i == 0) {
+          green_buoy_x = green_buoys_array[i].x;
+        }
+        if (green_buoy_x > green_buoys_array[i].x) {
+          green_buoy_x = green_buoys_array[i].x;
+        }
+
+        if (green_buoy_y == 0.0 && i == 0) {
+          green_buoy_y = green_buoys_array[i].y;
+        }
+        if (green_buoy_y > green_buoys_array[i].y) {
+          green_buoy_y = green_buoys_array[i].y;
+        }
+      }
+
+      goal_x = (red_buoy_x + green_buoy_x) / 2.0;
+      goal_y = (red_buoy_y + green_buoy_y) / 2.0;
+      goal_theta = 0.0;
+
+      goal_points = {goal_x, goal_y, goal_theta};
+
+      return goal_points;
+    
   }
 };
 }  // namespace robotx_behavior_tree
