@@ -10,3 +10,4 @@ In ActionROS2Node, these ports below are always exists and it is unnecessary to 
 | -------------- | ------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------- |
 | task_objects   | robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr | ActionROS2Node::getTaskObjects()   | task object data from '/perception/task_objects' topic            |
 | planner_status | hermite_path_msgs::msg::PlannerStatus::SharedPtr              | ActionROS2Node::getPlannerStatus() | planner status from '/local_waypoint_server/planner_status' topic |
+| current_pose   | geometry_msgs::msg::PoseStamped::SharedPtr                    | ActionROS2Node::getCurrentPose()   | current pose of  the robot.                                       |
