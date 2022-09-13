@@ -58,21 +58,21 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
+
 protected:
   BT::NodeStatus onStart() override
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
+    const auto status_planner = getPlannerStatus();
 
-    const auto aaa = getPlannerStatus();
-    if (aaa) {
-      RCLCPP_INFO(get_logger(), "status : %d", aaa.value()->status);
+    if (status_planner) {
+      RCLCPP_INFO(get_logger(), "status : %d", status_planner.value()->status);
     }
 
     try {
       const auto task_objects_array = getTaskObjects();
       if (task_objects_array) {
-        RCLCPP_INFO(get_logger(), "hogehogehoge");
         RCLCPP_INFO(
           get_logger(), "task object size : %ld", task_objects_array->task_objects.size());
       }
@@ -170,22 +170,34 @@ protected:
   }
   BT::NodeStatus onRunning() override
   {
-    auto pose = getCurrentPose();
+    int cnt = 0;
+    const auto status_planner = getPlannerStatus();
+    if(cnt == 0){
+      RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
+    }
+    const auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
+
+    goal_.header.stamp = get_clock()->now();
+    if(status_planner.value() == 0){
+      goal_pub_gate_->publish(goal_);
+      if(cnt == 0){
+        RCLCPP_INFO(get_logger(), "status1 : %d", status_planner.value()->status);
+      }
+    }
+
     if (pose) {
       distance_ = getDistance(pose.value(), goal_.pose);
     }
     RCLCPP_INFO(get_logger(), "distance from goal: %f", distance_);
+
     if (distance_ < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
     }
-    // return BT::NodeStatus::RUNNING;
-    // RCLCPP_INFO(get_logger(), "BBBBBBBBBB");
-    //return BT::NodeStatus::SUCCESS;
 
-    goal_.header.stamp = get_clock()->now();
-    goal_pub_gate_->publish(goal_);
+    RCLCPP_INFO(get_logger(), "status : %d", status_planner.value()->status);
+    cnt++;
 
     return BT::NodeStatus::RUNNING;
   }
