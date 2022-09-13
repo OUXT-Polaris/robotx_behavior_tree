@@ -35,7 +35,7 @@ class MoveGoalAction : public ActionROS2Node
 {
 public:
   MoveGoalAction(const std::string & name, const BT::NodeConfiguration & config)
-  : ActionROS2Node(name, config), buffer_(get_clock()), listener_(buffer_)
+  : ActionROS2Node(name, config)
   {
     declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
@@ -51,24 +51,6 @@ public:
       ActionROS2Node::providedPorts(),
       {BT::InputPort<double>("goal_x"), BT::InputPort<double>("goal_y"),
        BT::InputPort<double>("goal_theta")});
-  }
-
-  const std::optional<geometry_msgs::msg::Pose> getCurrentPose()
-  {
-    try {
-      auto transform_stamped =
-        buffer_.lookupTransform("map", "base_link", rclcpp::Time(0), tf2::durationFromSec(1.0));
-      geometry_msgs::msg::Pose pose;
-      pose.position.x = transform_stamped.transform.translation.x;
-      pose.position.y = transform_stamped.transform.translation.y;
-      pose.position.z = transform_stamped.transform.translation.z;
-      pose.orientation = transform_stamped.transform.rotation;
-      return pose;
-    } catch (tf2::ExtrapolationException & ex) {
-      RCLCPP_ERROR(get_logger(), ex.what());
-      return std::nullopt;
-    }
-    return std::nullopt;
   }
 
 protected:
@@ -107,8 +89,8 @@ protected:
     auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
     if (pose) {
-      dist = getDistance(pose.value(), goal.pose);
-      angle_dist = getAngleDiff(pose.value(), goal.pose);
+      dist = getDistance(pose.value()->pose, goal.pose);
+      angle_dist = getAngleDiff(pose.value()->pose, goal.pose);
     }
     if (dist < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
@@ -147,8 +129,6 @@ protected:
   }
 
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener listener_;
   double goal_tolerance_;
   double goal_angle_tolerance_;
   double dist;

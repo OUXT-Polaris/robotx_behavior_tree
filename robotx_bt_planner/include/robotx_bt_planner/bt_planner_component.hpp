@@ -16,6 +16,7 @@
 #define ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
 
 #include <fstream>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_msgs/msg/planner_status.hpp>
 #include <memory>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
@@ -155,6 +156,7 @@ private:
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   std::string addRosPorts(const std::string & xml_string) const;
   std::vector<std::string> getRosPorts() const;
 };  // namespace robotx_bt_planner
