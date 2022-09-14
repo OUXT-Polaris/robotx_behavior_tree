@@ -140,7 +140,7 @@ protected:
     auto dx = x - static_cast<float>(pose->position.x);
     auto dy = y - static_cast<float>(pose->position.y);
 
-    return std::sqrt(dx * dx + dy * dy);
+    return std::hypot(dx, dy);
   }
 
   const std::optional<geometry_msgs::msg::Pose> GetCenterGate(
