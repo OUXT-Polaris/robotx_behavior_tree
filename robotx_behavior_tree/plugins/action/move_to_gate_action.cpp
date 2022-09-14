@@ -42,14 +42,6 @@ public:
 
 private:
   rclcpp::TimerBase::SharedPtr update_position_timer_;
-  float red_buoy_x = 0.0;
-  float red_buoy_y = 0.0;
-  float green_buoy_x = 0.0;
-  float green_buoy_y = 0.0;
-  float goal_x;
-  float goal_y;
-  float goal_theta;
-
   float distance_;
   double goal_tolerance_;
 
@@ -64,19 +56,7 @@ protected:
     const auto status_planner = getPlannerStatus();
     try {
       const auto task_objects_array = getTaskObjects();
-      const auto xyz = GetGenterGate(task_objects_array);
-
-      if (xyz) {
-        goal_.header.frame_id = "map";
-        goal_.pose.position.x = xyz.value()[0];
-        goal_.pose.position.y = xyz.value()[1];
-        goal_.pose.position.z = 0.0;
-
-        goal_.pose.orientation.w = 1.0;
-        goal_.pose.orientation.x = 0.0;
-        goal_.pose.orientation.y = 0.0;
-        goal_.pose.orientation.z = 0.0;
-
+      if (task_objects_array) {
         return BT::NodeStatus::RUNNING;
       }
       return BT::NodeStatus::FAILURE;
@@ -92,21 +72,20 @@ protected:
     const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
-    const auto xyz = GetGenterGate(task_objects_array);
+    const auto xyz = GetCenterGate(task_objects_array);
+    get_parameter("goal_tolerance", goal_tolerance_);
 
     if (xyz) {
       goal_.header.frame_id = "map";
-      goal_.pose.position.x = xyz.value()[0];
-      goal_.pose.position.y = xyz.value()[1];
+      goal_.pose.position.x = xyz->position.x;
+      goal_.pose.position.y = xyz->position.y;
       goal_.pose.position.z = 0.0;
 
-      goal_.pose.orientation.w = 1.0;
-      goal_.pose.orientation.x = 0.0;
-      goal_.pose.orientation.y = 0.0;
-      goal_.pose.orientation.z = 0.0;
+      goal_.pose.orientation.w = xyz->orientation.w;
+      goal_.pose.orientation.x = xyz->orientation.x;
+      goal_.pose.orientation.y = xyz->orientation.y;
+      goal_.pose.orientation.z = xyz->orientation.z;
     }
-
-    get_parameter("goal_tolerance", goal_tolerance_);
 
     if (pose) {
       distance_ = getDistance(pose.value(), goal_.pose);
@@ -162,18 +141,19 @@ protected:
     return std::sqrt(dx * dx + dy * dy);
   }
 
-  const std::optional<std::vector<float>> GetGenterGate(
+  const std::optional<geometry_msgs::msg::Pose> GetCenterGate(
     robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_objects_array)
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
-
-    std::vector<float> goal_points;
+    geometry_msgs::msg::Pose goal_coordinate;
     float x;
     float y;
-    float theta;
-
     int cnt = 0;
+    float red_buoy_x;
+    float red_buoy_y;
+    float green_buoy_x;
+    float green_buoy_y;
 
     if (task_objects_array) {
       for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
@@ -186,14 +166,14 @@ protected:
       }
 
       for (const auto & e : red_buoys_array) {
-        if (red_buoy_x == 0.0 && cnt == 0) {
+        if (cnt == 0) {
           red_buoy_x = e.x;
         }
         if (red_buoy_x > e.x) {
           red_buoy_x = e.x;
         }
 
-        if (red_buoy_y == 0.0 && cnt == 0) {
+        if (cnt == 0) {
           red_buoy_y = e.y;
         }
         if (red_buoy_y > e.y) {
@@ -205,14 +185,14 @@ protected:
       cnt = 0;
 
       for (const auto & e : green_buoys_array) {
-        if (green_buoy_x == 0.0 && cnt == 0) {
+        if (cnt == 0) {
           green_buoy_x = e.x;
         }
         if (green_buoy_x > e.x) {
           green_buoy_x = e.x;
         }
 
-        if (green_buoy_y == 0.0 && cnt == 0) {
+        if (cnt == 0) {
           green_buoy_y = e.y;
         }
         if (red_buoy_y > e.y) {
@@ -223,13 +203,16 @@ protected:
 
       x = (red_buoy_x + green_buoy_x) / 2.0;
       y = (red_buoy_y + green_buoy_y) / 2.0;
-      theta = 0.0;
 
-      goal_points.push_back(x);
-      goal_points.push_back(y);
-      goal_points.push_back(theta);
+      goal_coordinate.position.x = x;
+      goal_coordinate.position.y = y;
+      goal_coordinate.position.z = 0.0;
+      goal_coordinate.orientation.w = 1.0;
+      goal_coordinate.orientation.x = 0.0;
+      goal_coordinate.orientation.y = 0.0;
+      goal_coordinate.orientation.z = 0.0;
 
-      return goal_points;
+      return goal_coordinate;
     }
     return std::nullopt;
   }
