@@ -97,6 +97,17 @@ protected:
     PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
   DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
 #undef DEFINE_GET_INPUT
+  std::vector<robotx_behavior_msgs::msg::TaskObject> filter(
+    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects, uint8_t object_kind) const
+  {
+    std::vector<robotx_behavior_msgs::msg::TaskObject> filtered;
+    for (const auto & task_object : task_objects) {
+      if (task_object.object_kind == object_kind) {
+        filtered.emplace_back(task_object);
+      }
+    }
+    return filtered;
+  }
 };
 }  // namespace robotx_behavior_tree
 
