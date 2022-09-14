@@ -158,13 +158,12 @@ protected:
     float green_buoy_y;
 
     if (task_objects_array) {
-      for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
-        if (task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
-          red_buoys_array.push_back(task_objects_array->task_objects[i]);
+      for (const auto & object : task_objects_array->task_objects) {
+        if (object.object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
+          red_buoys_array.emplace_back(object);
         }
-        if (
-          task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
-          green_buoys_array.push_back(task_objects_array->task_objects[i]);
+        if (object.object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
+          green_buoys_array.emplace_back(object);
         }
       }
 
