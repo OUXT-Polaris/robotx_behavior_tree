@@ -133,6 +133,18 @@ protected:
     });
     return ret;
   }
+
+  std::vector<robotx_behavior_msgs::msg::TaskObject> sortByDistance(
+    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+    const geometry_msgs::msg::Point & origin) const
+  {
+    std::vector<robotx_behavior_msgs::msg::TaskObject> ret = task_objects;
+    std::sort(ret.begin(), ret.end(), [this, origin](auto const & lhs, auto const & rhs) {
+      return std::hypot(lhs.x - origin.x, lhs.y - origin.y, lhs.z - origin.z) <
+             std::hypot(rhs.x - origin.x, rhs.y - origin.y, rhs.z - origin.z);
+    });
+    return ret;
+  }
 };
 }  // namespace robotx_behavior_tree
 
