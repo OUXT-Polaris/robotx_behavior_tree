@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_msgs/msg/planner_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
@@ -53,7 +54,8 @@ public:
   {
     return {
       BT::InputPort<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects"),
-      BT::InputPort<hermite_path_msgs::msg::PlannerStatus::SharedPtr>("planner_status")};
+      BT::InputPort<hermite_path_msgs::msg::PlannerStatus::SharedPtr>("planner_status"),
+      BT::InputPort<geometry_msgs::msg::PoseStamped::SharedPtr>("current_pose")};
   }
   static BT::PortsList appendPorts(const BT::PortsList & ports1, const BT::PortsList & ports2)
   {
@@ -93,6 +95,7 @@ protected:
 
   DEFINE_GET_INPUT(
     PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
+  DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
 #undef DEFINE_GET_INPUT
 };
 }  // namespace robotx_behavior_tree

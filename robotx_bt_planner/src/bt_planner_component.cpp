@@ -79,6 +79,8 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   CONNECT_TO_BLACKBOARD(
     hermite_path_msgs::msg::PlannerStatus, planner_status_sub_,
     "/local_waypoint_server/planner_status", "planner_status");
+  CONNECT_TO_BLACKBOARD(
+    geometry_msgs::msg::PoseStamped, current_pose_sub_, "/current_pose", "current_pose");
 #undef CONNECT_TO_BLACKBOARD
 
   // registerPlannerStatusSubscription();
