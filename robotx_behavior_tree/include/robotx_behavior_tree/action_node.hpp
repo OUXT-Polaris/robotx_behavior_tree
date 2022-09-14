@@ -37,6 +37,23 @@ struct Point2D
   double y;
 };
 
+struct Vector2D
+{
+  double x;
+  double y;
+  Vector2D(double x, double y)
+  {
+    x = x;
+    y = y;
+  }
+  template <typename T1, typename T2>
+  Vector2D(const T1 & p1, const T2 & p2)
+  {
+    x = p2.x - p1.x;
+    y = p2.y - p1.y;
+  }
+};
+
 struct Pose2D
 {
   Point2D position;
@@ -216,6 +233,31 @@ protected:
     geometry_msgs::msg::Vector3 rpy;
     rpy.z = task_object.theta[0];
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+    return p;
+  }
+
+  geometry_msgs::msg::Pose between(
+    const robotx_behavior_msgs::msg::TaskObject & obj1,
+    const robotx_behavior_msgs::msg::TaskObject & obj2,
+    const geometry_msgs::msg::Pose & robot_pose) const
+  {
+    geometry_msgs::msg::Pose p;
+    const auto p1 = getPoint2D(obj1);
+    const auto p2 = getPoint2D(obj2);
+    p.position.x = (p1.x + p2.x) * 0.5;
+    p.position.y = (p1.y + p2.y) * 0.5;
+    p.position.z = 0.0;
+    const auto v = geometry_msgs::msg::Vector2D(p1, p2);
+    const auto robot_rpy =
+      quaternion_operation::convertQuaternionToEulerAngle(robot_pose.orientation);
+    const auto v_robot = geometry_msgs::msg::Vector2D(std::cos(robot_rpy.z), std::sin(robot_rpy.z));
+    geometry_msgs::msg::Vector3 goal_rpy;
+    if ((v.y * v_robot.x - v.x * v_robot.y) >= (-v.y * v_robot.x + v.x * v_robot.y)) {
+      goal_rpy.z = std::atan2(-v.x, v.y);
+    } else {
+      goal_rpy.z = std::atan2(v.x, -v.y);
+    }
+    p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
   }
 };
