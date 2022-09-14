@@ -26,6 +26,18 @@
 #include <stdexcept>
 #include <string>
 
+namespace geometry_msgs
+{
+namespace msg
+{
+struct Point2D
+{
+  double x;
+  double y;
+};
+}  // namespace msg
+}  // namespace geometry_msgs
+
 namespace robotx_behavior_tree
 {
 class ActionNode : public BT::StatefulActionNode
@@ -99,12 +111,14 @@ protected:
   DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
 #undef DEFINE_GET_INPUT
 
-  double getDistance(const geometry_msgs::msg::Point & p1, const geometry_msgs::msg::Point & p2)
+  template <typename T1, typename T2>
+  double getDistance(const T1 & p1, const T2 & p2) const
   {
     return std::hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
   }
 
-  double get2DDistance(const geometry_msgs::msg::Point & p1, const geometry_msgs::msg::Point & p2)
+  template <typename T1, typename T2>
+  double get2DDistance(const T1 & p1, const T2 & p2) const
   {
     return std::hypot(p1.x - p2.x, p1.y - p2.y);
   }
@@ -122,28 +136,46 @@ protected:
     return filtered;
   }
 
-  std::vector<robotx_behavior_msgs::msg::TaskObject> sortBy2DDistance(
-    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+  void sortBy2DDistance(
+    std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
     const geometry_msgs::msg::Point & origin) const
   {
-    std::vector<robotx_behavior_msgs::msg::TaskObject> ret = task_objects;
-    std::sort(ret.begin(), ret.end(), [this, origin](auto const & lhs, auto const & rhs) {
-      return std::hypot(lhs.x - origin.x, lhs.y - origin.y) <
-             std::hypot(rhs.x - origin.x, rhs.y - origin.y);
-    });
-    return ret;
+    std::sort(
+      task_objects.begin(), task_objects.end(), [this, origin](auto const & lhs, auto const & rhs) {
+        return get2DDistance(getPoint2D(lhs), origin) < get2DDistance(getPoint2D(rhs), origin);
+      });
   }
 
-  std::vector<robotx_behavior_msgs::msg::TaskObject> sortByDistance(
-    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+  void sortByDistance(
+    std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
     const geometry_msgs::msg::Point & origin) const
   {
-    std::vector<robotx_behavior_msgs::msg::TaskObject> ret = task_objects;
-    std::sort(ret.begin(), ret.end(), [this, origin](auto const & lhs, auto const & rhs) {
-      return std::hypot(lhs.x - origin.x, lhs.y - origin.y, lhs.z - origin.z) <
-             std::hypot(rhs.x - origin.x, rhs.y - origin.y, rhs.z - origin.z);
-    });
-    return ret;
+    std::sort(
+      task_objects.begin(), task_objects.end(), [this, origin](auto const & lhs, auto const & rhs) {
+        return getDistance(getPoint(lhs), origin) < getDistance(getPoint(rhs), origin);
+      });
+  }
+
+  geometry_msgs::msg::Point getPoint(
+    const robotx_behavior_msgs::msg::TaskObject & task_object) const
+  {
+    if (task_object.z.empty()) {
+      throw std::runtime_error("z value of the task object is empty.");
+    }
+    geometry_msgs::msg::Point p;
+    p.x = task_object.x;
+    p.y = task_object.y;
+    p.z = task_object.z[0];
+    return p;
+  }
+
+  geometry_msgs::msg::Point2D getPoint2D(
+    const robotx_behavior_msgs::msg::TaskObject & task_object) const
+  {
+    geometry_msgs::msg::Point2D p;
+    p.x = task_object.x;
+    p.y = task_object.y;
+    return p;
   }
 };
 }  // namespace robotx_behavior_tree
