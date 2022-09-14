@@ -17,6 +17,7 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
+#include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -34,6 +35,12 @@ struct Point2D
 {
   double x;
   double y;
+};
+
+struct Pose2D
+{
+  Point2D position;
+  Quaternion orientation;
 };
 }  // namespace msg
 }  // namespace geometry_msgs
@@ -152,15 +159,20 @@ protected:
   {
     std::sort(
       task_objects.begin(), task_objects.end(), [this, origin](auto const & lhs, auto const & rhs) {
-        return getDistance(getPoint(lhs), origin) < getDistance(getPoint(rhs), origin);
+        const auto p1 = getPoint(lhs);
+        const auto p2 = getPoint(rhs);
+        if (!p1 || !p2) {
+          throw std::runtime_error("including 2d task object!!");
+        }
+        return getDistance(p1.value(), origin) < getDistance(p2.value(), origin);
       });
   }
 
-  geometry_msgs::msg::Point getPoint(
+  std::optional<geometry_msgs::msg::Point> getPoint(
     const robotx_behavior_msgs::msg::TaskObject & task_object) const
   {
     if (task_object.z.empty()) {
-      throw std::runtime_error("z value of the task object is empty.");
+      return std::nullopt;
     }
     geometry_msgs::msg::Point p;
     p.x = task_object.x;
@@ -175,6 +187,35 @@ protected:
     geometry_msgs::msg::Point2D p;
     p.x = task_object.x;
     p.y = task_object.y;
+    return p;
+  }
+
+  std::optional<geometry_msgs::msg::Pose2D> getPose2D(
+    const robotx_behavior_msgs::msg::TaskObject & task_object) const
+  {
+    if (task_object.theta.empty()) {
+      return std::nullopt;
+    }
+    geometry_msgs::msg::Pose2D p;
+    p.position = getPoint2D(task_object);
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.z = task_object.theta[0];
+    p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+    return p;
+  }
+
+  std::optional<geometry_msgs::msg::Pose> getPose(
+    const robotx_behavior_msgs::msg::TaskObject & task_object) const
+  {
+    const auto point = getPoint(task_object);
+    if (task_object.theta.empty() || !point) {
+      return std::nullopt;
+    }
+    geometry_msgs::msg::Pose p;
+    p.position = point.value();
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.z = task_object.theta[0];
+    p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
     return p;
   }
 };
