@@ -50,7 +50,7 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
-  enum class Buoy : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
+  enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
 
 protected:
   BT::NodeStatus onStart() override
@@ -159,10 +159,11 @@ protected:
 
     if (task_objects_array) {
       for (size_t i = 0; i < task_objects_array->task_objects.size(); i++) {
-        if (task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy::BUOY_RED)) {
+        if (task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
           red_buoys_array.push_back(task_objects_array->task_objects[i]);
         }
-        if (task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy::BUOY_GREEN)) {
+        if (
+          task_objects_array->task_objects[i].object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
           green_buoys_array.push_back(task_objects_array->task_objects[i]);
         }
       }
