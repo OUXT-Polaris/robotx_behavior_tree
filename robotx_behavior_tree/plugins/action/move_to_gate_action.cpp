@@ -16,6 +16,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hermite_path_msgs/msg/planner_status.hpp"
@@ -74,7 +75,7 @@ protected:
     const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
-    const auto xyz = GetCenterGate(task_objects_array);
+    const auto xyz = getCenterGate(task_objects_array);
     get_parameter("goal_tolerance", goal_tolerance_);
 
     if (xyz) {
@@ -90,7 +91,7 @@ protected:
     }
 
     if (pose) {
-      distance_ = getDistance(pose.value(), goal_.pose);
+      distance_ = getDistance(pose.value()->pose, goal_.pose);
     }
 
     if (distance_ < goal_tolerance_) {
@@ -115,35 +116,16 @@ protected:
     return std::sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  const std::optional<geometry_msgs::msg::Pose> getCurrentPose()
-  {
-    try {
-      auto transform_stamped =
-        buffer_.lookupTransform("map", "base_link", rclcpp::Time(0), tf2::durationFromSec(1.0));
-      geometry_msgs::msg::Pose pose;
-
-      pose.position.x = transform_stamped.transform.translation.x;
-      pose.position.y = transform_stamped.transform.translation.y;
-      pose.position.z = transform_stamped.transform.translation.z;
-      pose.orientation = transform_stamped.transform.rotation;
-      return pose;
-    } catch (tf2::ExtrapolationException & ex) {
-      RCLCPP_ERROR(get_logger(), ex.what());
-      return std::nullopt;
-    }
-    return std::nullopt;
-  }
-
   float calculateDistance(float x, float y)
   {
     auto pose = getCurrentPose();
-    auto dx = x - static_cast<float>(pose->position.x);
-    auto dy = y - static_cast<float>(pose->position.y);
+    auto dx = x - static_cast<float>(pose.value()->pose.position.x);
+    auto dy = y - static_cast<float>(pose.value()->pose.position.y);
 
     return std::hypot(dx, dy);
   }
 
-  const std::optional<geometry_msgs::msg::Pose> GetCenterGate(
+  const std::optional<geometry_msgs::msg::Pose> getCenterGate(
     robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_objects_array)
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
@@ -166,6 +148,9 @@ protected:
           green_buoys_array.emplace_back(object);
         }
       }
+
+      std::sort(red_buoys_array.begin(), red_buoys_array.end());
+      std::sort(green_buoys_array.begin(), green_buoys_array.end());
 
       for (const auto & e : red_buoys_array) {
         if (cnt == 0) {
