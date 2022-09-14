@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
+#include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_msgs/msg/planner_status.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -97,8 +98,20 @@ protected:
     PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
   DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
 #undef DEFINE_GET_INPUT
+
+  double getDistance(const geometry_msgs::msg::Point & p1, const geometry_msgs::msg::Point & p2)
+  {
+    return std::hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+  }
+
+  double get2DDistance(const geometry_msgs::msg::Point & p1, const geometry_msgs::msg::Point & p2)
+  {
+    return std::hypot(p1.x - p2.x, p1.y - p2.y);
+  }
+
   std::vector<robotx_behavior_msgs::msg::TaskObject> filter(
-    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects, uint8_t object_kind) const
+    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+    uint8_t object_kind) const
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> filtered;
     for (const auto & task_object : task_objects) {
@@ -107,6 +120,18 @@ protected:
       }
     }
     return filtered;
+  }
+
+  std::vector<robotx_behavior_msgs::msg::TaskObject> sortBy2DDistance(
+    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+    const geometry_msgs::msg::Point & origin) const
+  {
+    std::vector<robotx_behavior_msgs::msg::TaskObject> ret = task_objects;
+    std::sort(ret.begin(), ret.end(), [this, origin](auto const & lhs, auto const & rhs) {
+      return std::hypot(lhs.x - origin.x, lhs.y - origin.y) <
+             std::hypot(rhs.x - origin.x, rhs.y - origin.y);
+    });
+    return ret;
   }
 };
 }  // namespace robotx_behavior_tree
