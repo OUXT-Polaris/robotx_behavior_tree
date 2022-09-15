@@ -121,6 +121,7 @@ protected:
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
+    geometry_msgs::msg::Point2D point;
     geometry_msgs::msg::Pose goal_coordinate;
     float x;
     float y;
@@ -134,6 +135,7 @@ protected:
       for (const auto & object : task_objects_array->task_objects) {
         if (object.object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
           //distance calculate
+          point  = getPoint2D(task_objects_array->task_objects)
           
           red_buoys_array.emplace_back(object);
         }
