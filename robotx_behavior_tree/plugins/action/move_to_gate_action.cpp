@@ -113,16 +113,7 @@ protected:
     auto dy = pose1.position.y - pose2.position.y;
     auto dz = pose1.position.z - pose2.position.z;
 
-    return std::sqrt(dx * dx + dy * dy + dz * dz);
-  }
-
-  float calculateDistance(float x, float y)
-  {
-    auto pose = getCurrentPose();
-    auto dx = x - static_cast<float>(pose.value()->pose.position.x);
-    auto dy = y - static_cast<float>(pose.value()->pose.position.y);
-
-    return std::hypot(dx, dy);
+    return std::hypot(dx, dy, dz);
   }
 
   const std::optional<geometry_msgs::msg::Pose> getCenterGate(
@@ -133,15 +124,17 @@ protected:
     geometry_msgs::msg::Pose goal_coordinate;
     float x;
     float y;
-    int cnt = 0;
     float red_buoy_x;
     float red_buoy_y;
     float green_buoy_x;
     float green_buoy_y;
+    int cnt = 0;
 
     if (task_objects_array) {
       for (const auto & object : task_objects_array->task_objects) {
         if (object.object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
+          //distance calculate
+          
           red_buoys_array.emplace_back(object);
         }
         if (object.object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
@@ -149,8 +142,6 @@ protected:
         }
       }
 
-      std::sort(red_buoys_array.begin(), red_buoys_array.end());
-      std::sort(green_buoys_array.begin(), green_buoys_array.end());
 
       for (const auto & e : red_buoys_array) {
         if (cnt == 0) {
