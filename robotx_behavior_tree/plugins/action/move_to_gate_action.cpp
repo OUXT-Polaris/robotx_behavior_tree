@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose2D"
 #include "hermite_path_msgs/msg/planner_status.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_msgs/msg/task_object.hpp"
@@ -52,6 +53,7 @@ private:
   geometry_msgs::msg::PoseStamped goal_;
 
   enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
+  enum class Status_ : short {WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING};
 
 protected:
   BT::NodeStatus onStart() override
@@ -100,20 +102,18 @@ protected:
     }
 
     goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status != 1) {
+    if (status_planner.value()->status != static_cast<short>(MOVING_TO_GOAL)) {
       goal_pub_gate_->publish(goal_);
     }
 
     return BT::NodeStatus::RUNNING;
   }
 
-  double getDistance(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
+  double getDistance(const geometry_msgs::msg::Pose2D pose1, const geometry_msgs::msg::Pose2D pose2)
   {
     auto dx = pose1.position.x - pose2.position.x;
     auto dy = pose1.position.y - pose2.position.y;
-    auto dz = pose1.position.z - pose2.position.z;
-
-    return std::hypot(dx, dy, dz);
+    return std::hypot(dx, dy);
   }
 
   const std::optional<geometry_msgs::msg::Pose> getCenterGate(
@@ -121,7 +121,7 @@ protected:
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
     std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
-    geometry_msgs::msg::Point2D point;
+    geometry_msgs::msg::Pose point;
     geometry_msgs::msg::Pose goal_coordinate;
     float x;
     float y;
@@ -131,15 +131,19 @@ protected:
     float green_buoy_y;
     int cnt = 0;
 
+    const auto pose = getCurrentPose();
+
     if (task_objects_array) {
       for (const auto & object : task_objects_array->task_objects) {
         if (object.object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
           //distance calculate
-          point  = getPoint2D(task_objects_array->task_objects)
-          
+          pose  = getPose2D(task_objects_array->task_objects);
+          getDistance()
+
           red_buoys_array.emplace_back(object);
         }
         if (object.object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
+          point  = getPoint(task_objects_array->task_objects);
           green_buoys_array.emplace_back(object);
         }
       }
