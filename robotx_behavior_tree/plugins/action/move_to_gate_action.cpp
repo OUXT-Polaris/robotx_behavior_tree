@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/pose2D"
 #include "hermite_path_msgs/msg/planner_status.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_msgs/msg/task_object.hpp"
@@ -52,22 +51,31 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
+  std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array_;
+  std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array_;
+
   enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
-  enum class Status_ : short {WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING};
+  enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
 
 protected:
   BT::NodeStatus onStart() override
   {
     const auto status_planner = getPlannerStatus();
-    try {
-      const auto task_objects_array = getTaskObjects();
-      if (task_objects_array) {
-        return BT::NodeStatus::RUNNING;
-      }
-      return BT::NodeStatus::FAILURE;
+    // try {
+    //   const auto task_objects_array = getTaskObjects();
+    //   if (task_objects_array) {
+    //     return BT::NodeStatus::RUNNING;
+    //   }
+    //   return BT::NodeStatus::FAILURE;
 
-    } catch (const std::runtime_error & error) {
-      RCLCPP_WARN_STREAM(get_logger(), error.what());
+    // } catch (const std::runtime_error & error) {
+    //   RCLCPP_WARN_STREAM(get_logger(), error.what());
+    //   return BT::NodeStatus::FAILURE;
+    // }
+    const auto task_objects_array = getTaskObjects();
+    if (task_objects_array) {
+      return BT::NodeStatus::RUNNING;
+    } else {
       return BT::NodeStatus::FAILURE;
     }
   }
@@ -77,23 +85,31 @@ protected:
     const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
-    const auto xyz = getCenterGate(task_objects_array);
-    get_parameter("goal_tolerance", goal_tolerance_);
 
-    if (xyz) {
-      goal_.header.frame_id = "map";
-      goal_.pose.position.x = xyz->position.x;
-      goal_.pose.position.y = xyz->position.y;
-      goal_.pose.position.z = 0.0;
-
-      goal_.pose.orientation.w = xyz->orientation.w;
-      goal_.pose.orientation.x = xyz->orientation.x;
-      goal_.pose.orientation.y = xyz->orientation.y;
-      goal_.pose.orientation.z = xyz->orientation.z;
+    if (task_objects_array) {
+      red_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_RED));
+      green_buoys_array_ =
+        filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_GREEN));
     }
 
+    sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
+    sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
+
+    const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
+    get_parameter("goal_tolerance", goal_tolerance_);
+
+    goal_.header.frame_id = "map";
+    goal_.pose.position.x = xyz.position.x;
+    goal_.pose.position.y = xyz.position.y;
+    goal_.pose.position.z = xyz.position.z;
+
+    goal_.pose.orientation.w = xyz.orientation.w;
+    goal_.pose.orientation.x = xyz.orientation.x;
+    goal_.pose.orientation.y = xyz.orientation.y;
+    goal_.pose.orientation.z = xyz.orientation.z;
+
     if (pose) {
-      distance_ = getDistance(pose.value()->pose, goal_.pose);
+      distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
     }
 
     if (distance_ < goal_tolerance_) {
@@ -102,103 +118,11 @@ protected:
     }
 
     goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status != static_cast<short>(MOVING_TO_GOAL)) {
+    if (status_planner.value()->status != static_cast<short>(Status_::MOVING_TO_GOAL)) {
       goal_pub_gate_->publish(goal_);
     }
 
     return BT::NodeStatus::RUNNING;
-  }
-
-  double getDistance(const geometry_msgs::msg::Pose2D pose1, const geometry_msgs::msg::Pose2D pose2)
-  {
-    auto dx = pose1.position.x - pose2.position.x;
-    auto dy = pose1.position.y - pose2.position.y;
-    return std::hypot(dx, dy);
-  }
-
-  const std::optional<geometry_msgs::msg::Pose> getCenterGate(
-    robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_objects_array)
-  {
-    std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array;
-    std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array;
-    geometry_msgs::msg::Pose point;
-    geometry_msgs::msg::Pose goal_coordinate;
-    float x;
-    float y;
-    float red_buoy_x;
-    float red_buoy_y;
-    float green_buoy_x;
-    float green_buoy_y;
-    int cnt = 0;
-
-    const auto pose = getCurrentPose();
-
-    if (task_objects_array) {
-      for (const auto & object : task_objects_array->task_objects) {
-        if (object.object_kind == static_cast<int>(Buoy_::BUOY_RED)) {
-          //distance calculate
-          pose  = getPose2D(task_objects_array->task_objects);
-          getDistance()
-
-          red_buoys_array.emplace_back(object);
-        }
-        if (object.object_kind == static_cast<int>(Buoy_::BUOY_GREEN)) {
-          point  = getPoint(task_objects_array->task_objects);
-          green_buoys_array.emplace_back(object);
-        }
-      }
-
-
-      for (const auto & e : red_buoys_array) {
-        if (cnt == 0) {
-          red_buoy_x = e.x;
-        }
-        if (red_buoy_x > e.x) {
-          red_buoy_x = e.x;
-        }
-
-        if (cnt == 0) {
-          red_buoy_y = e.y;
-        }
-        if (red_buoy_y > e.y) {
-          red_buoy_y = e.y;
-        }
-        cnt++;
-      }
-
-      cnt = 0;
-
-      for (const auto & e : green_buoys_array) {
-        if (cnt == 0) {
-          green_buoy_x = e.x;
-        }
-        if (green_buoy_x > e.x) {
-          green_buoy_x = e.x;
-        }
-
-        if (cnt == 0) {
-          green_buoy_y = e.y;
-        }
-        if (red_buoy_y > e.y) {
-          green_buoy_y = e.y;
-        }
-        cnt++;
-      }
-
-      x = (red_buoy_x + green_buoy_x) / 2.0;
-      y = (red_buoy_y + green_buoy_y) / 2.0;
-
-      goal_coordinate.position.x = x;
-      goal_coordinate.position.y = y;
-      goal_coordinate.position.z = 0.0;
-      goal_coordinate.orientation.w = 1.0;
-      goal_coordinate.orientation.x = 0.0;
-      goal_coordinate.orientation.y = 0.0;
-      goal_coordinate.orientation.z = 0.0;
-
-      return goal_coordinate;
-    }
-    return std::nullopt;
   }
 };
 }  // namespace robotx_behavior_tree

@@ -109,16 +109,16 @@ public:
 protected:
   void onHalted() override {}
   std::string name;
-  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr getTaskObjects() const
-  {
-    const auto ret =
-      this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
-    if (ret) {
-      return ret.value();
-    } else {
-      throw std::runtime_error("Task objects were not subscribed.");
-    }
-  }
+  // const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr getTaskObjects() const
+  // {
+  //   const auto ret =
+  //     this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
+  //   if (ret) {
+  //     return ret.value();
+  //   } else {
+  //     throw std::runtime_error("Task objects were not subscribed.");
+  //   }
+  // }
 
 #define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
   std::optional<TYPE> get##NAME() const              \
@@ -133,6 +133,8 @@ protected:
   DEFINE_GET_INPUT(
     PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
   DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
+  DEFINE_GET_INPUT(
+    TaskObjects, robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr, "task_objects");
 #undef DEFINE_GET_INPUT
 
   template <typename T1, typename T2>
@@ -148,11 +150,11 @@ protected:
   }
 
   std::vector<robotx_behavior_msgs::msg::TaskObject> filter(
-    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+    robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_object_array,
     uint8_t object_kind) const
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> filtered;
-    for (const auto & task_object : task_objects) {
+    for (const auto & task_object : task_object_array->task_objects) {
       if (task_object.object_kind == object_kind) {
         filtered.emplace_back(task_object);
       }
