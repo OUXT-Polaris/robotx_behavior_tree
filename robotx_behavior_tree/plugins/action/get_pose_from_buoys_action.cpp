@@ -38,6 +38,13 @@ public:
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
   }
 
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(
+      ActionROS2Node::providedPorts(),
+      {BT::OutputPort<geometry_msgs::msg::Pose>("pose")});
+  }
+
 private:
   rclcpp::TimerBase::SharedPtr update_position_timer_;
   float distance_;
@@ -54,16 +61,10 @@ private:
   enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
   enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
 
+
 protected:
-
-  static BT::PortsList providedPorts()
-  {
-    return { BT::OutputPort<geometry_msgs::msg::Pose>("pose") };
-  }
-
   BT::NodeStatus onStart() override
   {
-    const auto status_planner = getPlannerStatus();
     const auto task_objects_array = getTaskObjects();
     if (task_objects_array) {
       RCLCPP_INFO(get_logger(), "get task_objects");
@@ -75,7 +76,6 @@ protected:
 
   BT::NodeStatus onRunning() override
   {
-    const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
 

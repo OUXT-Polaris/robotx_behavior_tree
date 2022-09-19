@@ -1,9 +1,24 @@
+<?xml version="1.0"?>
 <root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
     <BehaviorTree ID="MainTree">
-        <Sequence>
-            <Action ID="GetPoseFromBuoysAction" task_objects="{task_objects}" pose="{pose}"/>
-            <!-- <Action ID="MoveAction" pose="{pose}"/> -->
-        </Sequence>
+        <RetryUntilSuccesful num_attempts="5">
+            <Sequence>
+                <Action ID="GetPoseFromBuoysAction" pose="{pose}" task_objects="{task_objects}"/>
+                <Action ID="MoveAction" pose="{pose}"/>
+            </Sequence>
+        </RetryUntilSuccesful>
     </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="GetPoseFromBuoysAction">
+            <inout_port name="pose"/>
+            <inout_port name="task_objects"/>
+        </Action>
+        <Action ID="MoveAction">
+            <inout_port name="pose"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
 </root>
 

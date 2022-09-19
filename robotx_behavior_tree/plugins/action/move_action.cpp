@@ -57,6 +57,7 @@ protected:
   BT::NodeStatus onStart() override
   {
     auto goal_pose = this->getInput<geometry_msgs::msg::Pose>("pose");
+    const auto status_planner = getPlannerStatus();
 
     if (goal_pose) {
       goal.header.frame_id = "map";
