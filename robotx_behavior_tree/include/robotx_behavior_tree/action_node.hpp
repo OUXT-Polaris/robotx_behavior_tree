@@ -27,6 +27,10 @@
 #include <stdexcept>
 #include <string>
 
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_listener.h"
+
 namespace geometry_msgs
 {
 namespace msg
@@ -109,7 +113,7 @@ public:
 protected:
   void onHalted() override {}
   std::string name;
-  
+
 #define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
   std::optional<TYPE> get##NAME() const              \
   {                                                  \
