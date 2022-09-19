@@ -19,8 +19,8 @@
 #include <optional>
 #include <string>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -49,8 +49,7 @@ public:
   static BT::PortsList providedPorts()
   {
     return appendPorts(
-      ActionROS2Node::providedPorts(),
-      {BT::InputPort<geometry_msgs::msg::Pose>("pose")});
+      ActionROS2Node::providedPorts(), {BT::InputPort<geometry_msgs::msg::Pose>("pose")});
   }
 
 protected:

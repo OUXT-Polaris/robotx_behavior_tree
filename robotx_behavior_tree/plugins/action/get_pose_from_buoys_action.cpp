@@ -41,8 +41,7 @@ public:
   static BT::PortsList providedPorts()
   {
     return appendPorts(
-      ActionROS2Node::providedPorts(),
-      {BT::OutputPort<geometry_msgs::msg::Pose>("pose")});
+      ActionROS2Node::providedPorts(), {BT::OutputPort<geometry_msgs::msg::Pose>("pose")});
   }
 
 private:
@@ -60,7 +59,6 @@ private:
 
   enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
   enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
-
 
 protected:
   BT::NodeStatus onStart() override
@@ -84,13 +82,13 @@ protected:
       green_buoys_array_ =
         filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_GREEN));
 
-        sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
-        sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
+      sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
+      sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
 
-        const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
+      const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
 
-        setOutput("pose", xyz);
-        return BT::NodeStatus::SUCCESS;
+      setOutput("pose", xyz);
+      return BT::NodeStatus::SUCCESS;
     }
     return BT::NodeStatus::RUNNING;
   }
