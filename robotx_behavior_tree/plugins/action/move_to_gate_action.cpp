@@ -61,19 +61,9 @@ protected:
   BT::NodeStatus onStart() override
   {
     const auto status_planner = getPlannerStatus();
-    // try {
-    //   const auto task_objects_array = getTaskObjects();
-    //   if (task_objects_array) {
-    //     return BT::NodeStatus::RUNNING;
-    //   }
-    //   return BT::NodeStatus::FAILURE;
-
-    // } catch (const std::runtime_error & error) {
-    //   RCLCPP_WARN_STREAM(get_logger(), error.what());
-    //   return BT::NodeStatus::FAILURE;
-    // }
     const auto task_objects_array = getTaskObjects();
     if (task_objects_array) {
+      RCLCPP_INFO(get_logger(), "get task_objects");
       return BT::NodeStatus::RUNNING;
     } else {
       return BT::NodeStatus::FAILURE;
@@ -103,23 +93,29 @@ protected:
     goal_.pose.position.y = xyz.position.y;
     goal_.pose.position.z = xyz.position.z;
 
+    RCLCPP_INFO(get_logger(), "debug w 1: [%f]", xyz.orientation.w);
+    RCLCPP_INFO(get_logger(), "debug x 1: [%f]", xyz.orientation.x);
+    RCLCPP_INFO(get_logger(), "debug y 1: [%f]", xyz.orientation.y);
+    RCLCPP_INFO(get_logger(), "debug z 1: [%f]", xyz.orientation.z);
+
     goal_.pose.orientation.w = xyz.orientation.w;
     goal_.pose.orientation.x = xyz.orientation.x;
     goal_.pose.orientation.y = xyz.orientation.y;
     goal_.pose.orientation.z = xyz.orientation.z;
 
-    if (pose) {
-      distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
+    RCLCPP_INFO(get_logger(), "debug w 2: [%f]", xyz.orientation.w);
+    RCLCPP_INFO(get_logger(), "debug x 2: [%f]", xyz.orientation.x);
+    RCLCPP_INFO(get_logger(), "debug y 2: [%f]", xyz.orientation.y);
+    RCLCPP_INFO(get_logger(), "debug z 2: [%f]", xyz.orientation.z);
+    goal_.header.stamp = get_clock()->now();
+    if (status_planner.value()->status == static_cast<short>(Status_::WAITING_FOR_GOAL)) {
+      goal_pub_gate_->publish(goal_);
     }
+    distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
 
     if (distance_ < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
-    }
-
-    goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status != static_cast<short>(Status_::MOVING_TO_GOAL)) {
-      goal_pub_gate_->publish(goal_);
     }
 
     return BT::NodeStatus::RUNNING;

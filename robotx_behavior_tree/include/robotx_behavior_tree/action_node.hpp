@@ -109,17 +109,7 @@ public:
 protected:
   void onHalted() override {}
   std::string name;
-  // const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr getTaskObjects() const
-  // {
-  //   const auto ret =
-  //     this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
-  //   if (ret) {
-  //     return ret.value();
-  //   } else {
-  //     throw std::runtime_error("Task objects were not subscribed.");
-  //   }
-  // }
-
+  
 #define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
   std::optional<TYPE> get##NAME() const              \
   {                                                  \
@@ -250,14 +240,18 @@ protected:
     p.position.y = (p1.y + p2.y) * 0.5;
     p.position.z = 0.0;
     const auto v = geometry_msgs::msg::Vector2D(p1, p2);
+    // RCLCPP_INFO(get_logger(), "debug x : [%f]", v.x);
+    // RCLCPP_INFO(get_logger(), "debug y : [%f]", v.y);
     const auto robot_rpy =
       quaternion_operation::convertQuaternionToEulerAngle(robot_pose.orientation);
     const auto v_robot = geometry_msgs::msg::Vector2D(std::cos(robot_rpy.z), std::sin(robot_rpy.z));
     geometry_msgs::msg::Vector3 goal_rpy;
     if ((v.y * v_robot.x - v.x * v_robot.y) >= (-v.y * v_robot.x + v.x * v_robot.y)) {
       goal_rpy.z = std::atan2(-v.x, v.y);
+      RCLCPP_INFO(get_logger(), "debug x : [%f]", goal_rpy.z);
     } else {
       goal_rpy.z = std::atan2(v.x, -v.y);
+      RCLCPP_INFO(get_logger(), "debug y : [%f]", goal_rpy.z);
     }
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
