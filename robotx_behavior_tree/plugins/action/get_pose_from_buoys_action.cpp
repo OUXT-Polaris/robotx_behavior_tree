@@ -26,10 +26,10 @@
 
 namespace robotx_behavior_tree
 {
-class MoveToGateAction : public ActionROS2Node
+class GetPoseFromBuoysAction : public ActionROS2Node
 {
 public:
-  MoveToGateAction(const std::string & name, const BT::NodeConfiguration & config)
+  GetPoseFromBuoysAction(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config), buffer_(get_clock()), listener_(buffer_)
   {
     declare_parameter("goal_tolerance", 1.0);
@@ -55,6 +55,12 @@ private:
   enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
 
 protected:
+
+  static BT::PortsList providedPorts()
+  {
+    return { BT::OutputPort<geometry_msgs::msg::Pose>("pose") };
+  }
+
   BT::NodeStatus onStart() override
   {
     const auto status_planner = getPlannerStatus();
@@ -77,34 +83,15 @@ protected:
       red_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_RED));
       green_buoys_array_ =
         filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_GREEN));
+
+        sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
+        sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
+
+        const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
+
+        setOutput("pose", xyz);
+        return BT::NodeStatus::SUCCESS;
     }
-
-    sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
-    sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
-
-    const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
-    get_parameter("goal_tolerance", goal_tolerance_);
-
-    goal_.header.frame_id = "map";
-    goal_.pose.position.x = xyz.position.x;
-    goal_.pose.position.y = xyz.position.y;
-    goal_.pose.position.z = xyz.position.z;
-    goal_.pose.orientation.w = xyz.orientation.w;
-    goal_.pose.orientation.x = xyz.orientation.x;
-    goal_.pose.orientation.y = xyz.orientation.y;
-    goal_.pose.orientation.z = xyz.orientation.z;
-
-    goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status == static_cast<short>(Status_::WAITING_FOR_GOAL)) {
-      goal_pub_gate_->publish(goal_);
-    }
-    distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
-
-    if (distance_ < goal_tolerance_) {
-      RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
-      return BT::NodeStatus::SUCCESS;
-    }
-
     return BT::NodeStatus::RUNNING;
   }
 };
@@ -112,4 +99,4 @@ protected:
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
 
-REGISTER_NODES(robotx_behavior_tree, MoveToGateAction)
+REGISTER_NODES(robotx_behavior_tree, GetPoseFromBuoysAction)

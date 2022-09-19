@@ -1,8 +1,9 @@
-<root main_tree_to_execute = "MainTree">
+<root main_tree_to_execute="MainTree">
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="MoveToGateAction" task_objects="{task_objects}"/>
-            <Action ID="MoveToGateAction" task_objects="{task_objects}"/>
+            <Action ID="GetPoseFromBuoysAction" task_objects="{task_objects}" pose="{pose}"/>
+            <!-- <Action ID="MoveAction" pose="{pose}"/> -->
         </Sequence>
     </BehaviorTree>
 </root>
+
