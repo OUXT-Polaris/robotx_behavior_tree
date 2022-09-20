@@ -95,36 +95,7 @@ protected:
     }
     return BT::NodeStatus::RUNNING;
   }
-
-  double getDistance(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
-  {
-    auto dx = pose1.position.x - pose2.position.x;
-    auto dy = pose1.position.y - pose2.position.y;
-    auto dz = pose1.position.z - pose2.position.z;
-    return std::sqrt(dx * dx + dy * dy + dz * dz);
-  }
-
-  double getAngleDiff(const geometry_msgs::msg::Pose pose1, const geometry_msgs::msg::Pose pose2)
-  {
-    auto transform1 = convertToTF2(pose1);
-    auto transform2 = convertToTF2(pose2);
-    auto diff = transform2.inverse() * transform1;
-    return diff.getRotation().getAngle();
-  }
-
-  tf2::Transform convertToTF2(const geometry_msgs::msg::Pose pose)
-  {
-    geometry_msgs::msg::Transform transform_msg;
-    transform_msg.translation.x = pose.position.x;
-    transform_msg.translation.y = pose.position.y;
-    transform_msg.translation.z = pose.position.z;
-    transform_msg.rotation = pose.orientation;
-
-    tf2::Transform transform;
-    tf2::convert(transform_msg, transform);
-    return transform;
-  }
-
+  
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   double goal_tolerance_;
   double goal_angle_tolerance_;
