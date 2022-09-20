@@ -30,7 +30,7 @@ ament_auto_add_library(calculation_action SHARED src/plugin/calculation_action.c
 
 ament_auto_add_executable(${PROJECT_NAME}_node src/bt_planner_node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
-target_link_libraries(${PROJECT_NAME}_node ${YAML_CPP_LIBRARIES} ${behaviortree_cpp_v3_LIBRARIES} ${ZMQ_LIBRARIES} pugixml Boost::filesystem)
+target_link_libraries(${PROJECT_NAME}_node ${YAML_CPP_LIBRARIES} ${behaviortree_cpp_v3_LIBRARIES} ${ZMQ_LIBRARIES} pugixml Boost::filesystem glog)
 
 install(DIRECTORY behavior_trees DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})

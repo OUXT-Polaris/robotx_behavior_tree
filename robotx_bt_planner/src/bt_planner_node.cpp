@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <glog/logging.h>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <robotx_bt_planner/bt_planner_component.hpp>
 
 int main(int argc, char ** argv)
 {
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<robotx_bt_planner::BTPlannerComponent>(rclcpp::NodeOptions()));
   rclcpp::shutdown();

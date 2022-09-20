@@ -127,7 +127,7 @@ public:
   explicit BTPlannerComponent(const rclcpp::NodeOptions & options);
   ~BTPlannerComponent() {}
   void timerCallback();
-  void loadConfig(const std::string & file_path);
+  bool loadConfig(const std::string & file_path);
   void loadPlugins();
   bool loadTree();
   void evaluationCallback();
