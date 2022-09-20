@@ -107,6 +107,7 @@ void BTPlannerComponent::taskObjectsArrayCallback(
 
 void BTPlannerComponent::loadConfig(const std::string & file_path)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "loading yaml files from  : " << file_path);
   node_ = YAML::LoadFile(file_path);
   node_ >> format_;
 

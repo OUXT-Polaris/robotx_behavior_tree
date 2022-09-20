@@ -25,6 +25,7 @@
   <depend>hermite_path_msgs</depend>
   <depend>pugixml-dev</depend>
   <depend>boost</depend>
+  <depend>libgoogle-glog-dev</depend>
 <!--  <depend>robotx_behavior_tree</depend>-->
 
   <test_depend>ament_lint_auto</test_depend>
