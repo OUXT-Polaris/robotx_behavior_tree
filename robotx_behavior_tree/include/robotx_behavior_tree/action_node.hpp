@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <quaternion_operation/quaternion_operation.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -234,6 +235,47 @@ protected:
     rpy.z = task_object.theta[0];
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
     return p;
+  }
+
+  double getAngleDiff(
+    const geometry_msgs::msg::Quaternion & pose1, const geometry_msgs::msg::Quaternion & pose2)
+  {
+    auto transform1 = convertToTF2(pose1);
+    auto transform2 = convertToTF2(pose2);
+    auto diff = transform2.inverse() * transform1;
+    return diff.getRotation().getAngle();
+  }
+
+  tf2::Transform convertToTF2(const geometry_msgs::msg::Quaternion & orientation)
+  {
+    geometry_msgs::msg::Transform transform_msg;
+    transform_msg.rotation = orientation;
+
+    tf2::Transform transform;
+    tf2::convert(transform_msg, transform);
+    return transform;
+  }
+
+  double getAngleDiff(
+    const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2)
+  {
+    auto transform1 = convertToTF2(pose1);
+    auto transform2 = convertToTF2(pose2);
+    auto diff = transform2.inverse() * transform1;
+    return diff.getRotation().getAngle();
+  }
+
+  tf2::Transform convertToTF2(const geometry_msgs::msg::Pose & pose)
+  {
+    geometry_msgs::msg::Transform transform_msg;
+    transform_msg.translation.x = pose.position.x;
+    transform_msg.translation.y = pose.position.y;
+    transform_msg.translation.z = pose.position.z;
+    transform_msg.rotation = pose.orientation;
+
+    tf2::Transform transform;
+    tf2::convert(transform_msg, transform);
+    return transform;
   }
 
   geometry_msgs::msg::Pose between(
