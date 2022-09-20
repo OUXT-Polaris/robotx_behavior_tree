@@ -295,9 +295,9 @@ protected:
     const auto v_robot = geometry_msgs::msg::Vector2D(std::cos(robot_rpy.z), std::sin(robot_rpy.z));
     geometry_msgs::msg::Vector3 goal_rpy;
     if ((v.y * v_robot.x - v.x * v_robot.y) >= (-v.y * v_robot.x + v.x * v_robot.y)) {
-      goal_rpy.z = std::atan2(-v.x, v.y);
+      goal_rpy.z = std::atan2(-v.y, v.x);
     } else {
-      goal_rpy.z = std::atan2(v.x, -v.y);
+      goal_rpy.z = std::atan2(v.y, -v.x);
     }
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
