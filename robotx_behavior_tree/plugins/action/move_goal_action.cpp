@@ -86,8 +86,8 @@ protected:
     auto pose = getCurrentPose();
     get_parameter("goal_tolerance", goal_tolerance_);
     if (pose) {
-      dist = getDistance(pose.value()->pose, goal.pose);
-      angle_dist = getAngleDiff(pose.value()->pose, goal.pose);
+      dist = getDistance(pose.value()->pose.position, goal.pose.position);
+      angle_dist = getAngleDiff(pose.value()->pose.orientation, goal.pose.orientation);
     }
     if (dist < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "MoveGoalAction : SUCCESS");
@@ -95,7 +95,7 @@ protected:
     }
     return BT::NodeStatus::RUNNING;
   }
-  
+
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
   double goal_tolerance_;
   double goal_angle_tolerance_;
