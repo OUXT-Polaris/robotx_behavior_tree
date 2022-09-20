@@ -51,7 +51,12 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   std::string config_path =
     ament_index_cpp::get_package_share_directory(config_package_) + "/" + config_file_;
   RCLCPP_INFO_STREAM(get_logger(), "start loading config file : " << config_path);
-  loadConfig(config_path);
+  if (!loadConfig(config_path)) {
+    RCLCPP_WARN_THROTTLE_STREAM(
+      get_logger(), get_clock(), 1000,
+      "Failed to load yaml config file for behavior, Please check "
+        << config_file_ << " is really exists or valid yaml file.");
+  }
   RCLCPP_INFO(get_logger(), "config file loaded!");
 
   using std::chrono_literals::operator""ms;
@@ -105,10 +110,19 @@ void BTPlannerComponent::taskObjectsArrayCallback(
     "task_objects", data);
 }
 
-void BTPlannerComponent::loadConfig(const std::string & file_path)
+bool BTPlannerComponent::loadConfig(const std::string & file_path)
 {
   RCLCPP_INFO_STREAM(get_logger(), "loading yaml files from  : " << file_path);
-  node_ = YAML::LoadFile(file_path);
+  const boost::filesystem::path path(file_path);
+  const bool result = fs::exists(path, error);
+  if (!result || error) {
+    return false;
+  }
+  try {
+    node_ = YAML::LoadFile(file_path);
+  } catch (...) {
+    return false;
+  }
   node_ >> format_;
 
   RCLCPP_INFO(get_logger(), "open sol library");
@@ -130,6 +144,7 @@ void BTPlannerComponent::loadConfig(const std::string & file_path)
       RCLCPP_INFO_STREAM(get_logger(), "loading evaluation : " << evaluation->name);
     }
   }
+  return true;
 }
 
 void BTPlannerComponent::timerCallback()
