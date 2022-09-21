@@ -174,7 +174,7 @@ void BTPlannerComponent::timerCallback()
   behavior_string_marker.scale.x = 0.3;
   behavior_string_marker.scale.y = 0.3;
   behavior_string_marker.scale.z = 0.3;
-  behavior_string_marker.pose.position.z = 4.0;
+  behavior_string_marker.pose.position.z = 3.5;
   behavior_string_marker.color = color_names::makeColorMsg("white", 1.0);
   behavior_string_marker.text = logging_event_ptr_->getCurrentAction();
   behavior_string_marker.frame_locked = true;
