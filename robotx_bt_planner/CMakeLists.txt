@@ -24,7 +24,10 @@ ament_auto_find_build_dependencies()
 include_directories(${ZMQ_INCLUDE_DIR})
 include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
-ament_auto_add_library(${PROJECT_NAME}_component SHARED src/bt_planner_component.cpp)
+ament_auto_add_library(${PROJECT_NAME}_component SHARED 
+  src/bt_planner_component.cpp
+  src/transition_events/transition_event.cpp
+  src/transition_events/logging_event.cpp)
 ament_auto_add_library(calculation_action SHARED src/plugin/calculation_action.cpp)
 
 
