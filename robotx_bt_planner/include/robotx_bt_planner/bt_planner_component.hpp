@@ -27,7 +27,7 @@
 #include <robotx_behavior_msgs/srv/evaluation.hpp>
 #include <robotx_bt_planner/descriptor/data_structures.hpp>
 #include <robotx_bt_planner/descriptor/operators.hpp>
-#include <robotx_bt_planner/logging_event.hpp>
+#include <robotx_bt_planner/transition_events/logging_event.hpp>
 #include <string>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -160,7 +160,8 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   std::string addRosPorts(const std::string & xml_string) const;
   std::vector<std::string> getRosPorts() const;
-};  // namespace robotx_bt_planner
+  std::unique_ptr<robotx_bt_planner::LoggingEvent> logging_event_ptr_;
+};
 }  // namespace robotx_bt_planner
 
 #endif  // ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_

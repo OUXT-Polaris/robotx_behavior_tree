@@ -95,6 +95,9 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   loadPlugins();
   loadTree();
 
+  logging_event_ptr_ =
+    std::make_unique<robotx_bt_planner::LoggingEvent>(tree_.rootNode(), get_logger());
+
   publisher_zmq_ = std::make_unique<BT::PublisherZMQ>(tree_);
 
   using std::literals::chrono_literals::operator""s;

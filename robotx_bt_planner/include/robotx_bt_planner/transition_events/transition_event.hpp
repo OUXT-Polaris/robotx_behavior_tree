@@ -30,7 +30,7 @@ public:
 
 protected:
   virtual void callback(
-    BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
+    BT::Duration timestamp, const BT::TreeNode & node, const BT::NodeStatus & prev_status,
     BT::NodeStatus status) = 0;
   void updateCurrentAction(const BT::NodeStatus & status, const BT::TreeNode & node);
   BT::TimePoint first_timestamp_;
