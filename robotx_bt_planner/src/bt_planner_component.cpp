@@ -14,12 +14,14 @@
 
 #include "robotx_bt_planner/bt_planner_component.hpp"
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <color_names/color_names.hpp>
 #include <fstream>
 #include <memory>
 #include <pugixml.hpp>
@@ -27,8 +29,6 @@
 #include <robotx_behavior_tree/to_marker.hpp>
 #include <set>
 #include <string>
-
-#include "ament_index_cpp/get_package_share_directory.hpp"
 
 namespace robotx_bt_planner
 {
@@ -45,6 +45,10 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   get_parameter("task_object_topic", task_object_topic_);
   declare_parameter<std::string>("task_object_marker_topic", "/perception/task_objects/marker");
   get_parameter("task_object_marker_topic", task_object_marker_topic_);
+  declare_parameter<std::string>("behavior_marker_topic", "/behavior/marker");
+  get_parameter("behavior_marker_topic", behavior_marker_topic_);
+  declare_parameter<std::string>("robot_frame", "base_link");
+  get_parameter("robot_frame", robot_frame_);
   declare_parameter<bool>("publish_marker", true);
   get_parameter("publish_marker", publish_marker_);
 
@@ -74,6 +78,8 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   if (publish_marker_) {
     task_object_marker_pub_ =
       this->create_publisher<visualization_msgs::msg::MarkerArray>(task_object_marker_topic_, 1);
+    behavior_marker_pub_ =
+      this->create_publisher<visualization_msgs::msg::MarkerArray>(behavior_marker_topic_, 1);
   }
   task_objects_array_sub_ =
     this->create_subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>(
@@ -158,6 +164,20 @@ void BTPlannerComponent::timerCallback()
 {
   evaluationCallback();
   tree_.rootNode()->executeTick();
+  visualization_msgs::msg::MarkerArray behavior_marker;
+  visualization_msgs::msg::Marker behavior_string_marker;
+  behavior_string_marker.header.frame_id = robot_frame_;
+  behavior_string_marker.header.stamp = get_clock()->now();
+  behavior_string_marker.id = 0;
+  behavior_string_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+  behavior_string_marker.action = visualization_msgs::msg::Marker::ADD;
+  behavior_string_marker.scale.x = 1.0;
+  behavior_string_marker.scale.y = 1.0;
+  behavior_string_marker.scale.z = 1.0;
+  behavior_string_marker.color = color_names::makeColorMsg("white", 1.0);
+  behavior_string_marker.text = logging_event_ptr_->getCurrentAction();
+  behavior_marker.markers.emplace_back(behavior_string_marker);
+  behavior_marker_pub_->publish(behavior_marker);
 }
 
 void BTPlannerComponent::loadPlugins()

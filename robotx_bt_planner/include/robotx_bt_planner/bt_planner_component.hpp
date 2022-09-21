@@ -138,6 +138,8 @@ private:
   std::string config_package_;
   std::string task_object_topic_;
   std::string task_object_marker_topic_;
+  std::string behavior_marker_topic_;
+  std::string robot_frame_;
   float update_rate_;
   bool publish_marker_;
   YAML::Node node_;
