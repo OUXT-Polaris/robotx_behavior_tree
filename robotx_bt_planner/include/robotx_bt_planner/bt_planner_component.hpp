@@ -137,7 +137,7 @@ private:
   std::string config_file_;
   std::string config_package_;
   std::string task_object_topic_;
-  std::string marker_topic_;
+  std::string task_object_marker_topic_;
   float update_rate_;
   bool publish_marker_;
   YAML::Node node_;
@@ -156,6 +156,7 @@ private:
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr task_object_marker_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr behavior_marker_pub_;
   rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   std::string addRosPorts(const std::string & xml_string) const;

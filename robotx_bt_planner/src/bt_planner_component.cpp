@@ -43,8 +43,8 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   get_parameter("update_rate", update_rate_);
   declare_parameter<std::string>("task_object_topic", "/perception/task_objects");
   get_parameter("task_object_topic", task_object_topic_);
-  declare_parameter<std::string>("marker_topic", "/perception/task_objects/marker");
-  get_parameter("marker_topic", marker_topic_);
+  declare_parameter<std::string>("task_object_marker_topic", "/perception/task_objects/marker");
+  get_parameter("task_object_marker_topic", task_object_marker_topic_);
   declare_parameter<bool>("publish_marker", true);
   get_parameter("publish_marker", publish_marker_);
 
@@ -73,7 +73,7 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
 
   if (publish_marker_) {
     task_object_marker_pub_ =
-      this->create_publisher<visualization_msgs::msg::MarkerArray>(marker_topic_, 1);
+      this->create_publisher<visualization_msgs::msg::MarkerArray>(task_object_marker_topic_, 1);
   }
   task_objects_array_sub_ =
     this->create_subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>(
