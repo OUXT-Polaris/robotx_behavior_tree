@@ -171,11 +171,13 @@ void BTPlannerComponent::timerCallback()
   behavior_string_marker.id = 0;
   behavior_string_marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
   behavior_string_marker.action = visualization_msgs::msg::Marker::ADD;
-  behavior_string_marker.scale.x = 1.0;
-  behavior_string_marker.scale.y = 1.0;
-  behavior_string_marker.scale.z = 1.0;
+  behavior_string_marker.scale.x = 0.3;
+  behavior_string_marker.scale.y = 0.3;
+  behavior_string_marker.scale.z = 0.3;
+  behavior_string_marker.pose.position.z = 4.0;
   behavior_string_marker.color = color_names::makeColorMsg("white", 1.0);
   behavior_string_marker.text = logging_event_ptr_->getCurrentAction();
+  behavior_string_marker.frame_locked = true;
   behavior_marker.markers.emplace_back(behavior_string_marker);
   behavior_marker_pub_->publish(behavior_marker);
 }
