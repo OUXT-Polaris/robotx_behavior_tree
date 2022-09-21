@@ -72,7 +72,8 @@ BTPlannerComponent::BTPlannerComponent(const rclcpp::NodeOptions & options)
   blackboard_->set<std::chrono::milliseconds>("server_timeout", std::chrono::milliseconds(10));
 
   if (publish_marker_) {
-    marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(marker_topic_, 1);
+    task_object_marker_pub_ =
+      this->create_publisher<visualization_msgs::msg::MarkerArray>(marker_topic_, 1);
   }
   task_objects_array_sub_ =
     this->create_subscription<robotx_behavior_msgs::msg::TaskObjectsArrayStamped>(
@@ -109,7 +110,7 @@ void BTPlannerComponent::taskObjectsArrayCallback(
   const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data)
 {
   if (publish_marker_) {
-    marker_pub_->publish(robotx_behavior_tree::toMarker(data));
+    task_object_marker_pub_->publish(robotx_behavior_tree::toMarker(data));
   }
   blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>(
     "task_objects", data);
