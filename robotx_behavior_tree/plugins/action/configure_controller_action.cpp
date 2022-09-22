@@ -28,7 +28,7 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<string>("mode")});
+    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("mode")});
   }
 
 protected:

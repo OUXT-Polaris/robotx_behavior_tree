@@ -23,3 +23,11 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/hermite_path_planner.git
     version: master
+  geographic_info:
+    type: git
+    url: https://github.com/OUXT-Polaris/geographic_info.git
+    version: ros2
+  tcp_sender:
+    type: git
+    url: https://github.com/OUXT-Polaris/tcp_sender.git
+    version: master
