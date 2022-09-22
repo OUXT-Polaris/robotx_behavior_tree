@@ -19,15 +19,18 @@
 
 namespace robotx_behavior_tree
 {
-class CalculationAction : public ActionNode
+class ConfigureControllerAction : public ActionROS2Node
 {
 public:
-  CalculationAction(const std::string & name, const BT::NodeConfiguration & config)
-  : ActionNode(name, config)
+  ConfigureControllerAction(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionROS2Node(name, config)
   {
   }
 
-  static BT::PortsList providedPorts() { return {BT::InputPort<int>("test_input")}; }
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<string>("mode")});
+  }
 
 protected:
   BT::NodeStatus onStart() override { return BT::NodeStatus::RUNNING; }
@@ -36,4 +39,4 @@ protected:
 }  // namespace robotx_behavior_tree
 
 #include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
-REGISTER_NODES(robotx_behavior_tree, ExampleAction)
+REGISTER_NODES(robotx_behavior_tree, ConfigureControllerAction)
