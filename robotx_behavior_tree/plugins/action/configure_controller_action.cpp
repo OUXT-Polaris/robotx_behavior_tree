@@ -56,6 +56,11 @@ protected:
 
 private:
   uint8_t requested_mode_;
+  rclcpp::Service<controller_manager_msgs::srv::SwitchController>::SharedPtr
+    switch_controller_client_;
+  void switchController(
+    const std::shared_ptr<controller_manager_msgs::srv::SwitchController::Request> request,
+    const std::shared_ptr<controller_manager_msgs::srv::SwitchController::Response> response);
 };
 }  // namespace robotx_behavior_tree
 
