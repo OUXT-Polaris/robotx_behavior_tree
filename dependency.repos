@@ -31,3 +31,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/tcp_sender.git
     version: master
+  robotx_communication:
+    type: git
+    url: https://github.com/OUXT-Polaris/robotx_communication.git
+    version: master
