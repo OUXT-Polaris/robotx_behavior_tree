@@ -15,6 +15,7 @@
 #include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <memory>
 #include <robotx_behavior_tree/action_node.hpp>
+#include <robotx_msgs/msg/autonomous_maritime_system_status.hpp>
 #include <string>
 
 namespace robotx_behavior_tree
@@ -23,7 +24,7 @@ class ConfigureControllerAction : public ActionROS2Node
 {
 public:
   ConfigureControllerAction(const std::string & name, const BT::NodeConfiguration & config)
-  : ActionROS2Node(name, config)
+  : ActionROS2Node(name, config), requested_mode_(0)
   {
   }
 
@@ -35,10 +36,26 @@ public:
 protected:
   BT::NodeStatus onStart() override
   {
-    this->getInput<uint8_t>("mode");
+    auto mode = this->getInput<uint8_t>("mode");
+    if (!mode) {
+      return BT::NodeStatus::FAILURE;
+    }
+    switch (mode.value()) {
+      case robotx_msgs::msg::AutonomousMaritimeSystemStatus::REMOTE_OPERATED:
+        break;
+      case robotx_msgs::msg::AutonomousMaritimeSystemStatus::AUTONOMOUS:
+        break;
+      case robotx_msgs::msg::AutonomousMaritimeSystemStatus::KILLED:
+        break;
+      default:
+        return BT::NodeStatus::FAILURE;
+    }
     return BT::NodeStatus::RUNNING;
   }
   BT::NodeStatus onRunning() override { return BT::NodeStatus::FAILURE; }
+
+private:
+  uint8_t requested_mode_;
 };
 }  // namespace robotx_behavior_tree
 
