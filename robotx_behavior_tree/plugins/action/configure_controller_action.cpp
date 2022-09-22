@@ -54,8 +54,8 @@ protected:
         response_received_ = true;
         mtx_.unlock();
       };
-    auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
-    switch_controller_client_->async_send_request(request, response_received_callback);
+    switch_controller_client_->async_send_request(
+      createSwitchControllerRequest(mode.value()), response_received_callback);
     return BT::NodeStatus::RUNNING;
   }
 
@@ -79,12 +79,21 @@ private:
   createSwitchControllerRequest(uint8_t mode)
   {
     auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
+    request->strictness = controller_manager_msgs::srv::SwitchController::Request::BEST_EFFORT;
+    request->start_asap = true;
+    request->timeout = rclcpp::Duration(1, 0);
     switch (mode) {
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::REMOTE_OPERATED:
+        request->stop_controllers.emplace_back("usv_twist_controller");
+        request->start_controllers.emplace_back("usv_joy_controller");
         break;
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::AUTONOMOUS:
+        request->stop_controllers.emplace_back("usv_twist_controller");
+        request->start_controllers.emplace_back("usv_joy_controller");
         break;
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::KILLED:
+        request->stop_controllers.emplace_back("usv_twist_controller");
+        request->stop_controllers.emplace_back("usv_joy_controller");
         break;
       default:
         break;
