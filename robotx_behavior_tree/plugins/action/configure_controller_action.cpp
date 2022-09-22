@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <memory>
 #include <robotx_behavior_tree/action_node.hpp>
 #include <string>
@@ -28,11 +29,15 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("mode")});
+    return appendPorts(ActionROS2Node::providedPorts(), {BT::InputPort<uint8_t>("mode")});
   }
 
 protected:
-  BT::NodeStatus onStart() override { return BT::NodeStatus::RUNNING; }
+  BT::NodeStatus onStart() override
+  {
+    this->getInput<uint8_t>("mode");
+    return BT::NodeStatus::RUNNING;
+  }
   BT::NodeStatus onRunning() override { return BT::NodeStatus::FAILURE; }
 };
 }  // namespace robotx_behavior_tree
