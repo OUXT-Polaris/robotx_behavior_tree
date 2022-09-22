@@ -33,6 +33,9 @@ target_compile_definitions(move_goal_action PRIVATE BT_PLUGIN_EXPORT)
 ament_auto_add_library(set_turn_action SHARED plugins/action/set_turn_action.cpp)
 target_compile_definitions(set_turn_action PRIVATE BT_PLUGIN_EXPORT)
 
+ament_auto_add_library(configure_controller_action SHARED plugins/action/configure_controller_action.cpp)
+target_compile_definitions(configure_controller_action PRIVATE BT_PLUGIN_EXPORT)
+
 ament_auto_add_library(to_marker SHARED src/to_marker.cpp)
 
 install(TARGETS
