@@ -16,8 +16,9 @@
 #include <string>
 
 // some type of msgs
+#include <robotx_behavior_tree/action_node.hpp>
+
 #include "rclcpp/rclcpp.hpp"
-#include "robotx_behavior_tree/action_node.hpp"
 #include "std_msgs/msg/empty.hpp"
 
 namespace robotx_behavior_tree

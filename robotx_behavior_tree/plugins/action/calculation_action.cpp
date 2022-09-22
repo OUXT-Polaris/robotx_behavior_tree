@@ -13,9 +13,8 @@
 // limitations under the License.
 
 #include <memory>
+#include <robotx_behavior_tree/action_node.hpp>
 #include <string>
-
-#include "robotx_behavior_tree/action_node.hpp"
 
 namespace robotx_behavior_tree
 {
