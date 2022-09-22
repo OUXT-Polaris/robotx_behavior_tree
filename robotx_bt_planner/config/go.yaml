@@ -2,6 +2,7 @@ plugins:
   - package: robotx_behavior_tree
     name:
       - move_goal_action
+      - configure_controller_action
 behavior:
   description:
     package: robotx_bt_planner
