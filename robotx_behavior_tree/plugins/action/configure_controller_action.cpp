@@ -14,6 +14,7 @@
 
 #include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <memory>
+#include <mutex>
 #include <robotx_behavior_tree/action_node.hpp>
 #include <robotx_msgs/msg/autonomous_maritime_system_status.hpp>
 #include <string>
@@ -24,8 +25,10 @@ class ConfigureControllerAction : public ActionROS2Node
 {
 public:
   ConfigureControllerAction(const std::string & name, const BT::NodeConfiguration & config)
-  : ActionROS2Node(name, config), requested_mode_(0)
+  : ActionROS2Node(name, config)
   {
+    switch_controller_client_ = create_client<controller_manager_msgs::srv::SwitchController>(
+      "/controller_manager/load_controller");
   }
 
   static BT::PortsList providedPorts()
@@ -36,11 +39,47 @@ public:
 protected:
   BT::NodeStatus onStart() override
   {
+    mtx_.lock();
+    switch_succeed_ = false;
+    response_received_ = false;
+    mtx_.unlock();
     auto mode = this->getInput<uint8_t>("mode");
     if (!mode) {
       return BT::NodeStatus::FAILURE;
     }
-    switch (mode.value()) {
+    auto response_received_callback =
+      [this](rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedFuture future) {
+        mtx_.lock();
+        switch_succeed_ = future.get()->ok;
+        response_received_ = true;
+        mtx_.unlock();
+      };
+    auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
+    switch_controller_client_->async_send_request(request, response_received_callback);
+    return BT::NodeStatus::RUNNING;
+  }
+
+  BT::NodeStatus onRunning() override
+  {
+    mtx_.lock();
+    if (!response_received_) {
+      mtx_.unlock();
+      return BT::NodeStatus::RUNNING;
+    }
+    if (switch_succeed_) {
+      mtx_.unlock();
+      return BT::NodeStatus::SUCCESS;
+    }
+    mtx_.unlock();
+    return BT::NodeStatus::FAILURE;
+  }
+
+private:
+  std::shared_ptr<controller_manager_msgs::srv::SwitchController::Request>
+  createSwitchControllerRequest(uint8_t mode)
+  {
+    auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
+    switch (mode) {
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::REMOTE_OPERATED:
         break;
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::AUTONOMOUS:
@@ -48,19 +87,16 @@ protected:
       case robotx_msgs::msg::AutonomousMaritimeSystemStatus::KILLED:
         break;
       default:
-        return BT::NodeStatus::FAILURE;
+        break;
     }
-    return BT::NodeStatus::RUNNING;
+    return request;
   }
-  BT::NodeStatus onRunning() override { return BT::NodeStatus::FAILURE; }
 
-private:
-  uint8_t requested_mode_;
-  rclcpp::Service<controller_manager_msgs::srv::SwitchController>::SharedPtr
+  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr
     switch_controller_client_;
-  void switchController(
-    const std::shared_ptr<controller_manager_msgs::srv::SwitchController::Request> request,
-    const std::shared_ptr<controller_manager_msgs::srv::SwitchController::Response> response);
+  bool switch_succeed_;
+  bool response_received_;
+  std::mutex mtx_;
 };
 }  // namespace robotx_behavior_tree
 
