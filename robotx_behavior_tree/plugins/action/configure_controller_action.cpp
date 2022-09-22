@@ -109,27 +109,29 @@ private:
     if (!list_controller_client_->service_is_ready()) {
       return false;
     }
-    auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
-    auto response_received_callback =
-      [this](rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedFuture future) {
-        RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
-        mtx_.lock();
-        std::vector<std::string> controllers;
-        std::transform(
-          future.get()->controller.begin(), future.get()->controller.end(),
-          std::back_inserter(controllers),
-          [](const controller_manager_msgs::msg::ControllerState & state) { return state.name; });
-        if (
-          std::find(controllers.begin(), controllers.end(), "usv_joy_controller") !=
-            controllers.end() &&
-          std::find(controllers.begin(), controllers.end(), "usv_twist_controller") !=
-            controllers.end()) {
-          controller_loaded_ = true;
-        }
-        mtx_.unlock();
-      };
     if (!list_requested_) {
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
+      auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
+      auto response_received_callback =
+        [this](rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedFuture future) {
+          RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
+          mtx_.lock();
+          std::vector<std::string> controllers;
+          std::transform(
+            future.get()->controller.begin(), future.get()->controller.end(),
+            std::back_inserter(controllers),
+            [](const controller_manager_msgs::msg::ControllerState & state) { return state.name; });
+          if (
+            std::find(controllers.begin(), controllers.end(), "usv_joy_controller") !=
+              controllers.end() &&
+            std::find(controllers.begin(), controllers.end(), "usv_twist_controller") !=
+              controllers.end()) {
+            controller_loaded_ = true;
+          }
+          mtx_.unlock();
+        };
       list_controller_client_->async_send_request(request, response_received_callback);
+      RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
       list_requested_ = true;
     }
     return false;
