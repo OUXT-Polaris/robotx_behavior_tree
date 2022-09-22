@@ -30,7 +30,7 @@ public:
   : ActionROS2Node(name, config)
   {
     list_controller_client_ = create_client<controller_manager_msgs::srv::ListControllers>(
-      "/controller_manager/list_controller");
+      "/controller_manager/list_controllers");
     switch_controller_client_ = create_client<controller_manager_msgs::srv::SwitchController>(
       "/controller_manager/switch_controller");
   }
@@ -76,10 +76,12 @@ protected:
           mtx_.unlock();
         };
       mtx_.lock();
-      switch_requested_ = true;
-      switch_controller_client_->async_send_request(
-        createSwitchControllerRequest(static_cast<uint8_t>(mode.value())),
-        response_received_callback);
+      if (!switch_requested_) {
+        switch_controller_client_->async_send_request(
+          createSwitchControllerRequest(static_cast<uint8_t>(mode.value())),
+          response_received_callback);
+        switch_requested_ = true;
+      }
       mtx_.unlock();
     }
     mtx_.lock();
@@ -110,6 +112,7 @@ private:
     auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
     auto response_received_callback =
       [this](rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedFuture future) {
+        RCLCPP_ERROR_STREAM(get_logger(), __FILE__ << "," << __LINE__);
         mtx_.lock();
         std::vector<std::string> controllers;
         std::transform(
@@ -125,7 +128,10 @@ private:
         }
         mtx_.unlock();
       };
-    list_controller_client_->async_send_request(request, response_received_callback);
+    if (!list_requested_) {
+      list_controller_client_->async_send_request(request, response_received_callback);
+      list_requested_ = true;
+    }
     return false;
   }
 
