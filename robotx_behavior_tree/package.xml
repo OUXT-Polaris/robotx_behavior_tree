@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Implement elements of behavior tree</description>
   <maintainer email="pythagora.yoshimoto@gmail.com">Kotaro Yoshimoto</maintainer>
-  <license>MIT</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 

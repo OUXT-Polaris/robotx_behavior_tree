@@ -5,10 +5,11 @@
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="ms.kataoka@gmail.com">masaya-desktop</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>ament_cmake_auto</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>controller_manager_msgs</depend>
