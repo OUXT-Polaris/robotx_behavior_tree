@@ -62,7 +62,11 @@ extern "C" {
 }
 #endif
 
+#include <algorithm>
+#include <controller_manager_msgs/srv/list_controllers.hpp>
+#include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <robotx_msgs/msg/autonomous_maritime_system_status.hpp>
 
 namespace state_manager
 {
@@ -70,6 +74,13 @@ class StateManagerComponent : public rclcpp::Node
 {
 public:
   explicit StateManagerComponent(const rclcpp::NodeOptions & options);
+
+private:
+  std::shared_ptr<controller_manager_msgs::srv::SwitchController::Request>
+  createSwitchControllerRequest(uint8_t mode);
+  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr
+    switch_controller_client_;
+  rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedPtr list_controller_client_;
 };
 }  // namespace state_manager
 
