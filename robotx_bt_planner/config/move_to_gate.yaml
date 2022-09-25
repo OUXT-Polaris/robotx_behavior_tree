@@ -1,9 +1,9 @@
 plugins:
   - package: robotx_behavior_tree
     name:
-      - get_pose_from_buoys_action
-      - move_action
+      - move_to_gate_action
+      - move_goal_action
 behavior:
   description:
     package: robotx_bt_planner
-    path : behavior_trees/test.xml
+    path : behavior_trees/move_to_gate2.xml

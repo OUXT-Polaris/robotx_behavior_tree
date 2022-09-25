@@ -15,21 +15,22 @@
 #ifndef ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
 #define ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
 
+#include <behaviortree_cpp_v3/blackboard.h>
+#include <behaviortree_cpp_v3/loggers/bt_zmq_publisher.h>
+
 #include <fstream>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <hermite_path_msgs/msg/planner_status.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <robotx_behavior_msgs/msg/task_objects_array_stamped.hpp>
+#include <robotx_behavior_msgs/srv/evaluation.hpp>
+#include <robotx_bt_planner/descriptor/data_structures.hpp>
+#include <robotx_bt_planner/descriptor/operators.hpp>
+#include <robotx_bt_planner/transition_events/logging_event.hpp>
 #include <string>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-
-#include "behaviortree_cpp_v3/blackboard.h"
-#include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
-#include "rclcpp/rclcpp.hpp"
-#include "robotx_behavior_msgs/srv/evaluation.hpp"
-#include "robotx_bt_planner/descriptor/data_structures.hpp"
-#include "robotx_bt_planner/descriptor/operators.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -127,7 +128,7 @@ public:
   explicit BTPlannerComponent(const rclcpp::NodeOptions & options);
   ~BTPlannerComponent() {}
   void timerCallback();
-  void loadConfig(const std::string & file_path);
+  bool loadConfig(const std::string & file_path);
   void loadPlugins();
   bool loadTree();
   void evaluationCallback();
@@ -136,7 +137,9 @@ private:
   std::string config_file_;
   std::string config_package_;
   std::string task_object_topic_;
-  std::string marker_topic_;
+  std::string task_object_marker_topic_;
+  std::string behavior_marker_topic_;
+  std::string robot_frame_;
   float update_rate_;
   bool publish_marker_;
   YAML::Node node_;
@@ -154,12 +157,14 @@ private:
     task_objects_array_sub_;
   void taskObjectsArrayCallback(
     const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr data);
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr task_object_marker_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr behavior_marker_pub_;
   rclcpp::Subscription<hermite_path_msgs::msg::PlannerStatus>::SharedPtr planner_status_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
   std::string addRosPorts(const std::string & xml_string) const;
   std::vector<std::string> getRosPorts() const;
-};  // namespace robotx_bt_planner
+  std::unique_ptr<robotx_bt_planner::LoggingEvent> logging_event_ptr_;
+};
 }  // namespace robotx_bt_planner
 
 #endif  // ROBOTX_BT_PLANNER__DESCRIPTOR__DESCRIPTOR_HPP_
