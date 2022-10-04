@@ -50,6 +50,7 @@ struct Vector2D
   {
     x = x;
     y = y;
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("vec:"), x << "," << y);
   }
   template <typename T1, typename T2>
   Vector2D(const T1 & p1, const T2 & p2)
@@ -234,10 +235,10 @@ protected:
   }
 
   double getAngleDiff(
-    const geometry_msgs::msg::Quaternion & pose1, const geometry_msgs::msg::Quaternion & pose2)
+    const geometry_msgs::msg::Quaternion & quat1, const geometry_msgs::msg::Quaternion & quat2)
   {
-    auto transform1 = convertToTF2(pose1);
-    auto transform2 = convertToTF2(pose2);
+    auto transform1 = convertToTF2(quat1);
+    auto transform2 = convertToTF2(quat2);
     auto diff = transform2.inverse() * transform1;
     return diff.getRotation().getAngle();
   }
@@ -286,16 +287,16 @@ protected:
     p.position.y = (p1.y + p2.y) * 0.5;
     p.position.z = 0.0;
     const auto v = geometry_msgs::msg::Vector2D(p1, p2);
-    RCLCPP_INFO(get_logger(), "debug x : [%f]", v.x);
-    RCLCPP_INFO(get_logger(), "debug y : [%f]", v.y);
     const auto robot_rpy =
       quaternion_operation::convertQuaternionToEulerAngle(robot_pose.orientation);
-    const auto v_robot = geometry_msgs::msg::Vector2D(std::cos(robot_rpy.z), std::sin(robot_rpy.z));
     geometry_msgs::msg::Vector3 goal_rpy;
-    if ((v.y * v_robot.x - v.x * v_robot.y) >= (-v.y * v_robot.x + v.x * v_robot.y)) {
-      goal_rpy.z = std::atan2(-v.y, v.x);
+
+    if (
+      (v.y * std::cos(robot_rpy.z) - v.x * std::sin(robot_rpy.z)) >=
+      (-v.y * std::cos(robot_rpy.z) + v.x * std::sin(robot_rpy.z))) {
+      goal_rpy.z = std::atan2(-v.x, v.y);
     } else {
-      goal_rpy.z = std::atan2(v.y, -v.x);
+      goal_rpy.z = std::atan2(v.x, -v.y);
     }
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
