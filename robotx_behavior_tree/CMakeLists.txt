@@ -36,12 +36,6 @@ target_compile_definitions(set_turn_action PRIVATE BT_PLUGIN_EXPORT)
 ament_auto_add_library(move_to_gate_action SHARED plugins/action/move_to_gate_action.cpp)
 target_compile_definitions(move_to_gate_action PRIVATE BT_PLUGIN_EXPORT)
 
-ament_auto_add_library(get_pose_from_buoys_action SHARED plugins/action/get_pose_from_buoys_action.cpp)
-target_compile_definitions(get_pose_from_buoys_action PRIVATE BT_PLUGIN_EXPORT)
-
-ament_auto_add_library(move_action SHARED plugins/action/move_action.cpp)
-target_compile_definitions(move_action PRIVATE BT_PLUGIN_EXPORT)
-
 ament_auto_add_library(to_marker SHARED src/to_marker.cpp)
 
 install(TARGETS
