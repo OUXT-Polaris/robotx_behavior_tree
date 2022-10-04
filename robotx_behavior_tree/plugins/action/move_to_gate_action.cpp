@@ -30,7 +30,7 @@ class MoveToGateAction : public ActionROS2Node
 {
 public:
   MoveToGateAction(const std::string & name, const BT::NodeConfiguration & config)
-  : ActionROS2Node(name, config), buffer_(get_clock()), listener_(buffer_)
+  : ActionROS2Node(name, config)
   {
     declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
@@ -43,15 +43,20 @@ private:
   float distance_;
   double goal_tolerance_;
 
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener listener_;
+  // tf2_ros::Buffer buffer_;
+  // tf2_ros::TransformListener listener_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_gate_;
   geometry_msgs::msg::PoseStamped goal_;
 
   std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array_;
   std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array_;
 
-  enum class Buoy_ : short { BUOY_RED = 1, BUOY_GREEN = 2, BUOY_WHITE = 3, BUOY_BLACK = 4 };
+  enum class Buoy_ : short {
+    BUOY_RED = robotx_behavior_msgs::msg::TaskObject::BUOY_RED,
+    BUOY_GREEN = robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN,
+    BUOY_WHITE = robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE,
+    BUOY_BLACK = robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK
+  };
   enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
 
 protected:

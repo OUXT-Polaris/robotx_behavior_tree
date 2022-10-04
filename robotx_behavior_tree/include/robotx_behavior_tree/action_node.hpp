@@ -88,7 +88,10 @@ class ActionROS2Node : public BT::StatefulActionNode, public rclcpp::Node
 {
 public:
   ActionROS2Node(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::StatefulActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
+  : BT::StatefulActionNode(name, config),
+    rclcpp::Node(name, rclcpp::NodeOptions()),
+    buffer_(get_clock()),
+    listener_(buffer_)
   {
     setRegistrationID(name);
   }
@@ -111,6 +114,10 @@ public:
     }
     return ports;
   }
+
+private:
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener listener_;
 
 protected:
   void onHalted() override {}
