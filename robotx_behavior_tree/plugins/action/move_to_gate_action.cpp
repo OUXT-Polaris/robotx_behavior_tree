@@ -51,13 +51,17 @@ private:
   std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array_;
   std::vector<robotx_behavior_msgs::msg::TaskObject> green_buoys_array_;
 
-  enum class Buoy_ : short {
+  enum class Buoy : short {
     BUOY_RED = robotx_behavior_msgs::msg::TaskObject::BUOY_RED,
     BUOY_GREEN = robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN,
     BUOY_WHITE = robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE,
     BUOY_BLACK = robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK
   };
-  enum class Status_ : short { WAITING_FOR_GOAL, MOVING_TO_GOAL, AVOIDING };
+  enum class Status : short {
+    WAITING_FOR_GOAL = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL,
+    MOVING_TO_GOAL = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL,
+    AVOIDING = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL
+  };
 
 protected:
   BT::NodeStatus onStart() override
@@ -79,13 +83,15 @@ protected:
     const auto task_objects_array = getTaskObjects();
 
     if (task_objects_array) {
-      red_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_RED));
-      green_buoys_array_ =
-        filter(task_objects_array.value(), static_cast<short>(Buoy_::BUOY_GREEN));
+      red_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+      green_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
     }
 
     sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
     sortBy2DDistance(green_buoys_array_, pose.value()->pose.position);
+    if (red_buoys_array_.empty() || green_buoys_array_.empty()) {
+      return BT::NodeStatus::FAILURE;
+    }
 
     const auto xyz = between(red_buoys_array_[0], green_buoys_array_[0], pose.value()->pose);
     get_parameter("goal_tolerance", goal_tolerance_);
@@ -100,7 +106,7 @@ protected:
     goal_.pose.orientation.z = xyz.orientation.z;
 
     goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status == static_cast<short>(Status_::WAITING_FOR_GOAL)) {
+    if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
       goal_pub_gate_->publish(goal_);
     }
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
