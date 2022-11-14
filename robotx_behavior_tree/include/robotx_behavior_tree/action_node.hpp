@@ -242,23 +242,10 @@ protected:
   }
 
   double getAngleDiff(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 5a577457a5599fd5e7d13946a9d56dca69c1b053
     const geometry_msgs::msg::Quaternion & quat1, const geometry_msgs::msg::Quaternion & quat2)
   {
     auto transform1 = convertToTF2(quat1);
     auto transform2 = convertToTF2(quat2);
-<<<<<<< HEAD
-=======
-    const geometry_msgs::msg::Quaternion & pose1, const geometry_msgs::msg::Quaternion & pose2)
-  {
-    auto transform1 = convertToTF2(pose1);
-    auto transform2 = convertToTF2(pose2);
->>>>>>> 86d5b4707bb53520d31b09866e615af544fb369b
-=======
->>>>>>> 5a577457a5599fd5e7d13946a9d56dca69c1b053
     auto diff = transform2.inverse() * transform1;
     return diff.getRotation().getAngle();
   }
