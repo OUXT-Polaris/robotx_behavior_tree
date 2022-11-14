@@ -235,10 +235,17 @@ protected:
   }
 
   double getAngleDiff(
+<<<<<<< HEAD
     const geometry_msgs::msg::Quaternion & quat1, const geometry_msgs::msg::Quaternion & quat2)
   {
     auto transform1 = convertToTF2(quat1);
     auto transform2 = convertToTF2(quat2);
+=======
+    const geometry_msgs::msg::Quaternion & pose1, const geometry_msgs::msg::Quaternion & pose2)
+  {
+    auto transform1 = convertToTF2(pose1);
+    auto transform2 = convertToTF2(pose2);
+>>>>>>> 86d5b4707bb53520d31b09866e615af544fb369b
     auto diff = transform2.inverse() * transform1;
     return diff.getRotation().getAngle();
   }
@@ -295,7 +302,7 @@ protected:
       (-v.y * std::cos(robot_rpy.z) + v.x * std::sin(robot_rpy.z))) {
       goal_rpy.z = std::atan2(-v.x, v.y);
     } else {
-      goal_rpy.z = std::atan2(v.x, -v.y);
+      goal_rpy.z = std::atan2(v.y, -v.x);
     }
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
