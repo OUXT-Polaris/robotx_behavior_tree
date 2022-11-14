@@ -118,7 +118,7 @@ void BTPlannerComponent::taskObjectsArrayCallback(
   if (publish_marker_) {
     task_object_marker_pub_->publish(robotx_behavior_tree::toMarker(data));
   }
-  blackboard_->set<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>(
+  tree_.rootBlackboard()->set<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>(
     "task_objects", data);
 }
 

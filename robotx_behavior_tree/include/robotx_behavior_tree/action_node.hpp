@@ -28,6 +28,10 @@
 #include <stdexcept>
 #include <string>
 
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_listener.h"
+
 namespace geometry_msgs
 {
 namespace msg
@@ -46,6 +50,7 @@ struct Vector2D
   {
     x = x;
     y = y;
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("vec:"), x << "," << y);
   }
   template <typename T1, typename T2>
   Vector2D(const T1 & p1, const T2 & p2)
@@ -83,7 +88,10 @@ class ActionROS2Node : public BT::StatefulActionNode, public rclcpp::Node
 {
 public:
   ActionROS2Node(const std::string & name, const BT::NodeConfiguration & config)
-  : BT::StatefulActionNode(name, config), rclcpp::Node(name, rclcpp::NodeOptions())
+  : BT::StatefulActionNode(name, config),
+    rclcpp::Node(name, rclcpp::NodeOptions()),
+    buffer_(get_clock()),
+    listener_(buffer_)
   {
     setRegistrationID(name);
   }
@@ -107,19 +115,13 @@ public:
     return ports;
   }
 
+private:
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener listener_;
+
 protected:
   void onHalted() override {}
   std::string name;
-  const robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr getTaskObjects() const
-  {
-    const auto ret =
-      this->getInput<robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr>("task_objects");
-    if (ret) {
-      ret.value();
-    } else {
-      throw std::runtime_error("Task objects were not subscribed.");
-    }
-  }
 
 #define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
   std::optional<TYPE> get##NAME() const              \
@@ -134,6 +136,8 @@ protected:
   DEFINE_GET_INPUT(
     PlannerStatus, hermite_path_msgs::msg::PlannerStatus::SharedPtr, "planner_status");
   DEFINE_GET_INPUT(CurrentPose, geometry_msgs::msg::PoseStamped::SharedPtr, "current_pose");
+  DEFINE_GET_INPUT(
+    TaskObjects, robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr, "task_objects");
 #undef DEFINE_GET_INPUT
 
   template <typename T1, typename T2>
@@ -149,11 +153,11 @@ protected:
   }
 
   std::vector<robotx_behavior_msgs::msg::TaskObject> filter(
-    const std::vector<robotx_behavior_msgs::msg::TaskObject> & task_objects,
+    robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr task_object_array,
     uint8_t object_kind) const
   {
     std::vector<robotx_behavior_msgs::msg::TaskObject> filtered;
-    for (const auto & task_object : task_objects) {
+    for (const auto & task_object : task_object_array->task_objects) {
       if (task_object.object_kind == object_kind) {
         filtered.emplace_back(task_object);
       }
@@ -238,10 +242,10 @@ protected:
   }
 
   double getAngleDiff(
-    const geometry_msgs::msg::Quaternion & pose1, const geometry_msgs::msg::Quaternion & pose2)
+    const geometry_msgs::msg::Quaternion & quat1, const geometry_msgs::msg::Quaternion & quat2)
   {
-    auto transform1 = convertToTF2(pose1);
-    auto transform2 = convertToTF2(pose2);
+    auto transform1 = convertToTF2(quat1);
+    auto transform2 = convertToTF2(quat2);
     auto diff = transform2.inverse() * transform1;
     return diff.getRotation().getAngle();
   }
@@ -292,12 +296,13 @@ protected:
     const auto v = geometry_msgs::msg::Vector2D(p1, p2);
     const auto robot_rpy =
       quaternion_operation::convertQuaternionToEulerAngle(robot_pose.orientation);
-    const auto v_robot = geometry_msgs::msg::Vector2D(std::cos(robot_rpy.z), std::sin(robot_rpy.z));
     geometry_msgs::msg::Vector3 goal_rpy;
-    if ((v.y * v_robot.x - v.x * v_robot.y) >= (-v.y * v_robot.x + v.x * v_robot.y)) {
-      goal_rpy.z = std::atan2(-v.y, v.x);
+    if (
+      (v.y * std::cos(robot_rpy.z) - v.x * std::sin(robot_rpy.z)) >=
+      (-v.y * std::cos(robot_rpy.z) + v.x * std::sin(robot_rpy.z))) {
+      goal_rpy.z = std::atan2(-v.x, v.y);
     } else {
-      goal_rpy.z = std::atan2(v.y, -v.x);
+      goal_rpy.z = std::atan2(v.x, -v.y);
     }
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
