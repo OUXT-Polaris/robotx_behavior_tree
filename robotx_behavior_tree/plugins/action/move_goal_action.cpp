@@ -36,7 +36,7 @@ public:
   {
     declare_parameter("goal_tolerance", 1.0);
     get_parameter("goal_tolerance", goal_tolerance_);
-    declare_parameter("goal_angle_tolerance", 0.08);
+    declare_parameter("goal_angle_tolerance", 0.4);
     get_parameter("goal_angle_tolerance", goal_angle_tolerance_);
     goal_pub_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
