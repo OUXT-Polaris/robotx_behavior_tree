@@ -335,7 +335,8 @@ protected:
     // 
     // Convert Quaternion to Euler
     // To 
-    const auto ship_yaw = current_pose.pose.orientation.z;
+    const auto ship_yaw = quaternion_operation::convertQuaternionToEulerAngle(current_pose.value()->pose.orientation).z  ;
+
     // const auto ship_yaw = quaternion_operation::convertQuaternionToEulerAngle(current_pose.orientation);
 
     // double in_sqrt = math::sqrt(pow())
