@@ -325,16 +325,33 @@ protected:
     std::vector<geometry_msgs::msg::Pose> waypoints;
 
 
+    // Get current pose(Quaternion)
+    // std::optional<geometry_msgs::msg::PoseStamped::SharedPtr> current_pose =  getCurrentPose();
+    const auto current_pose = getCurrentPose();
+    if(!current_pose){
+      return {};
+    }
+
+    // 
+    // Convert Quaternion to Euler
+    // To 
+    const auto ship_yaw = current_pose.pose.orientation.z;
+    // const auto ship_yaw = quaternion_operation::convertQuaternionToEulerAngle(current_pose.orientation);
+
+    // double in_sqrt = math::sqrt(pow())
+    // double waypoint_x = ()
+
+
     // 頑張って計算
     // 分割あたりの角度を計算
-    int per_rad = (2 * 3.14) / num_split; 
+    // int per_rad = (2 * std::) / num_split; 
 
-    for(int cnt = 1; cnt <= per_rad; cnt++)
-    {
-      // TODO: 配列に置換
-      double x = radius * cos(per_rad * cnt) + obj.x;
-      double y = radius * sin(per_rad * cnt) + obj.y;
-    }
+    // for(int cnt = 1; cnt <= per_rad; cnt++)
+    // {
+    //   // TODO: 配列に置換
+    //   double x = radius * cos(per_rad * cnt) + obj.x;
+    //   double y = radius * sin(per_rad * cnt) + obj.y;
+    // }
 
         
     switch (direction)
