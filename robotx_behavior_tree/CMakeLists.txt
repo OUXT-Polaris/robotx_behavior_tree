@@ -45,7 +45,9 @@ install(TARGETS
     RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-if($ENV{DEVELOP})
+option(DEVELOP "If true, install 3d models for desktop development" OFF)
+
+if(DEVELOP)
   install(DIRECTORY models DESTINATION share/${PROJECT_NAME})
 endif()
 
