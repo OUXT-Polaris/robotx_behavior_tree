@@ -45,7 +45,9 @@ install(TARGETS
     RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY models DESTINATION share/${PROJECT_NAME})
+if($ENV{DEVELOP})
+  install(DIRECTORY models DESTINATION share/${PROJECT_NAME})
+endif()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

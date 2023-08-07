@@ -24,7 +24,7 @@
 #include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
 namespace robotx_behavior_tree
 {
