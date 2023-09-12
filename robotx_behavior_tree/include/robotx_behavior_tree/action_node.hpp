@@ -139,7 +139,7 @@ protected:
   DEFINE_GET_INPUT(
     TaskObjects, robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr, "task_objects");
 #undef DEFINE_GET_INPUT
-geometry_msgs/msg/pose_stamped.hppe T1, typename T2>
+  template <typename T1, typename T2>
   double getDistance(const T1 & p1, const T2 & p2) const
   {
     return std::hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
@@ -200,7 +200,7 @@ geometry_msgs/msg/pose_stamped.hppe T1, typename T2>
     p.y = task_object.y;
     p.z = task_object.z[0];
     return p;
-  }geometry_msgs/msg/pose_stamped.hpp
+  }
   geometry_msgs::msg::Point2D getPoint2D(
     const robotx_behavior_msgs::msg::TaskObject & task_object) const
   {
@@ -306,13 +306,13 @@ geometry_msgs/msg/pose_stamped.hppe T1, typename T2>
     return p;
   }
 
-  std::vector<geometry_msgs::msg::Pose> getGoWaypoint(
+  std::optional<geometry_msgs::msg::Pose> getFrontOfWaypointToGo(
     const robotx_behavior_msgs::msg::TaskObject & obj,
-    double distance = 2.0) const
+    const double distance = 2.0) const
   {
     const auto current_pose = getCurrentPose();
     if(!current_pose){
-      return {};
+      return std::nullopt;
     }
     double delta_x = obj.x - current_pose.value()->pose.position.x;
     double delta_y = obj.y - current_pose.value()->pose.position.y;
@@ -324,8 +324,7 @@ geometry_msgs/msg/pose_stamped.hppe T1, typename T2>
     geometry_msgs::msg::Vector3 goal_rpy;
     goal_rpy.z = theta;
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
-    // return {p};
-    // return {};
+    return p;
   }
 };
 }  // namespace robotx_behavior_tree
