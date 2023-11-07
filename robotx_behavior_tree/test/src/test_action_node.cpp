@@ -24,9 +24,23 @@
  */
 #include <gtest/gtest.h>
 
+#include <robotx_behavior_tree/action_node.hpp>
+
 TEST(TestSuite, testCase1)
 {
-  EXPECT_EQ(0, 0);
+  // robotx_behavior_msgs::msg::TaskObject object;
+  // object.pose.position.x = 0;
+  // object.pose.position.y = 0;
+  // object.pose.position.z = 0;
+  // object.pose.orientation.x = 0;
+  // object.pose.orientation.y = 0;
+  // object.pose.orientation.z = 0;
+  // object.pose.orientation.w = 1;
+  // object.type = robotx_behavior_msgs::msg::TaskObject::TYPE_WAYPOINT;
+  // object.id = 0;
+
+  // getFrontOfWaypointToGo(object);
+  EXPECT_EQ(true, false);
 }
 
 /**

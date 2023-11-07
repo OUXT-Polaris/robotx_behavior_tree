@@ -307,11 +307,10 @@ protected:
   }
 
   std::optional<geometry_msgs::msg::Pose> getFrontOfWaypointToGo(
-    const robotx_behavior_msgs::msg::TaskObject & obj,
-    const double distance = 2.0) const
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 2.0) const
   {
     const auto current_pose = getCurrentPose();
-    if(!current_pose){
+    if (!current_pose) {
       return std::nullopt;
     }
     double delta_x = obj.x - current_pose.value()->pose.position.x;
