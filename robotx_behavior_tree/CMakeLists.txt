@@ -54,6 +54,9 @@ endif()
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_action_node 
+    test/src/test_action_node.cpp)
 endif()
 
 ament_auto_package()
