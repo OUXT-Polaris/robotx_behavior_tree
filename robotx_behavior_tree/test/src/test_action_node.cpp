@@ -28,19 +28,11 @@
 
 TEST(TestSuite, testCase1)
 {
-  // robotx_behavior_msgs::msg::TaskObject object;
-  // object.pose.position.x = 0;
-  // object.pose.position.y = 0;
-  // object.pose.position.z = 0;
-  // object.pose.orientation.x = 0;
-  // object.pose.orientation.y = 0;
-  // object.pose.orientation.z = 0;
-  // object.pose.orientation.w = 1;
-  // object.type = robotx_behavior_msgs::msg::TaskObject::TYPE_WAYPOINT;
-  // object.id = 0;
-
-  // getFrontOfWaypointToGo(object);
-  EXPECT_EQ(true, false);
+  robotx_behavior_msgs::msg::TaskObject object;
+  object.x = 0;
+  object.y = 0;
+  getFrontPoseForWaypoint(object, 2.0);
+  EXPECT_EQ(true, true);
 }
 
 /**

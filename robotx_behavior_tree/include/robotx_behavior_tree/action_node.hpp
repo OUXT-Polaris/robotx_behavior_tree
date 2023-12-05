@@ -306,7 +306,7 @@ protected:
     return p;
   }
 
-  std::optional<geometry_msgs::msg::Pose> getFrontOfWaypointToGo(
+  std::optional<geometry_msgs::msg::Pose> getFrontPoseForWaypoint(
     const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 2.0) const
   {
     const auto current_pose = getCurrentPose();
