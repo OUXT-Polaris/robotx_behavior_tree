@@ -14,7 +14,7 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-#include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
 
 #set(library_name ${PROJECT_NAME})
 

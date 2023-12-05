@@ -24,7 +24,7 @@
  */
 #include <gtest/gtest.h>
 
-#include <robotx_behavior_tree/include/robotx_behavior_tree/action_node.hpp>
+#include <robotx_behavior_tree/action_node.hpp>
 
 TEST(TestSuite, testCase1)
 {
