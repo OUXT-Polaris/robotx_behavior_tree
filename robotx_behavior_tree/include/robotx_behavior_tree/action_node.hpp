@@ -190,6 +190,12 @@ protected:
       });
   }
 
+  enum class TurnDirection
+  {
+    Right, 
+    Left
+  }; 
+
   std::optional<geometry_msgs::msg::Point> getPoint(
     const robotx_behavior_msgs::msg::TaskObject & task_object) const
   {
@@ -307,6 +313,62 @@ protected:
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
   }
+
+  
+  std::vector<geometry_msgs::msg::Pose> getGoaroundWaypoints(
+    const robotx_behavior_msgs::msg::TaskObject & obj, 
+    double radius, 
+    TurnDirection direction,
+    size_t num_split = 4) const
+  {
+
+    std::vector<geometry_msgs::msg::Pose> waypoints;
+
+
+    // Get current pose(Quaternion)
+    // std::optional<geometry_msgs::msg::PoseStamped::SharedPtr> current_pose =  getCurrentPose();
+    const auto current_pose = getCurrentPose();
+    if(!current_pose){
+      return {};
+    }
+
+    // 
+    // Convert Quaternion to Euler
+    // To 
+    const auto ship_yaw = quaternion_operation::convertQuaternionToEulerAngle(current_pose.value()->pose.orientation).z  ;
+
+    // const auto ship_yaw = quaternion_operation::convertQuaternionToEulerAngle(current_pose.orientation);
+
+    // double in_sqrt = math::sqrt(pow())
+    // double waypoint_x = ()
+
+
+    // 頑張って計算
+    // 分割あたりの角度を計算
+    // int per_rad = (2 * std::) / num_split; 
+
+    // for(int cnt = 1; cnt <= per_rad; cnt++)
+    // {
+    //   // TODO: 配列に置換
+    //   double x = radius * cos(per_rad * cnt) + obj.x;
+    //   double y = radius * sin(per_rad * cnt) + obj.y;
+    // }
+
+        
+    switch (direction)
+    {
+    case TurnDirection::Right:
+
+      break;
+    
+    case TurnDirection::Left:
+      break;
+    }
+    
+
+  }
+
+
 };
 }  // namespace robotx_behavior_tree
 
