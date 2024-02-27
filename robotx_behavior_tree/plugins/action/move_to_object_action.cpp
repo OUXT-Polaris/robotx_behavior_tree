@@ -35,6 +35,49 @@
 
 namespace robotx_behavior_tree
 {
-class ActionNode : public BT::StatefulActionNode
+class MoveToObjectAction : public ActionROS2Node
 {
-}}
+public:
+  MoveToObjectAction(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionROS2Node(name, config)
+  {
+    declare_parameter("goal_tolerance", 1.0);
+    get_parameter("goal_tolerance", goal_tolerance_);
+    goal_pub_ =
+      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+  }
+
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(
+      ActionROS2Node::providedPorts(),
+      {BT::InputPort<double>("goal_x"), BT::InputPort<double>("goal_y"),
+       BT::InputPort<double>("goal_theta")});
+  }
+private:
+
+protected:
+  BT::NodeStatus onStart() override
+  {
+    if (1) {
+      return BT::NodeStatus::RUNNING;
+    } else {
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  BT::NodeStatus onRunning() override
+  {
+    get_parameter("goal_tolerance", goal_tolerance_);
+
+    if (1) {
+      RCLCPP_INFO(get_logger(), "MoveToObjectAction : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
+    }
+    return BT::NodeStatus::RUNNING;
+  }
+};
+}  // namespace robotx_behavior_tree
+
+#include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
+
+REGISTER_NODES(robotx_behavior_tree, MoveToObjectAction)
