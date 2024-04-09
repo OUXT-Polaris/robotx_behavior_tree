@@ -34,6 +34,9 @@ target_compile_definitions(set_turn_action PRIVATE BT_PLUGIN_EXPORT)
 ament_auto_add_library(move_to_gate_action SHARED plugins/action/move_to_gate_action.cpp)
 target_compile_definitions(move_to_gate_action PRIVATE BT_PLUGIN_EXPORT)
 
+ament_auto_add_library(move_to_front_pose_of_object SHARED plugins/action/move_to_front_pose_of_object.cpp)
+target_compile_definitions(move_to_front_pose_of_object PRIVATE BT_PLUGIN_EXPORT)
+
 ament_auto_add_library(to_marker SHARED src/to_marker.cpp)
 
 install(TARGETS
