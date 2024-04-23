@@ -90,16 +90,16 @@ protected:
 
     const auto xyz = getFrontPoseOfObject(red_buoys_array_[0]);
     get_parameter("goal_tolerance", goal_tolerance_);
-
     goal_.header.frame_id = "map";
-    goal_.pose.position.x = xyz.position.x;
-    goal_.pose.position.y = xyz.position.y;
-    goal_.pose.position.z = xyz.position.z;
-    goal_.pose.orientation.w = xyz.orientation.w;
-    goal_.pose.orientation.x = xyz.orientation.x;
-    goal_.pose.orientation.y = xyz.orientation.y;
-    goal_.pose.orientation.z = xyz.orientation.z;
-
+    if (xyz) {
+      goal_.pose.position.x = xyz.value().position.x;
+      goal_.pose.position.y = xyz.value().position.y;
+      goal_.pose.position.z = xyz.value().position.z;
+      goal_.pose.orientation.w = xyz.value().orientation.w;
+      goal_.pose.orientation.x = xyz.value().orientation.x;
+      goal_.pose.orientation.y = xyz.value().orientation.y;
+      goal_.pose.orientation.z = xyz.value().orientation.z;
+    }
     goal_.header.stamp = get_clock()->now();
     if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
       goal_pub_gate_->publish(goal_);
