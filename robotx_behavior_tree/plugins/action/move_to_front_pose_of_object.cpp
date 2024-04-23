@@ -102,7 +102,7 @@ protected:
     }
     goal_.header.stamp = get_clock()->now();
     if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
-      goal_pub_gate_->publish(goal_);
+      goal_pub_front_pose_of_object_->publish(goal_);
     }
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
 
