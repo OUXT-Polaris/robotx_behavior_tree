@@ -17,7 +17,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hermite_path_msgs/msg/planner_status.hpp"
@@ -103,7 +102,6 @@ protected:
     }
     goal_.header.stamp = get_clock()->now();
     if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
-      rclcpp::WallRate rate(10.0s);
       goal_pub_front_pose_of_object_->publish(goal_);
     }
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
