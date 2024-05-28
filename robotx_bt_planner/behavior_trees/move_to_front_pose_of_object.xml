@@ -1,10 +1,7 @@
 <root main_tree_to_execute = "MainTree" >
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="MoveGoalAction" goal_x="10.0" goal_y="-10.0" goal_theta="4.71"/>
-            <Action ID="MoveGoalAction" goal_x="0.0" goal_y="-20.0" goal_theta="3.14"/>
-            <Action ID="MoveGoalAction" goal_x="-10.0" goal_y="-10.0" goal_theta="1.57"/>
-            <Action ID="MoveGoalAction" goal_x="0.0" goal_y="0.0" goal_theta="0.0"/>
+            <Action ID="MoveToFrontPoseOfObject" task_objects="{task_objects}"/>
         </Sequence>
     </BehaviorTree>
 </root>
