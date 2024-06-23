@@ -78,7 +78,6 @@ public:
   {
     setRegistrationID(name);
   }
-  
 
 protected:
   void onHalted() override {}
