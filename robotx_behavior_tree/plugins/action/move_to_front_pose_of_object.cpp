@@ -42,11 +42,9 @@ private:
   rclcpp::TimerBase::SharedPtr update_position_timer_;
   float distance_;
   double goal_tolerance_;
-
-  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_front_pose_of_object_;
   geometry_msgs::msg::PoseStamped goal_;
-
-  std::vector<robotx_behavior_msgs::msg::TaskObject> red_buoys_array_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_front_pose_of_object_;
+  std::vector<robotx_behavior_msgs::msg::TaskObject> target_objects_array_;
 
   enum class Buoy : short {
     BUOY_RED = robotx_behavior_msgs::msg::TaskObject::BUOY_RED,
@@ -80,15 +78,15 @@ protected:
     const auto task_objects_array = getTaskObjects();
 
     if (task_objects_array) {
-      red_buoys_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+      target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
     }
 
-    sortBy2DDistance(red_buoys_array_, pose.value()->pose.position);
-    if (red_buoys_array_.empty()) {
+    sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
+    if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
     }
 
-    const auto xyz = getFrontPoseOfObject(red_buoys_array_[0], 5.0);
+    const auto xyz = getFrontPoseOfObject(target_objects_array_[0], 5.0);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
     if (xyz) {
