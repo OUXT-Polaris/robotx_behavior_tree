@@ -81,6 +81,22 @@ protected:
       target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
     }
 
+    auto object_type = this->getInput<std::string>("object_type"); 
+
+    if (task_objects_array) {
+      if (object_type == "red_bouy"){
+        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+      }else if (object_type == "green_bouy"){
+        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
+      }else if (object_type == "white_bouy"){
+        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
+      }else if (object_type == "black_bouy"){
+        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
+      } else {
+        throw std::runtime_error("There is an error in object_type.");
+      }      
+    }
+
     sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
     if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
