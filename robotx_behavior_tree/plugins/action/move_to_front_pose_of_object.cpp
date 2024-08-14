@@ -17,6 +17,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hermite_path_msgs/msg/planner_status.hpp"
@@ -77,25 +78,30 @@ protected:
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
 
-    if (task_objects_array) {
-      target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
-    }
+    // RCLCPP_INFO(get_logger(), "qwerty_");
+    // RCLCPP_INFO(get_logger(), "qwerty_", this->getInput<std::string>("object_type"));
+  
+    // if (task_objects_array) {
+    //   target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+    // }
+    target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
 
-    auto object_type = this->getInput<std::string>("object_type"); 
+    // auto object_type = this->getInput<std::string>("object_type"); 
 
-    if (task_objects_array) {
-      if (object_type == "red_bouy"){
-        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
-      }else if (object_type == "green_bouy"){
-        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
-      }else if (object_type == "white_bouy"){
-        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
-      }else if (object_type == "black_bouy"){
-        target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
-      } else {
-        throw std::runtime_error("There is an error in object_type.");
-      }      
-    }
+    // if (task_objects_array) {
+    //   if (object_type == "red_bouy"){
+    //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+    //   }else if (object_type == "green_bouy"){
+    //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
+    //   }else if (object_type == "white_bouy"){
+    //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
+    //   }else if (object_type == "black_bouy"){
+    //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
+    //   } else {
+    //     // throw std::runtime_error("There is an error in object_type.");
+    //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
+    //   }      
+    // }
 
     sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
     if (target_objects_array_.empty()) {
