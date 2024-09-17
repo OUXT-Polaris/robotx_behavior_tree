@@ -13,11 +13,11 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hermite_path_msgs/msg/planner_status.hpp"
@@ -37,6 +37,11 @@ public:
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_pub_front_pose_of_object_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+  }
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(
+      ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("object_type")});
   }
 
 private:
@@ -62,6 +67,7 @@ private:
 protected:
   BT::NodeStatus onStart() override
   {
+    RCLCPP_INFO(get_logger(), "qwerty_");
     const auto status_planner = getPlannerStatus();
     const auto task_objects_array = getTaskObjects();
     if (task_objects_array) {
@@ -78,15 +84,15 @@ protected:
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
 
-    // RCLCPP_INFO(get_logger(), "qwerty_");
+    RCLCPP_INFO(get_logger(), "qwerty_");
     // RCLCPP_INFO(get_logger(), "qwerty_", this->getInput<std::string>("object_type"));
-  
+
     // if (task_objects_array) {
     //   target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
     // }
     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
 
-    // auto object_type = this->getInput<std::string>("object_type"); 
+    // auto object_type = this->getInput<std::string>("object_type");
 
     // if (task_objects_array) {
     //   if (object_type == "red_bouy"){
@@ -100,7 +106,7 @@ protected:
     //   } else {
     //     // throw std::runtime_error("There is an error in object_type.");
     //     target_objects_array_ = filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
-    //   }      
+    //   }
     // }
 
     sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
