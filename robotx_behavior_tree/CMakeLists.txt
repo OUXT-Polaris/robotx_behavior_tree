@@ -14,9 +14,7 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-#include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
-
-#set(library_name ${PROJECT_NAME})
+include_directories(include ${EIGEN3_INCLUDE_DIR})
 
 ament_auto_add_library(example_action SHARED plugins/action/example_action.cpp)
 target_compile_definitions(example_action PRIVATE BT_PLUGIN_EXPORT)
@@ -36,6 +34,9 @@ target_compile_definitions(set_turn_action PRIVATE BT_PLUGIN_EXPORT)
 ament_auto_add_library(move_to_gate_action SHARED plugins/action/move_to_gate_action.cpp)
 target_compile_definitions(move_to_gate_action PRIVATE BT_PLUGIN_EXPORT)
 
+ament_auto_add_library(move_to_front_pose_of_object SHARED plugins/action/move_to_front_pose_of_object.cpp)
+target_compile_definitions(move_to_front_pose_of_object PRIVATE BT_PLUGIN_EXPORT)
+
 ament_auto_add_library(to_marker SHARED src/to_marker.cpp)
 
 install(TARGETS
@@ -50,6 +51,8 @@ install(DIRECTORY models DESTINATION share/${PROJECT_NAME})
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_auto_add_gtest(test_action_node test/src/test_action_node.cpp)
 endif()
 
 ament_auto_package()
