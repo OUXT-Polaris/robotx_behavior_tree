@@ -87,25 +87,18 @@ protected:
 
     if (task_objects_array) {
       if (object_type.value() == "red_bouy") {
-        RCLCPP_INFO(get_logger(), "object_type.value() is red_bouy");
         target_objects_array_ =
           filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
       } else if (object_type.value() == "green_bouy") {
-        RCLCPP_INFO(get_logger(), "object_type.value() is green_bouy");
         target_objects_array_ =
           filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
       } else if (object_type.value() == "white_bouy") {
-        RCLCPP_INFO(get_logger(), "object_type.value() is white_bouy");
         target_objects_array_ =
           filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
       } else if (object_type.value() == "black_bouy") {
-        RCLCPP_INFO(get_logger(), "object_type.value() is black_bouy");
         target_objects_array_ =
           filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
       } else {
-        RCLCPP_INFO(
-          get_logger(),
-          "object_type.value() is not red_bouy, green_bouy, white_bouy, or black_bouy");
         return BT::NodeStatus::FAILURE;
       }
     }
@@ -115,17 +108,17 @@ protected:
       return BT::NodeStatus::FAILURE;
     }
 
-    const auto xyz = getFrontPoseOfObject(target_objects_array_[0], 5.0);
+    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 5.0);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
-    if (xyz) {
-      goal_.pose.position.x = xyz.value().position.x;
-      goal_.pose.position.y = xyz.value().position.y;
-      goal_.pose.position.z = xyz.value().position.z;
-      goal_.pose.orientation.w = xyz.value().orientation.w;
-      goal_.pose.orientation.x = xyz.value().orientation.x;
-      goal_.pose.orientation.y = xyz.value().orientation.y;
-      goal_.pose.orientation.z = xyz.value().orientation.z;
+    if (front_pose) {
+      goal_.pose.position.x = front_pose.value().position.x;
+      goal_.pose.position.y = front_pose.value().position.y;
+      goal_.pose.position.z = front_pose.value().position.z;
+      goal_.pose.orientation.w = front_pose.value().orientation.w;
+      goal_.pose.orientation.x = front_pose.value().orientation.x;
+      goal_.pose.orientation.y = front_pose.value().orientation.y;
+      goal_.pose.orientation.z = front_pose.value().orientation.z;
     }
     goal_.header.stamp = get_clock()->now();
     if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
