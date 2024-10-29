@@ -315,6 +315,13 @@ protected:
     }
     double delta_x = obj.x - current_pose.value()->pose.position.x;
     double delta_y = obj.y - current_pose.value()->pose.position.y;
+    const double minimum_delta = 0.1;
+    if (abs(delta_x) < minimum_delta) {
+      delta_x = minimum_delta;
+    }
+    if (abs(delta_y) < minimum_delta) {
+      delta_y = minimum_delta;
+    }
     double theta = std::atan2(delta_y, delta_x);
     geometry_msgs::msg::Pose p;
     p.position.x = obj.x - distance * std::cos(theta);
