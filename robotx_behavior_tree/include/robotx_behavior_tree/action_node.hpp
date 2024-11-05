@@ -139,7 +139,6 @@ protected:
   DEFINE_GET_INPUT(
     TaskObjects, robotx_behavior_msgs::msg::TaskObjectsArrayStamped::SharedPtr, "task_objects");
 #undef DEFINE_GET_INPUT
-
   template <typename T1, typename T2>
   double getDistance(const T1 & p1, const T2 & p2) const
   {
@@ -202,7 +201,6 @@ protected:
     p.z = task_object.z[0];
     return p;
   }
-
   geometry_msgs::msg::Point2D getPoint2D(
     const robotx_behavior_msgs::msg::TaskObject & task_object) const
   {
@@ -304,6 +302,33 @@ protected:
     } else {
       goal_rpy.z = std::atan2(v.x, -v.y);
     }
+    p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
+    return p;
+  }
+
+  std::optional<geometry_msgs::msg::Pose> getFrontPoseOfObject(
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0) const
+  {
+    const auto current_pose = getCurrentPose();
+    if (!current_pose) {
+      return std::nullopt;
+    }
+    double delta_x = obj.x - current_pose.value()->pose.position.x;
+    double delta_y = obj.y - current_pose.value()->pose.position.y;
+    const double minimum_delta = 0.1;
+    if (abs(delta_x) < minimum_delta) {
+      delta_x = minimum_delta;
+    }
+    if (abs(delta_y) < minimum_delta) {
+      delta_y = minimum_delta;
+    }
+    double theta = std::atan2(delta_y, delta_x);
+    geometry_msgs::msg::Pose p;
+    p.position.x = obj.x - distance * std::cos(theta);
+    p.position.y = obj.y - distance * std::sin(theta);
+    p.position.z = 0.0;
+    geometry_msgs::msg::Vector3 goal_rpy;
+    goal_rpy.z = theta;
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
   }
