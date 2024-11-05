@@ -108,7 +108,7 @@ protected:
       return BT::NodeStatus::FAILURE;
     }
 
-    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 5.0);
+    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 7.0);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
     if (front_pose) {

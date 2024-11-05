@@ -307,7 +307,7 @@ protected:
   }
 
   std::optional<geometry_msgs::msg::Pose> getFrontPoseOfObject(
-    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 5.0) const
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0) const
   {
     const auto current_pose = getCurrentPose();
     if (!current_pose) {
