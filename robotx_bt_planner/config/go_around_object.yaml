@@ -1,0 +1,9 @@
+plugins:
+  - package: robotx_behavior_tree
+    name:
+      - go_around_object
+      - move_goal_action
+behavior:
+  description:
+    package: robotx_bt_planner
+    path : behavior_trees/go_around_object.xml
