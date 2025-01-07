@@ -79,6 +79,9 @@ protected:
 
   BT::NodeStatus onRunning() override
   {
+    static int count = 0;
+    // count++;
+    // RCLCPP_INFO(get_logger(), "Count: %d", count);
     const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
@@ -107,8 +110,18 @@ protected:
     if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
     }
-
-    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 7.0);
+    
+    auto distance = 11.0;
+    // RCLCPP_INFO(get_logger(), "Count: %d", count);
+    if (count == 0) {
+      distance = 11.0;
+    } else if (count == 1) {
+      distance = 5.0;
+    } else {
+      distance = 11.0;
+    }
+    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
+    RCLCPP_INFO(get_logger(), "distance: %f", distance);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
     if (front_pose) {
@@ -127,9 +140,12 @@ protected:
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
 
     if (distance_ < goal_tolerance_) {
+      count = 1;
+    } 
+    if (false) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
-    }
+    } 
 
     return BT::NodeStatus::RUNNING;
   }
