@@ -112,7 +112,7 @@ protected:
     }
     
     auto distance = 11.0;
-    // RCLCPP_INFO(get_logger(), "Count: %d", count);
+    RCLCPP_INFO(get_logger(), "Count: %d", count);
     if (count == 0) {
       distance = 11.0;
     } else if (count == 1) {
@@ -126,7 +126,9 @@ protected:
     goal_.header.frame_id = "map";
     if (front_pose) {
       goal_.pose.position.x = front_pose.value().position.x;
+      // RCLCPP_INFO(get_logger(), "front_pose.value().position.x: %f", front_pose.value().position.x);
       goal_.pose.position.y = front_pose.value().position.y;
+      // RCLCPP_INFO(get_logger(), "front_pose.value().position.y: %f", front_pose.value().position.y);
       goal_.pose.position.z = front_pose.value().position.z;
       goal_.pose.orientation.w = front_pose.value().orientation.w;
       goal_.pose.orientation.x = front_pose.value().orientation.x;
@@ -134,12 +136,17 @@ protected:
       goal_.pose.orientation.z = front_pose.value().orientation.z;
     }
     goal_.header.stamp = get_clock()->now();
-    if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
-      goal_pub_front_pose_of_object_->publish(goal_);
-    }
+
+    RCLCPP_INFO(get_logger(), "status_planner.value()->status: %d", status_planner.value()->status);
+    // if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
+    //   RCLCPP_INFO(get_logger(), "front_pose.value().position.y: %f", front_pose.value().position.y);
+    //   goal_pub_front_pose_of_object_->publish(goal_);
+    // }
+    goal_pub_front_pose_of_object_->publish(goal_);
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
 
     if (distance_ < goal_tolerance_) {
+      // return BT::NodeStatus::WAITING_FOR_GOAL; // error
       count = 1;
     } 
     if (false) {
@@ -147,7 +154,8 @@ protected:
       return BT::NodeStatus::SUCCESS;
     } 
 
-    return BT::NodeStatus::RUNNING;
+    return BT::NodeStatus::SUCCESS;
+    // return BT::NodeStatus::RUNNING;
   }
 };
 }  // namespace robotx_behavior_tree
