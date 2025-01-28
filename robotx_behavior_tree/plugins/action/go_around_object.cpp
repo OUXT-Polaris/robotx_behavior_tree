@@ -110,18 +110,19 @@ protected:
     if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
     }
-    
+
     auto distance = 11.0;
     RCLCPP_INFO(get_logger(), "Count: %d", count);
     if (count == 0) {
       distance = 11.0;
     } else if (count == 1) {
-      distance = 5.0;
+      distance = 11.0;
+      // distance = 5.0;
     } else {
       distance = 11.0;
     }
     const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
-    RCLCPP_INFO(get_logger(), "distance: %f", distance);
+    // RCLCPP_INFO(get_logger(), "distance: %f", distance);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
     if (front_pose) {
@@ -148,11 +149,11 @@ protected:
     if (distance_ < goal_tolerance_) {
       // return BT::NodeStatus::WAITING_FOR_GOAL; // error
       count = 1;
-    } 
+    }
     if (false) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
-    } 
+    }
 
     return BT::NodeStatus::SUCCESS;
     // return BT::NodeStatus::RUNNING;
