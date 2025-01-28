@@ -80,8 +80,7 @@ protected:
   BT::NodeStatus onRunning() override
   {
     static int count = 0;
-    // count++;
-    // RCLCPP_INFO(get_logger(), "Count: %d", count);
+    RCLCPP_INFO(get_logger(), "Count: %d", count);
     const auto status_planner = getPlannerStatus();
     const auto pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
@@ -111,17 +110,41 @@ protected:
       return BT::NodeStatus::FAILURE;
     }
 
-    auto distance = 11.0;
-    RCLCPP_INFO(get_logger(), "Count: %d", count);
-    if (count == 0) {
-      distance = 11.0;
-    } else if (count == 1) {
-      distance = 11.0;
-      // distance = 5.0;
-    } else {
-      distance = 11.0;
-    }
-    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
+    auto distance = 5.0;
+    // if (count == 0) {
+    //   distance = 5.0;
+    // } else if (count == 1) {
+    //   distance = 5.0;
+    // } else {
+    //   distance = 5.0;
+    // }
+
+    // static const auto around_pose_a = getFrontPoseOfObject(target_objects_array_[0], distance, 0);
+    // static const auto around_pose_b = getFrontPoseOfObject(target_objects_array_[0], distance, 1);
+    // static const auto around_pose_c = getFrontPoseOfObject(target_objects_array_[0], distance, 2);
+    // static const auto around_pose_d = getFrontPoseOfObject(target_objects_array_[0], distance, 3);
+    // const auto target_pose = around_pose_a;
+    // if (count == 0) {
+    //   target_pose = around_pose_a;
+    // } else if (count == 1) {
+    //   target_pose = around_pose_b;
+    // } else if (count == 2) {
+    //   target_pose = around_pose_c;
+    // } else if (count == 3) {
+    //   target_pose = around_pose_d;
+    // } else {
+    //   target_pose = around_pose_a;
+    // }
+
+    // const int around_pose_maximum = 4;
+    // std::array<auto, around_pose_maximum> around_pose;     // int型、要素数10
+    // for(int i = 0; i < around_pose_maximum; i++) {
+    //     around_pose[i] = getAroundPoseOfObject(target_objects_array_[0], distance, i);
+    // }
+
+    int goal_position_num = 0;
+    const auto front_pose = getAroundPoseOfObject(target_objects_array_[0], distance, goal_position_num);
+    // const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
     // RCLCPP_INFO(get_logger(), "distance: %f", distance);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
@@ -148,7 +171,8 @@ protected:
 
     if (distance_ < goal_tolerance_) {
       // return BT::NodeStatus::WAITING_FOR_GOAL; // error
-      count = 1;
+      count++;
+      count = count % 4;
     }
     if (false) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");

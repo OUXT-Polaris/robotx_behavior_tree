@@ -333,6 +333,34 @@ protected:
     return p;
   }
 
+  // std::optional<geometry_msgs::msg::Pose> getAroundPoseOfObject(
+  //   const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0,
+  //   const int bouy_num = 0) const
+  // {
+  //   const auto current_pose = getCurrentPose();
+  //   if (!current_pose) {
+  //     return std::nullopt;
+  //   }
+  //   double delta_x = obj.x - current_pose.value()->pose.position.x;
+  //   double delta_y = obj.y - current_pose.value()->pose.position.y;
+  //   const double minimum_delta = 0.1;
+  //   if (abs(delta_x) < minimum_delta) {
+  //     delta_x = minimum_delta;
+  //   }
+  //   if (abs(delta_y) < minimum_delta) {
+  //     delta_y = minimum_delta;
+  //   }
+  //   double theta = std::atan2(delta_y, delta_x);
+  //   geometry_msgs::msg::Pose p;
+  //   p.position.x = obj.x - distance * std::cos(theta);
+  //   p.position.y = obj.y - distance * std::sin(theta);
+  //   p.position.z = 0.0;
+  //   geometry_msgs::msg::Vector3 goal_rpy;
+  //   goal_rpy.z = theta;
+  //   p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
+  //   return p;
+  // }
+
   std::optional<geometry_msgs::msg::Pose> getAroundPoseOfObject(
     const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0,
     const int bouy_num = 0) const
