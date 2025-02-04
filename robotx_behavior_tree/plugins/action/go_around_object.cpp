@@ -33,7 +33,7 @@ public:
   GoAroundObject(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
-    declare_parameter("goal_tolerance", 5.0);
+    declare_parameter("goal_tolerance", 0.5);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_pub_front_pose_of_object_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
@@ -46,10 +46,8 @@ public:
 
 private:
   rclcpp::TimerBase::SharedPtr update_position_timer_;
-  float goal_distance_;
   double goal_tolerance_;
-  // static int count = 0;
-  geometry_msgs::msg::PoseStamped goal_;
+  geometry_msgs::msg::PoseStamped target_pose_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_front_pose_of_object_;
   std::vector<robotx_behavior_msgs::msg::TaskObject> target_objects_array_;
 
@@ -64,20 +62,36 @@ private:
     MOVING_TO_GOAL = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL,
     AVOIDING = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL
   };
+  enum class Order : short { FIRST, SUBSEQUENT };
 
 protected:
-  // BT::NodeStatus dispQWR() 
-  // {
-  //   RCLCPP_INFO(get_logger(), "super qwerty: %d", 39);
-  //   return BT::NodeStatus::FAILURE;
-  //   // return 0;
-  // }
-
-  BT::NodeStatus dispQWR() 
+  void publish_waypoint_pose(
+    const std::optional<
+      std::shared_ptr<geometry_msgs::msg::PoseStamped_<std::allocator<void> > > > & current_pose,
+    const std::optional<geometry_msgs::msg::Pose> & waypoint_pose)
   {
-    const auto status_planner = getPlannerStatus();
-    RCLCPP_INFO(get_logger(), "status_planner.value()->status: %d", status_planner.value()->status);
-    const auto pose = getCurrentPose();
+    if (waypoint_pose) {
+      target_pose_.header.frame_id = "map";
+      target_pose_.pose.position.x = waypoint_pose.value().position.x;
+      target_pose_.pose.position.y = waypoint_pose.value().position.y;
+      target_pose_.pose.position.z = waypoint_pose.value().position.z;
+      target_pose_.pose.orientation.w = waypoint_pose.value().orientation.w;
+      target_pose_.pose.orientation.x = waypoint_pose.value().orientation.x;
+      target_pose_.pose.orientation.y = waypoint_pose.value().orientation.y;
+      target_pose_.pose.orientation.z = waypoint_pose.value().orientation.z;
+    }
+    target_pose_.header.stamp = get_clock()->now();
+    auto target_waypoint_distance =
+      getDistance(current_pose.value()->pose.position, target_pose_.pose.position);
+    if (target_waypoint_distance > goal_tolerance_) {
+      goal_pub_front_pose_of_object_->publish(target_pose_);
+    }
+  }
+
+  BT::NodeStatus publish_target_pose(Order order = Order::FIRST)
+  {
+    target_pose_.header.frame_id = "map";
+    const auto current_pose = getCurrentPose();
     const auto task_objects_array = getTaskObjects();
     auto object_type = this->getInput<std::string>("object_type");
 
@@ -98,131 +112,60 @@ protected:
         return BT::NodeStatus::FAILURE;
       }
     }
-    sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
+    sortBy2DDistance(target_objects_array_, current_pose.value()->pose.position);
     if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
     }
 
-    auto bouy_distance = 5.5;
-    int goal_position_num = 0;
-    const auto goal_pose = getAroundPoseOfObject(target_objects_array_[0], bouy_distance, goal_position_num);
+    const auto bouy_distance = 5.5;
+    const auto goal_position_num = 0;
+    const auto target_waypoint_distance =
+      getDistance(current_pose.value()->pose.position, target_pose_.pose.position);
+    const auto waypoint_pose =
+      getAroundPoseOfObject(target_objects_array_[0], bouy_distance, goal_position_num);
     get_parameter("goal_tolerance", goal_tolerance_);
-    goal_.header.frame_id = "map";
-    if (goal_pose) {
-      goal_.pose.position.x = goal_pose.value().position.x;
-      goal_.pose.position.y = goal_pose.value().position.y;
-      goal_.pose.position.z = goal_pose.value().position.z;
-      goal_.pose.orientation.w = goal_pose.value().orientation.w;
-      goal_.pose.orientation.x = goal_pose.value().orientation.x;
-      goal_.pose.orientation.y = goal_pose.value().orientation.y;
-      goal_.pose.orientation.z = goal_pose.value().orientation.z;
+    if (order == Order::FIRST) {
+      publish_waypoint_pose(current_pose, waypoint_pose);
     }
-    goal_.header.stamp = get_clock()->now();
-    goal_distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
-    static int count = 0;
-    RCLCPP_INFO(get_logger(), "Count: %d", count);
-    RCLCPP_INFO(get_logger(), "goal_distance_: %f", goal_distance_);
+    if (target_waypoint_distance < goal_tolerance_) {
+      publish_waypoint_pose(current_pose, waypoint_pose);
+    }
+    RCLCPP_INFO(get_logger(), "target_waypoint_distance: %f", target_waypoint_distance);
     RCLCPP_INFO(get_logger(), "goal_tolerance_: %f", goal_tolerance_);
-    if (goal_distance_ < goal_tolerance_) {
-      goal_pub_front_pose_of_object_->publish(goal_);
-    }
-    if (count == 0) {
-      goal_pub_front_pose_of_object_->publish(goal_);
-      count++;
-    }
+    return BT::NodeStatus::RUNNING;
   }
 
   BT::NodeStatus onStart() override
   {
     const auto status_planner = getPlannerStatus();
+    RCLCPP_INFO(get_logger(), "WAITING_FOR_GOAL: 0 / MOVING_TO_GOAL: 1 / AVOIDING: 2");
     RCLCPP_INFO(get_logger(), "status_planner.value()->status: %d", status_planner.value()->status);
-    RCLCPP_INFO(get_logger(), "qwerty: %d", status_planner.value()->status);
     const auto task_objects_array = getTaskObjects();
     if (task_objects_array) {
+      const auto result_publish = publish_target_pose(Order::FIRST);
+      if (result_publish == BT::NodeStatus::FAILURE) {
+        RCLCPP_INFO(get_logger(), "Throgh Goal : FAILURE");
+        return BT::NodeStatus::FAILURE;
+      } else if (result_publish == BT::NodeStatus::SUCCESS) {
+        RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
+        return BT::NodeStatus::SUCCESS;
+      }
       RCLCPP_INFO(get_logger(), "get task_objects");
       return BT::NodeStatus::RUNNING;
     } else {
       RCLCPP_INFO(get_logger(), "Not Found task_objects");
       return BT::NodeStatus::FAILURE;
     }
+    return BT::NodeStatus::RUNNING;
   }
 
   BT::NodeStatus onRunning() override
   {
-    // const auto result_dispQWR = dispQWR();
-    // if (result_dispQWR == BT::NodeStatus::FAILURE) {
-    //   RCLCPP_INFO(get_logger(), "Throgh Goal : FAILURE");
-    //   return BT::NodeStatus::FAILURE;
-    // } else if (result_dispQWR == BT::NodeStatus::SUCCESS) {
-    //   RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
-    //   return BT::NodeStatus::SUCCESS;
-    // // } 
-
-    const auto result_dispQWR = dispQWR();
-    if (result_dispQWR == BT::NodeStatus::FAILURE) {
+    const auto result_publish_target_pose = publish_target_pose(Order::SUBSEQUENT);
+    if (result_publish_target_pose == BT::NodeStatus::FAILURE) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : FAILURE");
       return BT::NodeStatus::FAILURE;
-    } else if (result_dispQWR == BT::NodeStatus::SUCCESS) {
-      RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
-      return BT::NodeStatus::SUCCESS;
-    } 
-
-    // const auto status_planner = getPlannerStatus();
-    // RCLCPP_INFO(get_logger(), "status_planner.value()->status: %d", status_planner.value()->status);
-    // const auto pose = getCurrentPose();
-    // const auto task_objects_array = getTaskObjects();
-    // auto object_type = this->getInput<std::string>("object_type");
-
-    // if (task_objects_array) {
-    //   if (object_type.value() == "red_bouy") {
-    //     target_objects_array_ =
-    //       filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
-    //   } else if (object_type.value() == "green_bouy") {
-    //     target_objects_array_ =
-    //       filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
-    //   } else if (object_type.value() == "white_bouy") {
-    //     target_objects_array_ =
-    //       filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
-    //   } else if (object_type.value() == "black_bouy") {
-    //     target_objects_array_ =
-    //       filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
-    //   } else {
-    //     return BT::NodeStatus::FAILURE;
-    //   }
-    // }
-    // sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
-    // if (target_objects_array_.empty()) {
-    //   return BT::NodeStatus::FAILURE;
-    // }
-
-    // auto bouy_distance = 5.5;
-    // int goal_position_num = 0;
-    // const auto goal_pose = getAroundPoseOfObject(target_objects_array_[0], bouy_distance, goal_position_num);
-    // get_parameter("goal_tolerance", goal_tolerance_);
-    // goal_.header.frame_id = "map";
-    // if (goal_pose) {
-    //   goal_.pose.position.x = goal_pose.value().position.x;
-    //   goal_.pose.position.y = goal_pose.value().position.y;
-    //   goal_.pose.position.z = goal_pose.value().position.z;
-    //   goal_.pose.orientation.w = goal_pose.value().orientation.w;
-    //   goal_.pose.orientation.x = goal_pose.value().orientation.x;
-    //   goal_.pose.orientation.y = goal_pose.value().orientation.y;
-    //   goal_.pose.orientation.z = goal_pose.value().orientation.z;
-    // }
-    // goal_.header.stamp = get_clock()->now();
-    // goal_distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
-    // static int count = 0;
-    // RCLCPP_INFO(get_logger(), "Count: %d", count);
-    // RCLCPP_INFO(get_logger(), "goal_distance_: %f", goal_distance_);
-    // RCLCPP_INFO(get_logger(), "goal_tolerance_: %f", goal_tolerance_);
-    // if (goal_distance_ < goal_tolerance_) {
-    //   goal_pub_front_pose_of_object_->publish(goal_);
-    // }
-    // if (count == 0) {
-    //   goal_pub_front_pose_of_object_->publish(goal_);
-    //   count++;
-    // }
-    if (false) {
+    } else if (result_publish_target_pose == BT::NodeStatus::SUCCESS) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
     }

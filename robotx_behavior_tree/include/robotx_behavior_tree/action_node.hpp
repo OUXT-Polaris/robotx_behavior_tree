@@ -351,8 +351,10 @@ protected:
       delta_y = minimum_delta;
     }
     const double front_position_theta = std::atan2(delta_y, delta_x);
-    const double around_position_theta = front_position_theta + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
-    const double orientation_theta = front_position_theta - 3.14 / 2.0 + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
+    const double around_position_theta =
+      front_position_theta + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
+    const double orientation_theta =
+      front_position_theta - 3.14 / 2.0 + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
     geometry_msgs::msg::Pose p;
     p.position.x = obj.x - distance * std::cos(around_position_theta);
     p.position.y = obj.y - distance * std::sin(around_position_theta);

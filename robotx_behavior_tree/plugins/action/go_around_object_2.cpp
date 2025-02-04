@@ -143,7 +143,8 @@ protected:
     // }
 
     int goal_position_num = 0;
-    const auto front_pose = getAroundPoseOfObject(target_objects_array_[0], distance, goal_position_num);
+    const auto front_pose =
+      getAroundPoseOfObject(target_objects_array_[0], distance, goal_position_num);
     // const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
     // RCLCPP_INFO(get_logger(), "distance: %f", distance);
     get_parameter("goal_tolerance", goal_tolerance_);
