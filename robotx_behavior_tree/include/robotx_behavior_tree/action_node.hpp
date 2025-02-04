@@ -333,36 +333,8 @@ protected:
     return p;
   }
 
-  // std::optional<geometry_msgs::msg::Pose> getAroundPoseOfObject(
-  //   const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0,
-  //   const int bouy_num = 0) const
-  // {
-  //   const auto current_pose = getCurrentPose();
-  //   if (!current_pose) {
-  //     return std::nullopt;
-  //   }
-  //   double delta_x = obj.x - current_pose.value()->pose.position.x;
-  //   double delta_y = obj.y - current_pose.value()->pose.position.y;
-  //   const double minimum_delta = 0.1;
-  //   if (abs(delta_x) < minimum_delta) {
-  //     delta_x = minimum_delta;
-  //   }
-  //   if (abs(delta_y) < minimum_delta) {
-  //     delta_y = minimum_delta;
-  //   }
-  //   double theta = std::atan2(delta_y, delta_x);
-  //   geometry_msgs::msg::Pose p;
-  //   p.position.x = obj.x - distance * std::cos(theta);
-  //   p.position.y = obj.y - distance * std::sin(theta);
-  //   p.position.z = 0.0;
-  //   geometry_msgs::msg::Vector3 goal_rpy;
-  //   goal_rpy.z = theta;
-  //   p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
-  //   return p;
-  // }
-
   std::optional<geometry_msgs::msg::Pose> getAroundPoseOfObject(
-    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0,
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 5.5,
     const int bouy_num = 0) const
   {
     const auto current_pose = getCurrentPose();
@@ -379,8 +351,8 @@ protected:
       delta_y = minimum_delta;
     }
     const double front_position_theta = std::atan2(delta_y, delta_x);
-    const double around_position_theta = front_position_theta + M_PI / 4.0 + M_PI / 2.0 * bouy_num;
-    const double orientation_theta = front_position_theta - M_PI / 4.0 + M_PI / 2.0 * bouy_num;
+    const double around_position_theta = front_position_theta + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
+    const double orientation_theta = front_position_theta - 3.14 / 2.0 + 2 * 3.14 * 90.0 / 360.0 + 3.14 / 2.0 * bouy_num;
     geometry_msgs::msg::Pose p;
     p.position.x = obj.x - distance * std::cos(around_position_theta);
     p.position.y = obj.y - distance * std::sin(around_position_theta);

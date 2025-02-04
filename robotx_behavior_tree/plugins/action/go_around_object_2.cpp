@@ -1,0 +1,190 @@
+// Copyright (c) 2024, OUXT-Polaris
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "hermite_path_msgs/msg/planner_status.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "robotx_behavior_msgs/msg/task_object.hpp"
+#include "robotx_behavior_tree/action_node.hpp"
+
+namespace robotx_behavior_tree
+{
+class GoAroundObject : public ActionROS2Node
+{
+public:
+  GoAroundObject(const std::string & name, const BT::NodeConfiguration & config)
+  : ActionROS2Node(name, config)
+  {
+    declare_parameter("goal_tolerance", 1.0);
+    get_parameter("goal_tolerance", goal_tolerance_);
+    goal_pub_front_pose_of_object_ =
+      this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+  }
+  static BT::PortsList providedPorts()
+  {
+    return appendPorts(
+      ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("object_type")});
+  }
+
+private:
+  rclcpp::TimerBase::SharedPtr update_position_timer_;
+  float distance_;
+  double goal_tolerance_;
+  geometry_msgs::msg::PoseStamped goal_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_front_pose_of_object_;
+  std::vector<robotx_behavior_msgs::msg::TaskObject> target_objects_array_;
+
+  enum class Buoy : short {
+    BUOY_RED = robotx_behavior_msgs::msg::TaskObject::BUOY_RED,
+    BUOY_GREEN = robotx_behavior_msgs::msg::TaskObject::BUOY_GREEN,
+    BUOY_WHITE = robotx_behavior_msgs::msg::TaskObject::BUOY_WHITE,
+    BUOY_BLACK = robotx_behavior_msgs::msg::TaskObject::BUOY_BLACK
+  };
+  enum class Status : short {
+    WAITING_FOR_GOAL = hermite_path_msgs::msg::PlannerStatus::WAITING_FOR_GOAL,
+    MOVING_TO_GOAL = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL,
+    AVOIDING = hermite_path_msgs::msg::PlannerStatus::MOVING_TO_GOAL
+  };
+
+protected:
+  BT::NodeStatus onStart() override
+  {
+    const auto status_planner = getPlannerStatus();
+    const auto task_objects_array = getTaskObjects();
+    if (task_objects_array) {
+      RCLCPP_INFO(get_logger(), "get task_objects");
+      return BT::NodeStatus::RUNNING;
+    } else {
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+
+  BT::NodeStatus onRunning() override
+  {
+    static int count = 0;
+    RCLCPP_INFO(get_logger(), "Count: %d", count);
+    const auto status_planner = getPlannerStatus();
+    const auto pose = getCurrentPose();
+    const auto task_objects_array = getTaskObjects();
+
+    auto object_type = this->getInput<std::string>("object_type");
+
+    if (task_objects_array) {
+      if (object_type.value() == "red_bouy") {
+        target_objects_array_ =
+          filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_RED));
+      } else if (object_type.value() == "green_bouy") {
+        target_objects_array_ =
+          filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_GREEN));
+      } else if (object_type.value() == "white_bouy") {
+        target_objects_array_ =
+          filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_WHITE));
+      } else if (object_type.value() == "black_bouy") {
+        target_objects_array_ =
+          filter(task_objects_array.value(), static_cast<short>(Buoy::BUOY_BLACK));
+      } else {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+
+    sortBy2DDistance(target_objects_array_, pose.value()->pose.position);
+    if (target_objects_array_.empty()) {
+      return BT::NodeStatus::FAILURE;
+    }
+
+    auto distance = 5.0;
+    // if (count == 0) {
+    //   distance = 5.0;
+    // } else if (count == 1) {
+    //   distance = 5.0;
+    // } else {
+    //   distance = 5.0;
+    // }
+
+    // static const auto around_pose_a = getFrontPoseOfObject(target_objects_array_[0], distance, 0);
+    // static const auto around_pose_b = getFrontPoseOfObject(target_objects_array_[0], distance, 1);
+    // static const auto around_pose_c = getFrontPoseOfObject(target_objects_array_[0], distance, 2);
+    // static const auto around_pose_d = getFrontPoseOfObject(target_objects_array_[0], distance, 3);
+    // const auto target_pose = around_pose_a;
+    // if (count == 0) {
+    //   target_pose = around_pose_a;
+    // } else if (count == 1) {
+    //   target_pose = around_pose_b;
+    // } else if (count == 2) {
+    //   target_pose = around_pose_c;
+    // } else if (count == 3) {
+    //   target_pose = around_pose_d;
+    // } else {
+    //   target_pose = around_pose_a;
+    // }
+
+    // const int around_pose_maximum = 4;
+    // std::array<auto, around_pose_maximum> around_pose;     // int型、要素数10
+    // for(int i = 0; i < around_pose_maximum; i++) {
+    //     around_pose[i] = getAroundPoseOfObject(target_objects_array_[0], distance, i);
+    // }
+
+    int goal_position_num = 0;
+    const auto front_pose = getAroundPoseOfObject(target_objects_array_[0], distance, goal_position_num);
+    // const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], distance);
+    // RCLCPP_INFO(get_logger(), "distance: %f", distance);
+    get_parameter("goal_tolerance", goal_tolerance_);
+    goal_.header.frame_id = "map";
+    if (front_pose) {
+      goal_.pose.position.x = front_pose.value().position.x;
+      // RCLCPP_INFO(get_logger(), "front_pose.value().position.x: %f", front_pose.value().position.x);
+      goal_.pose.position.y = front_pose.value().position.y;
+      // RCLCPP_INFO(get_logger(), "front_pose.value().position.y: %f", front_pose.value().position.y);
+      goal_.pose.position.z = front_pose.value().position.z;
+      goal_.pose.orientation.w = front_pose.value().orientation.w;
+      goal_.pose.orientation.x = front_pose.value().orientation.x;
+      goal_.pose.orientation.y = front_pose.value().orientation.y;
+      goal_.pose.orientation.z = front_pose.value().orientation.z;
+    }
+    goal_.header.stamp = get_clock()->now();
+
+    RCLCPP_INFO(get_logger(), "status_planner.value()->status: %d", status_planner.value()->status);
+    // if (status_planner.value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
+    //   RCLCPP_INFO(get_logger(), "front_pose.value().position.y: %f", front_pose.value().position.y);
+    //   goal_pub_front_pose_of_object_->publish(goal_);
+    // }
+    goal_pub_front_pose_of_object_->publish(goal_);
+    distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
+
+    if (distance_ < goal_tolerance_) {
+      // return BT::NodeStatus::WAITING_FOR_GOAL; // error
+      count++;
+      count = count % 4;
+    }
+    if (false) {
+      RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
+      return BT::NodeStatus::SUCCESS;
+    }
+
+    return BT::NodeStatus::SUCCESS;
+    // return BT::NodeStatus::RUNNING;
+  }
+};
+}  // namespace robotx_behavior_tree
+
+#include "behavior_tree_action_builder/register_nodes.hpp"  // NOLINT
+
+REGISTER_NODES(robotx_behavior_tree, GoAroundObject)
