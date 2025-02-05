@@ -1,7 +1,7 @@
 <root main_tree_to_execute = "MainTree" >
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="GoAroundObject" task_objects="{task_objects}" object_type="red_bouy"/>
+            <Action ID="GoAroundObject" task_objects="{task_objects}" object_type="green_bouy" turning_direction="clockwise" turning_angle="45.2"/>
         </Sequence>
     </BehaviorTree>
 </root>
