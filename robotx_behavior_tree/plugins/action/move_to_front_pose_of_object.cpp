@@ -33,7 +33,7 @@ public:
   MoveToFrontPoseOfObject(const std::string & name, const BT::NodeConfiguration & config)
   : ActionROS2Node(name, config)
   {
-    declare_parameter("goal_tolerance", 1.0);
+    declare_parameter("goal_tolerance", 0.5);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_pub_front_pose_of_object_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
@@ -41,7 +41,8 @@ public:
   static BT::PortsList providedPorts()
   {
     return appendPorts(
-      ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("object_type")});
+      ActionROS2Node::providedPorts(), {BT::InputPort<std::string>("object_type"),
+                                        BT::InputPort<double>("distance_from_object_to_goal")});
   }
 
 private:
@@ -107,8 +108,13 @@ protected:
     if (target_objects_array_.empty()) {
       return BT::NodeStatus::FAILURE;
     }
-
-    const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 7.0);
+    const auto interim_distance_from_object_to_goal =
+      this->getInput<double>("distance_from_object_to_goal");
+    const auto distance_from_object_to_goal = interim_distance_from_object_to_goal.value();
+    RCLCPP_INFO(get_logger(), "distance_from_object_to_goal: %f", distance_from_object_to_goal);
+    const auto front_pose =
+      getFrontPoseOfObject(target_objects_array_[0], distance_from_object_to_goal);
+    // const auto front_pose = getFrontPoseOfObject(target_objects_array_[0], 7.0);
     get_parameter("goal_tolerance", goal_tolerance_);
     goal_.header.frame_id = "map";
     if (front_pose) {
@@ -125,13 +131,14 @@ protected:
       goal_pub_front_pose_of_object_->publish(goal_);
     }
     distance_ = getDistance(pose.value()->pose.position, goal_.pose.position);
-
+    RCLCPP_INFO(get_logger(), "distance: %f", distance_);
+    RCLCPP_INFO(get_logger(), "goal_tolerance: %f", goal_tolerance_);
     if (distance_ < goal_tolerance_) {
       RCLCPP_INFO(get_logger(), "Throgh Goal : SUCCESS");
       return BT::NodeStatus::SUCCESS;
+    } else {
+      return BT::NodeStatus::RUNNING;
     }
-
-    return BT::NodeStatus::RUNNING;
   }
 };
 }  // namespace robotx_behavior_tree

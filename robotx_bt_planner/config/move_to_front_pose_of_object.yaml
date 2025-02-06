@@ -2,6 +2,7 @@ plugins:
   - package: robotx_behavior_tree
     name:
       - move_to_front_pose_of_object
+      - wait_action
       - move_goal_action
 behavior:
   description:

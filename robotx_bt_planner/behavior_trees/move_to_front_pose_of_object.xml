@@ -1,7 +1,19 @@
 <root main_tree_to_execute = "MainTree" >
     <BehaviorTree ID="MainTree">
         <Sequence>
-            <Action ID="MoveToFrontPoseOfObject" task_objects="{task_objects}" object_type="red_bouy"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveGoalAction" goal_x="2.5" goal_y="0.8" goal_theta="0.4"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveToFrontPoseOfObject" task_objects="{task_objects}" object_type="green_bouy" distance_from_object_to_goal="4.0"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveToFrontPoseOfObject" task_objects="{task_objects}" object_type="red_bouy" distance_from_object_to_goal="6.0"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveGoalAction" goal_x="5.0" goal_y="10.0" goal_theta="3.14"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveGoalAction" goal_x="-9.0" goal_y="9.0" goal_theta="-2.35"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
+            <Action ID="MoveGoalAction" goal_x="-9.0" goal_y="1.0" goal_theta="-0.78"/>
+            <Action ID="WaitAction" wait_time="3.0"/>
         </Sequence>
     </BehaviorTree>
 </root>

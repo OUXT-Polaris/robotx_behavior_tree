@@ -314,7 +314,7 @@ protected:
     const double interim_delta_x = x2 - x1;
     const double delta_x = abs(interim_delta_x) < minimum_delta ? minimum_delta : interim_delta_x;
     const double interim_delta_y = y2 - y1;
-    const double delta_y = abs(interim_delta_x) < minimum_delta ? minimum_delta : interim_delta_y;
+    const double delta_y = abs(interim_delta_y) < minimum_delta ? minimum_delta : interim_delta_y;
     const double relative_angle = std::atan2(delta_y, delta_x);
     return relative_angle;
   }
@@ -327,7 +327,7 @@ protected:
     }
     const double object_direction_rad = getRelativeAngle(
       current_pose.value()->pose.position.x, current_pose.value()->pose.position.y, obj.x, obj.y,
-      0.1);
+      0.4);
     return object_direction_rad;
   }
 
