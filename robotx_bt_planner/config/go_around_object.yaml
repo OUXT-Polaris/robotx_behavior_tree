@@ -3,6 +3,7 @@ plugins:
     name:
       - go_around_object
       - move_goal_action
+      - wait_action
 behavior:
   description:
     package: robotx_bt_planner
