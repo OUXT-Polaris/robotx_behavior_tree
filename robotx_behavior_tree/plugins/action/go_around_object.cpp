@@ -106,8 +106,8 @@ private:
         delta_turning_angle_rad = interim_delta_turning_angle_rad -
                                   copysign(1.0, interim_delta_turning_angle_rad) * 2 * M_PI;
       }
-      RCLCPP_INFO(get_logger(), "target_objects_array_[0].x): %f", target_objects_array_[0].x);
-      RCLCPP_INFO(get_logger(), "target_objects_array_[0].y): %f", target_objects_array_[0].y);
+      RCLCPP_INFO(get_logger(), "target_objects_array_[0].x: %f", target_objects_array_[0].x);
+      RCLCPP_INFO(get_logger(), "target_objects_array_[0].y: %f", target_objects_array_[0].y);
       RCLCPP_INFO(
         get_logger(), "current_pose_.value()->pose.position.x: %f",
         current_pose_.value()->pose.position.x);
