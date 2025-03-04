@@ -120,7 +120,7 @@ private:
     return delta_turning_angle_rad;
   }
 
-  void publish_waypoint_pose(const std::optional<geometry_msgs::msg::Pose> & waypoint_pose)
+  void publishWaypointPose(const std::optional<geometry_msgs::msg::Pose> & waypoint_pose)
   {
     if (waypoint_pose) {
       target_pose_.header.frame_id = "map";
@@ -218,7 +218,7 @@ private:
   }
 
 protected:
-  BT::NodeStatus publish_target_pose(const BehaviorState BehaviorState)
+  BT::NodeStatus publishTargetPose(const BehaviorState BehaviorState)
   {
     if (BehaviorState == BehaviorState::FIRST) {
       is_first_waypoint_ = true;
@@ -250,10 +250,10 @@ protected:
     auto waypoint_pose = getTurningWaypointPoseOfObject(
       target_objects_array_[0], bouy_distance_, turning_direction_, waypoint_angle_deg_);
     if (BehaviorState == BehaviorState::FIRST) {
-      publish_waypoint_pose(waypoint_pose);
+      publishWaypointPose(waypoint_pose);
       RCLCPP_INFO(get_logger(), "published waypoint pose");
     }else if (target_waypoint_distance < goal_tolerance_) {
-      publish_waypoint_pose(waypoint_pose);
+      publishWaypointPose(waypoint_pose);
       RCLCPP_INFO(get_logger(), "published waypoint pose");
       is_first_waypoint_ = false;
     }
@@ -263,9 +263,9 @@ protected:
     return BT::NodeStatus::RUNNING;
   }
 
-  BT::NodeStatus onStart() override { return publish_target_pose(BehaviorState::FIRST); }
+  BT::NodeStatus onStart() override { return publishTargetPose(BehaviorState::FIRST); }
 
-  BT::NodeStatus onRunning() override { return publish_target_pose(BehaviorState::SUBSEQUENT); }
+  BT::NodeStatus onRunning() override { return publishTargetPose(BehaviorState::SUBSEQUENT); }
 };
 }  // namespace robotx_behavior_tree
 
