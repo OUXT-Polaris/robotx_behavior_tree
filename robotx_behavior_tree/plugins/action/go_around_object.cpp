@@ -171,16 +171,16 @@ private:
     auto total_turning_angle_rad = accumulated_movement_rad_ + delta_turning_angle_rad;
     auto total_turning_angle_deg = 180.0 * total_turning_angle_rad / M_PI;
     const auto target_orbit_angle = this->getInput<double>("orbit_angle").value();
-    is_final_waypoint_ =
-      !(BehaviorState == BehaviorState::FIRST) &&
-      abs(total_turning_angle_deg) > abs(target_orbit_angle) - split_angle_deg_;
+    is_final_waypoint_ = !(BehaviorState == BehaviorState::FIRST) &&
+                         abs(total_turning_angle_deg) > abs(target_orbit_angle) - split_angle_deg_;
     if (is_final_waypoint_) {
       waypoint_angle_deg_ = abs(target_orbit_angle) - abs(total_turning_angle_deg);
     } else {
       waypoint_angle_deg_ = split_angle_deg_;
     }
     RCLCPP_INFO(get_logger(), "abs_angle_threshold_deg: %f", abs_angle_threshold_deg_);
-    RCLCPP_INFO(get_logger(), "delta_turning_angle_deg: %f", 180.0 * delta_turning_angle_rad / M_PI);
+    RCLCPP_INFO(
+      get_logger(), "delta_turning_angle_deg: %f", 180.0 * delta_turning_angle_rad / M_PI);
     RCLCPP_INFO(get_logger(), "total_turning_angle_deg: %f", total_turning_angle_deg);
     RCLCPP_INFO(get_logger(), "waypoint_angle_deg_: %f", waypoint_angle_deg_);
   }
@@ -252,7 +252,7 @@ protected:
     if (BehaviorState == BehaviorState::FIRST) {
       publishWaypointPose(waypoint_pose);
       RCLCPP_INFO(get_logger(), "published waypoint pose");
-    }else if (target_waypoint_distance < goal_tolerance_) {
+    } else if (target_waypoint_distance < goal_tolerance_) {
       publishWaypointPose(waypoint_pose);
       RCLCPP_INFO(get_logger(), "published waypoint pose");
       is_first_waypoint_ = false;

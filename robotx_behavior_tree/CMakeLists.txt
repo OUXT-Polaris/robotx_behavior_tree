@@ -7,7 +7,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
@@ -56,13 +56,9 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_auto_add_gtest(test_action_node test/src/test_action_node.cpp)
-  ament_add_gtest(test_go_around_object 
+  ament_auto_add_gtest(test_go_around_object
     test/src/test_go_around_object.cpp
     plugins/action/go_around_object.cpp)
-  ament_target_dependencies(test_go_around_object quaternion_operation)
-  ament_target_dependencies(test_go_around_object hermite_path_msgs)
-  ament_target_dependencies(test_go_around_object robotx_behavior_msgs)
-  ament_target_dependencies(test_go_around_object tf2_geometry_msgs)
 endif()
 
 ament_auto_package()

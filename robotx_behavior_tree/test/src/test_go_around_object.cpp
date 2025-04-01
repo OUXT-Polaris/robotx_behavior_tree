@@ -32,16 +32,14 @@ TEST(TestSuite, testCase1)
   // // robotx_behavior_tree::ActionROS2Node *testtest();
   // object.x = 0;
   // object.y = 0;
-
   // // object->x = 0;
   // // object->y = 0;
   // // robotx_behavior_tree::ActionROS2Node::getFrontPoseForWaypoint(object, 2.0);
-
   // // robotx_behavior_tree::getFrontPoseForWaypoint(object, 2.0);
   // // robotx_behavior_tree::ActionROS2Node::getPoint(object);
   EXPECT_EQ(true, false);
+  // EXPECT_EQ(true, true);
 }
-
 /**
  * @brief Run all the tests that were declared with TEST()
  *
