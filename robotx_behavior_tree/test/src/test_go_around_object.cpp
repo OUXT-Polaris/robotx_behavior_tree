@@ -24,11 +24,14 @@
  */
 #include <gtest/gtest.h>
 
-#include <robotx_behavior_tree/action_node.hpp>
+#include "robotx_behavior_tree/go_around_object.hpp"
 
+#include <robotx_behavior_tree/action_node.hpp>
+// BT::NodeConfiguration config_;
 TEST(TestSuite, testCase1)
 {
   // robotx_behavior_msgs::msg::TaskObject object;
+  // robotx_behavior_tree::GoAroundObject goa;
   // // robotx_behavior_tree::ActionROS2Node *testtest();
   // object.x = 0;
   // object.y = 0;
@@ -38,6 +41,7 @@ TEST(TestSuite, testCase1)
   // // robotx_behavior_tree::getFrontPoseForWaypoint(object, 2.0);
   // // robotx_behavior_tree::ActionROS2Node::getPoint(object);
   EXPECT_EQ(true, false);
+  // EXPECT_EQ(BT::NodeStatus::RUNNING,BT::NodeStatus::RUNNING);
   // EXPECT_EQ(true, true);
 }
 /**
