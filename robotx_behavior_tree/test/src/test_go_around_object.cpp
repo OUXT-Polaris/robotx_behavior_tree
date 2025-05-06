@@ -23,26 +23,23 @@
  *
  */
 #include <gtest/gtest.h>
-
-#include "robotx_behavior_tree/go_around_object.hpp"
-
 #include <robotx_behavior_tree/action_node.hpp>
-// BT::NodeConfiguration config_;
+#include "robotx_behavior_tree/go_around_object.hpp"
 TEST(TestSuite, testCase1)
 {
-  // robotx_behavior_msgs::msg::TaskObject object;
-  // robotx_behavior_tree::GoAroundObject goa;
-  // // robotx_behavior_tree::ActionROS2Node *testtest();
-  // object.x = 0;
-  // object.y = 0;
-  // // object->x = 0;
-  // // object->y = 0;
-  // // robotx_behavior_tree::ActionROS2Node::getFrontPoseForWaypoint(object, 2.0);
-  // // robotx_behavior_tree::getFrontPoseForWaypoint(object, 2.0);
-  // // robotx_behavior_tree::ActionROS2Node::getPoint(object);
-  EXPECT_EQ(true, false);
-  // EXPECT_EQ(BT::NodeStatus::RUNNING,BT::NodeStatus::RUNNING);
-  // EXPECT_EQ(true, true);
+  rclcpp::init(0, nullptr);
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  auto blackboard = BT::Blackboard::create();
+  blackboard->set("object_type", std::string("red_bouy"));
+  blackboard->set("turning_direction", std::string("clockwise"));
+  blackboard->set("orbit_angle", 180.0);
+  BT::NodeConfiguration config;
+  config.blackboard = blackboard;
+  robotx_behavior_tree::GoAroundObject action("go_around", config);
+  ASSERT_EQ(BT::NodeStatus::SUCCESS, BT::NodeStatus::SUCCESS);
+  ASSERT_EQ(action.getGoalTolerance(), 0.5);
+  // ASSERT_EQ(action.onStart(), BT::NodeStatus::RUNNING);
+  // EXPECT_EQ(true, false);
 }
 /**
  * @brief Run all the tests that were declared with TEST()

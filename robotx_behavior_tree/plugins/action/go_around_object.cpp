@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "robotx_behavior_tree/go_around_object.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -24,7 +26,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "robotx_behavior_msgs/msg/task_object.hpp"
 #include "robotx_behavior_tree/action_node.hpp"
-#include "robotx_behavior_tree/go_around_object.hpp"
 
 namespace robotx_behavior_tree
 {
@@ -47,8 +48,8 @@ double GoAroundObject::getDeltaTurningAngle()
     if (abs(interim_delta_turning_angle_rad) < M_PI) {
       delta_turning_angle_rad = interim_delta_turning_angle_rad;
     } else {
-      delta_turning_angle_rad = interim_delta_turning_angle_rad -
-                                copysign(1.0, interim_delta_turning_angle_rad) * 2 * M_PI;
+      delta_turning_angle_rad =
+        interim_delta_turning_angle_rad - copysign(1.0, interim_delta_turning_angle_rad) * 2 * M_PI;
     }
     RCLCPP_INFO(get_logger(), "target_objects_array_[0].x: %f", target_objects_array_[0].x);
     RCLCPP_INFO(get_logger(), "target_objects_array_[0].y: %f", target_objects_array_[0].y);
@@ -64,7 +65,8 @@ double GoAroundObject::getDeltaTurningAngle()
   return delta_turning_angle_rad;
 }
 
-void GoAroundObject::publishWaypointPose(const std::optional<geometry_msgs::msg::Pose> & waypoint_pose)
+void GoAroundObject::publishWaypointPose(
+  const std::optional<geometry_msgs::msg::Pose> & waypoint_pose)
 {
   if (waypoint_pose) {
     target_pose_.header.frame_id = "map";
@@ -116,15 +118,14 @@ void GoAroundObject::updateWaypointAngleDeg(const BehaviorState BehaviorState)
   auto total_turning_angle_deg = 180.0 * total_turning_angle_rad / M_PI;
   const auto target_orbit_angle = this->getInput<double>("orbit_angle").value();
   is_final_waypoint_ = !(BehaviorState == BehaviorState::FIRST) &&
-                        abs(total_turning_angle_deg) > abs(target_orbit_angle) - split_angle_deg_;
+                       abs(total_turning_angle_deg) > abs(target_orbit_angle) - split_angle_deg_;
   if (is_final_waypoint_) {
     waypoint_angle_deg_ = abs(target_orbit_angle) - abs(total_turning_angle_deg);
   } else {
     waypoint_angle_deg_ = split_angle_deg_;
   }
   RCLCPP_INFO(get_logger(), "abs_angle_threshold_deg: %f", abs_angle_threshold_deg_);
-  RCLCPP_INFO(
-    get_logger(), "delta_turning_angle_deg: %f", 180.0 * delta_turning_angle_rad / M_PI);
+  RCLCPP_INFO(get_logger(), "delta_turning_angle_deg: %f", 180.0 * delta_turning_angle_rad / M_PI);
   RCLCPP_INFO(get_logger(), "total_turning_angle_deg: %f", total_turning_angle_deg);
   RCLCPP_INFO(get_logger(), "waypoint_angle_deg_: %f", waypoint_angle_deg_);
 }

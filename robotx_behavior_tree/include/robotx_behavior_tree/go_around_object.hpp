@@ -50,8 +50,10 @@ public:
     return appendPorts(
       ActionROS2Node::providedPorts(),
       {BT::InputPort<std::string>("object_type"), BT::InputPort<std::string>("turning_direction"),
-        BT::InputPort<double>("orbit_angle")});
+       BT::InputPort<double>("orbit_angle")});
   }
+
+  double getGoalTolerance() const { return goal_tolerance_; }
 
 private:
   rclcpp::TimerBase::SharedPtr update_position_timer_;
