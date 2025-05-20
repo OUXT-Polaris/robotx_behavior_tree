@@ -23,8 +23,19 @@
  *
  */
 #include <gtest/gtest.h>
+
 #include <robotx_behavior_tree/action_node.hpp>
+
 #include "robotx_behavior_tree/go_around_object.hpp"
+class MockGoAroundObject : public robotx_behavior_tree::GoAroundObject
+{
+public:
+  MockGoAroundObject(const std::string & name, const BT::NodeConfiguration & config)
+  : robotx_behavior_tree::GoAroundObject(name, config)
+  {
+  }
+  BT::NodeStatus onStart() { return robotx_behavior_tree::GoAroundObject::onStart(); }
+};
 TEST(TestSuite, testCase1)
 {
   rclcpp::init(0, nullptr);
@@ -35,10 +46,13 @@ TEST(TestSuite, testCase1)
   blackboard->set("orbit_angle", 180.0);
   BT::NodeConfiguration config;
   config.blackboard = blackboard;
-  robotx_behavior_tree::GoAroundObject action("go_around", config);
-  ASSERT_EQ(BT::NodeStatus::SUCCESS, BT::NodeStatus::SUCCESS);
-  ASSERT_EQ(action.getGoalTolerance(), 0.5);
+  // robotx_behavior_tree::GoAroundObject action("go_around", config);
+  // ASSERT_EQ(action.getGoalTolerance(), 0.5);
   // ASSERT_EQ(action.onStart(), BT::NodeStatus::RUNNING);
+  MockGoAroundObject action2("mack_go_around", config);
+  ASSERT_EQ(action2.getGoalTolerance(), 0.5);
+  ASSERT_EQ(action2.onStart(), BT::NodeStatus::RUNNING);
+  // ASSERT_EQ(BT::NodeStatus::SUCCESS, BT::NodeStatus::SUCCESS);
   // EXPECT_EQ(true, false);
 }
 /**
