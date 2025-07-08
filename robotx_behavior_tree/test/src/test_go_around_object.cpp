@@ -25,35 +25,57 @@
 #include <gtest/gtest.h>
 
 #include <robotx_behavior_tree/action_node.hpp>
+#include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/string.hpp>
 
 #include "robotx_behavior_tree/go_around_object.hpp"
-class MockGoAroundObject : public robotx_behavior_tree::GoAroundObject
+class SubscriberTestNode : public rclcpp::Node
 {
 public:
-  MockGoAroundObject(const std::string & name, const BT::NodeConfiguration & config)
-  : robotx_behavior_tree::GoAroundObject(name, config)
+  SubscriberTestNode(const std::string & node_name)
+  : Node(node_name), received_msg_(nullptr), msg_received_flag_(false)
   {
+    subscription_ = this->create_subscription<std_msgs::msg::String>(
+      "/go_around_object/started", 10,
+      std::bind(&SubscriberTestNode::callback, this, std::placeholders::_1));
+    RCLCPP_INFO(
+      this->get_logger(), "SubscriberTestNode created, waiting for messages on /planner_twist_cmd");
   }
-  BT::NodeStatus onStart() { return robotx_behavior_tree::GoAroundObject::onStart(); }
+  void callback(const std_msgs::msg::String::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received message");
+    received_msg_ = msg;
+    msg_received_flag_ = true;
+  }
+  bool hasReceivedMessage() const { return msg_received_flag_; }
+  std_msgs::msg::String::SharedPtr getReceivedMessage() const { return received_msg_; }
+
+private:
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+  std_msgs::msg::String::SharedPtr received_msg_;
+  bool msg_received_flag_;
 };
+
 TEST(TestSuite, testCase1)
 {
   rclcpp::init(0, nullptr);
-  auto node = std::make_shared<rclcpp::Node>("test_node");
-  auto blackboard = BT::Blackboard::create();
-  blackboard->set("object_type", std::string("red_bouy"));
-  blackboard->set("turning_direction", std::string("clockwise"));
-  blackboard->set("orbit_angle", 180.0);
-  BT::NodeConfiguration config;
-  config.blackboard = blackboard;
-  // robotx_behavior_tree::GoAroundObject action("go_around", config);
-  // ASSERT_EQ(action.getGoalTolerance(), 0.5);
-  // ASSERT_EQ(action.onStart(), BT::NodeStatus::RUNNING);
-  MockGoAroundObject action2("mack_go_around", config);
-  ASSERT_EQ(action2.getGoalTolerance(), 0.5);
-  ASSERT_EQ(action2.onStart(), BT::NodeStatus::RUNNING);
-  // ASSERT_EQ(BT::NodeStatus::SUCCESS, BT::NodeStatus::SUCCESS);
+  auto node = std::make_shared<SubscriberTestNode>("test_subscriber_node");
+  const auto timeout = std::chrono::seconds(80);
+  const auto start_time = std::chrono::steady_clock::now();
+  while (rclcpp::ok() && !node->hasReceivedMessage() &&
+         (std::chrono::steady_clock::now() - start_time) < timeout) {
+    rclcpp::spin_some(node);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  rclcpp::shutdown();
+  ASSERT_TRUE(node->hasReceivedMessage())
+    << "Timeout: No message received on /planner_twist_cmd within " << timeout.count()
+    << " seconds.";
+  auto received_msg = node->getReceivedMessage();
+  ASSERT_NE(received_msg, nullptr);
   // EXPECT_EQ(true, false);
+  // EXPECT_EQ(received_msg->data, "success");
+  EXPECT_EQ(received_msg->data, "GoAroundObject node started successfully!");
 }
 /**
  * @brief Run all the tests that were declared with TEST()

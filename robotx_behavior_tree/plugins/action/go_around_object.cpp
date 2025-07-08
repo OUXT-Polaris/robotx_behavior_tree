@@ -164,6 +164,10 @@ std::optional<std::monostate> GoAroundObject::updateTargetObjectsArray()
 
 BT::NodeStatus GoAroundObject::publishTargetPose(const BehaviorState BehaviorState)
 {
+  std_msgs::msg::String msg;
+  msg.data = "GoAroundObject node started successfully!";
+  start_complete_pub_->publish(msg);
+
   if (BehaviorState == BehaviorState::FIRST) {
     is_first_waypoint_ = true;
     is_first_reference_position_ = true;

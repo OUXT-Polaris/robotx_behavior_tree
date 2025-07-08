@@ -16,6 +16,8 @@
 #include <iostream>
 #include <memory>
 #include <optional>
+#include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <string>
 #include <vector>
 
@@ -43,6 +45,8 @@ public:
     get_parameter("abs_angle_threshold_deg", abs_angle_threshold_deg_);
     goal_pub_front_pose_of_object_ =
       this->create_publisher<geometry_msgs::msg::PoseStamped>("/move_base_simple/goal", 1);
+    start_complete_pub_ =
+      this->create_publisher<std_msgs::msg::String>("/go_around_object/started", 1);
   }
 
   static BT::PortsList providedPorts()
@@ -71,6 +75,7 @@ private:
   geometry_msgs::msg::PoseStamped target_pose_;
   std::vector<robotx_behavior_msgs::msg::TaskObject> target_objects_array_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_front_pose_of_object_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr start_complete_pub_;
   std::optional<std::shared_ptr<geometry_msgs::msg::PoseStamped_<std::allocator<void> > > >
     current_pose_ = getCurrentPose();
 
