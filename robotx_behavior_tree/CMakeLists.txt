@@ -59,6 +59,8 @@ if(BUILD_TESTING)
   ament_auto_add_gtest(test_go_around_object
     test/src/test_go_around_object.cpp
     plugins/action/go_around_object.cpp)
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(pytest_tests test/src)
 endif()
 
 ament_auto_package()

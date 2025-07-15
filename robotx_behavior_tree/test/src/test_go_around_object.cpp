@@ -39,7 +39,8 @@ public:
       "/go_around_object/started", 10,
       std::bind(&SubscriberTestNode::callback, this, std::placeholders::_1));
     RCLCPP_INFO(
-      this->get_logger(), "SubscriberTestNode created, waiting for messages on /planner_twist_cmd");
+      this->get_logger(),
+      "SubscriberTestNode created, waiting for messages on /go_around_object/started");
   }
   void callback(const std_msgs::msg::String::SharedPtr msg)
   {
@@ -69,12 +70,10 @@ TEST(TestSuite, testCase1)
   }
   rclcpp::shutdown();
   ASSERT_TRUE(node->hasReceivedMessage())
-    << "Timeout: No message received on /planner_twist_cmd within " << timeout.count()
+    << "Timeout: No message received on /go_around_object/started within " << timeout.count()
     << " seconds.";
   auto received_msg = node->getReceivedMessage();
   ASSERT_NE(received_msg, nullptr);
-  // EXPECT_EQ(true, false);
-  // EXPECT_EQ(received_msg->data, "success");
   EXPECT_EQ(received_msg->data, "GoAroundObject node started successfully!");
 }
 /**

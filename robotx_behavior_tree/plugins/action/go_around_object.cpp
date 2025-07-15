@@ -166,7 +166,6 @@ BT::NodeStatus GoAroundObject::publishTargetPose(const BehaviorState BehaviorSta
 {
   std_msgs::msg::String msg;
   msg.data = "GoAroundObject node started successfully!";
-  start_complete_pub_->publish(msg);
 
   if (BehaviorState == BehaviorState::FIRST) {
     is_first_waypoint_ = true;
@@ -208,6 +207,7 @@ BT::NodeStatus GoAroundObject::publishTargetPose(const BehaviorState BehaviorSta
   RCLCPP_INFO(get_logger(), "is_first_waypoint_: %d", is_first_waypoint_);
   RCLCPP_INFO(get_logger(), "target_waypoint_distance: %f", target_waypoint_distance);
   RCLCPP_INFO(get_logger(), "goal_tolerance_: %f", goal_tolerance_);
+  start_complete_pub_->publish(msg);
   return BT::NodeStatus::RUNNING;
 }
 
