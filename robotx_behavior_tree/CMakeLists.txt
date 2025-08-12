@@ -59,8 +59,14 @@ if(BUILD_TESTING)
   ament_auto_add_gtest(test_go_around_object
     test/src/test_go_around_object.cpp
     plugins/action/go_around_object.cpp)
-  find_package(ament_cmake_pytest REQUIRED)
-  ament_add_pytest_test(pytest_tests test/src)
+  find_package(ament_cmake_test REQUIRED)
+  add_test(
+    NAME go_around_object_integration_test
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/test/run_integration_test.sh
+  )
+  set_tests_properties(go_around_object_integration_test
+    PROPERTIES
+      FIXTURES_REQUIRED test_go_around_object
+  )
 endif()
-
 ament_auto_package()
