@@ -55,18 +55,14 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(GTest REQUIRED)
   ament_auto_add_gtest(test_action_node test/src/test_action_node.cpp)
-  ament_auto_add_gtest(test_go_around_object
-    test/src/test_go_around_object.cpp
-    plugins/action/go_around_object.cpp)
+  add_executable(test_go_around_object test/src/test_go_around_object.cpp)
+  target_link_libraries(test_go_around_object PRIVATE GTest::Main go_around_object rclcpp::rclcpp)
   find_package(ament_cmake_test REQUIRED)
   add_test(
     NAME go_around_object_integration_test
     COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/test/run_integration_test.sh
-  )
-  set_tests_properties(go_around_object_integration_test
-    PROPERTIES
-      FIXTURES_REQUIRED test_go_around_object
   )
 endif()
 ament_auto_package()

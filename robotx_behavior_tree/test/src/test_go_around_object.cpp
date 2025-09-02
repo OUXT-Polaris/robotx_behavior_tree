@@ -61,7 +61,7 @@ TEST(TestSuite, testCase1)
 {
   rclcpp::init(0, nullptr);
   auto node = std::make_shared<SubscriberTestNode>("test_subscriber_node");
-  const auto timeout = std::chrono::seconds(25);
+  const auto timeout = std::chrono::seconds(10);
   const auto start_time = std::chrono::steady_clock::now();
   while (rclcpp::ok() && !node->hasReceivedMessage() &&
          (std::chrono::steady_clock::now() - start_time) < timeout) {
