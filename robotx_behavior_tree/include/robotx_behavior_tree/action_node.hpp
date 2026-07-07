@@ -122,6 +122,7 @@ private:
 protected:
   void onHalted() override {}
   std::string name;
+  enum class TurningDirection : bool { CLOCKWISE, COUNTER_CLOCKWISE };
 
 #define DEFINE_GET_INPUT(NAME, TYPE, BLACKBOARD_KEY) \
   std::optional<TYPE> get##NAME() const              \
@@ -306,29 +307,71 @@ protected:
     return p;
   }
 
-  std::optional<geometry_msgs::msg::Pose> getFrontPoseOfObject(
-    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0) const
+  double getRelativeAngle(
+    const double x1, const double y1, const double x2, const double y2,
+    const double minimum_delta = 0.1) const
+  {
+    const double interim_delta_x = x2 - x1;
+    const double delta_x = abs(interim_delta_x) < minimum_delta ? minimum_delta : interim_delta_x;
+    const double interim_delta_y = y2 - y1;
+    const double delta_y = abs(interim_delta_y) < minimum_delta ? minimum_delta : interim_delta_y;
+    const double relative_angle = std::atan2(delta_y, delta_x);
+    return relative_angle;
+  }
+
+  std::optional<double> getObjectDirection(const robotx_behavior_msgs::msg::TaskObject & obj) const
   {
     const auto current_pose = getCurrentPose();
     if (!current_pose) {
       return std::nullopt;
     }
-    double delta_x = obj.x - current_pose.value()->pose.position.x;
-    double delta_y = obj.y - current_pose.value()->pose.position.y;
-    const double minimum_delta = 0.1;
-    if (abs(delta_x) < minimum_delta) {
-      delta_x = minimum_delta;
+    const double object_direction_rad = getRelativeAngle(
+      current_pose.value()->pose.position.x, current_pose.value()->pose.position.y, obj.x, obj.y,
+      0.4);
+    return object_direction_rad;
+  }
+
+  std::optional<geometry_msgs::msg::Pose> getFrontPoseOfObject(
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 7.0) const
+  {
+    const auto interim_theta = getObjectDirection(obj);
+    if (interim_theta == std::nullopt) {
+      return std::nullopt;
     }
-    if (abs(delta_y) < minimum_delta) {
-      delta_y = minimum_delta;
-    }
-    double theta = std::atan2(delta_y, delta_x);
+    const auto theta = interim_theta.value();
     geometry_msgs::msg::Pose p;
     p.position.x = obj.x - distance * std::cos(theta);
     p.position.y = obj.y - distance * std::sin(theta);
     p.position.z = 0.0;
     geometry_msgs::msg::Vector3 goal_rpy;
     goal_rpy.z = theta;
+    p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
+    return p;
+  }
+
+  std::optional<geometry_msgs::msg::Pose> getTurningWaypointPoseOfObject(
+    const robotx_behavior_msgs::msg::TaskObject & obj, const double distance = 5.5,
+    const TurningDirection turning_direction = TurningDirection::COUNTER_CLOCKWISE,
+    const double waypoint_angle_deg = 90.0) const
+  {
+    const auto interim_front_position_rad = getObjectDirection(obj);
+    if (interim_front_position_rad == std::nullopt) {
+      return std::nullopt;
+    }
+    const auto front_position_rad = interim_front_position_rad.value();
+    const auto turning_direction_sign =
+      turning_direction == TurningDirection::COUNTER_CLOCKWISE ? 1.0 : -1.0;
+    const auto relative_angle_difference_rad =
+      turning_direction_sign * 3.14 * waypoint_angle_deg / 180.0;
+    const double waypoint_position_rad = front_position_rad + relative_angle_difference_rad;
+    const double waypoint_orientation_rad =
+      waypoint_position_rad - turning_direction_sign * 3.14 / 2.0;
+    geometry_msgs::msg::Pose p;
+    p.position.x = obj.x - distance * std::cos(waypoint_position_rad);
+    p.position.y = obj.y - distance * std::sin(waypoint_position_rad);
+    p.position.z = 0.0;
+    geometry_msgs::msg::Vector3 goal_rpy;
+    goal_rpy.z = waypoint_orientation_rad;
     p.orientation = quaternion_operation::convertEulerAngleToQuaternion(goal_rpy);
     return p;
   }

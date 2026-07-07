@@ -7,7 +7,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
@@ -37,6 +37,9 @@ target_compile_definitions(move_to_gate_action PRIVATE BT_PLUGIN_EXPORT)
 ament_auto_add_library(move_to_front_pose_of_object SHARED plugins/action/move_to_front_pose_of_object.cpp)
 target_compile_definitions(move_to_front_pose_of_object PRIVATE BT_PLUGIN_EXPORT)
 
+ament_auto_add_library(go_around_object SHARED plugins/action/go_around_object.cpp)
+target_compile_definitions(go_around_object PRIVATE BT_PLUGIN_EXPORT)
+
 ament_auto_add_library(to_marker SHARED src/to_marker.cpp)
 
 install(TARGETS
@@ -52,7 +55,14 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
+  find_package(GTest REQUIRED)
   ament_auto_add_gtest(test_action_node test/src/test_action_node.cpp)
+  add_executable(test_go_around_object test/src/test_go_around_object.cpp)
+  target_link_libraries(test_go_around_object PRIVATE GTest::Main go_around_object rclcpp::rclcpp)
+  find_package(ament_cmake_test REQUIRED)
+  add_test(
+    NAME go_around_object_integration_test
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/test/run_integration_test.sh
+  )
 endif()
-
 ament_auto_package()

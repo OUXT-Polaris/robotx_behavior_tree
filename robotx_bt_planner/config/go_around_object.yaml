@@ -1,10 +1,10 @@
 plugins:
   - package: robotx_behavior_tree
     name:
-      - move_to_front_pose_of_object
-      - wait_action
+      - go_around_object
       - move_goal_action
+      - wait_action
 behavior:
   description:
     package: robotx_bt_planner
-    path : behavior_trees/move_to_front_pose_of_object.xml
+    path : behavior_trees/go_around_object.xml
