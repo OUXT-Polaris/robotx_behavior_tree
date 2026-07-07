@@ -174,11 +174,14 @@ BT::NodeStatus GoAroundObject::publishTargetPose(const BehaviorState BehaviorSta
   }
   current_pose_ = getCurrentPose();
   if (!current_pose_) {
+    RCLCPP_INFO(get_logger(), "current_pose_ is not available");
     return BT::NodeStatus::FAILURE;
   }
-  RCLCPP_INFO(get_logger(), "WAITING_FOR_GOAL: 0 / MOVING_TO_GOAL: 1 / AVOIDING: 2");
-  RCLCPP_INFO(get_logger(), "Planner Status: %d", getPlannerStatus().value()->status);
-
+  if (getPlannerStatus().has_value()) {
+    RCLCPP_INFO(get_logger(), "Planner Status: %d", getPlannerStatus().value()->status);
+  } else {
+    RCLCPP_WARN(get_logger(), "Planner Status is currently empty.");
+  }
   if (!updateTurningDirection().has_value()) {
     return BT::NodeStatus::FAILURE;
   }
@@ -197,6 +200,9 @@ BT::NodeStatus GoAroundObject::publishTargetPose(const BehaviorState BehaviorSta
   auto waypoint_pose = getTurningWaypointPoseOfObject(
     target_objects_array_[0], bouy_distance_, turning_direction_, waypoint_angle_deg_);
   if (BehaviorState == BehaviorState::FIRST) {
+    publishWaypointPose(waypoint_pose);
+    RCLCPP_INFO(get_logger(), "published waypoint pose");
+  } else if (BehaviorState == BehaviorState::SUBSEQUENT && getPlannerStatus().value()->status == static_cast<short>(Status::WAITING_FOR_GOAL)) {
     publishWaypointPose(waypoint_pose);
     RCLCPP_INFO(get_logger(), "published waypoint pose");
   } else if (target_waypoint_distance < goal_tolerance_) {
